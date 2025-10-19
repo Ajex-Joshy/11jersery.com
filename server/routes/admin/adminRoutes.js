@@ -1,8 +1,8 @@
 import express from "express";
 import authRoutes from "./authAccount.js";
 
-const adminRoutes = express.Router();
+const adminRouter = express.Router();
 
-adminRoutes.use("/auth", authRoutes);
+adminRouter.use("/auth", authRoutes);
 
-export default adminRoutes;
+export default adminRouter;
