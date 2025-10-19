@@ -7,13 +7,15 @@ import sendOTPEmail from "../../utils/sendEmailOTP.js";
 import { generateHashedOTP, saveOTP } from "../../utils/otpUtils.js";
 
 export const signupUser = async (userData) => {
-  const { email } = userData;
-  const existingUser = await User.findOne({ email });
+  const { email, phone } = userData;
+  const existingUser = await User.findOne({
+    $or: [{ email }, { phone }],
+  });
   if (existingUser) {
     throw new AppError(
       409,
       "EMAIL_ALREADY_EXISTS",
-      "A user with this email address already exists."
+      "A user with this email or phone address already exists."
     );
   }
 
@@ -78,7 +80,23 @@ export const verifyOtp = async (identifier, otp) => {
     throw new AppError(400, "OTP_EXPIRED", "OTP expired");
   const isOtpCorrect = await bcrypt.compare(otp, otpRecord.otpHash);
   if (!isOtpCorrect) throw new AppError(401, "INVALID_OTP", "OTP invalid");
+
   await Otp.deleteOne({ _id: otpRecord._id });
   const resetToken = generateToken({ id: otpRecord.userId }, "15m");
+
   return { message: "OTP verified successfully.", resetToken };
+};
+
+export const resetPassword = async (user, newPassword) => {
+  if (!user) {
+    throw new AppError(401, "UNAUTHORIZED", "User not found or token invalid");
+  }
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+
+  await user.save();
+
+  const userObj = user.toObject();
+  delete userObj.password;
+  return { data: { user: userObj } };
 };
