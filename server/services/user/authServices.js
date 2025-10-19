@@ -1,19 +1,10 @@
 import User from "../../models/userModel.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { AppError } from "../../utils/appError.js";
 import { generateToken } from "../../utils/jwt.js";
 
-export const signupUser = async ({
-  firstName,
-  lastName,
-  email,
-  password,
-  phone,
-  gender,
-  dob,
-  photoUrl,
-}) => {
+export const signupUser = async (userData) => {
+  const { email } = userData;
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new AppError(
@@ -23,20 +14,44 @@ export const signupUser = async ({
     );
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  if (userData.password) {
+    userData.password = await bcrypt.hash(userData.password, 10);
+  }
 
-  const newUser = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-    phone,
-    gender,
-    dob,
-    photoUrl,
-  });
-
+  const newUser = await User.create(userData);
   const token = generateToken({ id: newUser._id });
 
-  return { user: newUser, token };
+  const userObj = newUser.toObject();
+  delete userObj.password;
+
+  return { user: userObj, token };
+};
+
+export const loginUser = async ({ identifier, password }) => {
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { phone: identifier }],
+  }).select("+password");
+  if (!user) {
+    throw new AppError(
+      401,
+      "INVALID_CREDENTIALS",
+      "Invalid email/phone or password"
+    );
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new AppError(
+      401,
+      "INVALID_CREDENTIALS",
+      "Invalid email/phone or password"
+    );
+  }
+
+  const token = generateToken({ id: user._id });
+  user.lastLogin = new Date();
+  await user.save();
+  const userObj = user.toObject();
+  delete userObj.password;
+  return { user: userObj, token };
 };

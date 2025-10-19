@@ -1,5 +1,5 @@
 import express from "express";
-import { validateLoginData } from "../../middlewares/common/validateLoginData.js";
+import { validateLoginData } from "../../middlewares/admin/validateAdminLoginData.js";
 import { adminLoginController } from "../../controllers/admin/authAccountController.js";
 
 const router = express.Router();
