@@ -9,11 +9,15 @@ const OTPSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    identifier: {
+      type: String, // can be email or phone
+      required: true,
+      trim: true,
+    },
 
     otpHash: {
       type: String,
       required: true,
-      select: false,
     },
 
     type: {
@@ -34,5 +38,5 @@ const OTPSchema = new mongoose.Schema(
 
 OTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-const OTPModel = mongoose.model("OTP", OTPSchema);
-export default OTPModel;
+const Otp = mongoose.model("OTP", OTPSchema);
+export default Otp;

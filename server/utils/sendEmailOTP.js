@@ -1,19 +1,7 @@
 import nodemailer from "nodemailer";
-import bcrypt from "bcrypt";
-import OTPModel from "../models/OTPModel.js";
 
-const sendEmailOTP = async (email, userId) => {
+const sendEmailOTP = async (email, otp) => {
   try {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpHash = await bcrypt.hash(otp, 10);
-
-    await OTPModel.create({
-      userId,
-      otpHash,
-      type: "password-reset",
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -51,10 +39,7 @@ const sendEmailOTP = async (email, userId) => {
     };
 
     await transporter.sendMail(mailOptions);
-
-    return { message: "OTP sent successfully" };
   } catch (error) {
-    console.error("Error sending OTP:", error);
     throw new Error("Failed to send OTP");
   }
 };

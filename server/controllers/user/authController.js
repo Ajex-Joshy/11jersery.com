@@ -1,6 +1,7 @@
 import {
-  forgotPassword,
+  requestOTP,
   signupUser,
+  verifyOtp,
 } from "../../services/user/authServices.js";
 import { sendAuthResponse } from "../../utils/sendAuthResponse.js";
 import { loginUser } from "../../services/user/authServices.js";
@@ -27,8 +28,13 @@ export const userLoginController = async (req, res, next) => {
 
 export const forgotPasswordController = async (req, res, next) => {
   const { email } = req.body;
-  if (!email || !validator.isEmail(email))
-    return next(new AppError(400, "VALIDATION_ERROR", "Invalid email"));
-  const result = await forgotPassword(email);
-  res.send(result);
+  const result = await requestOTP(email);
+  res.status(200).send(result);
+};
+
+export const verifyOtpController = async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  const result = await verifyOtp(email, otp);
+  res.status(200).send(result);
 };

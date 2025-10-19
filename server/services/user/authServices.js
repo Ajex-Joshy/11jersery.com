@@ -2,7 +2,9 @@ import User from "../../models/userModel.js";
 import bcrypt from "bcrypt";
 import { AppError } from "../../utils/appError.js";
 import { generateToken } from "../../utils/jwt.js";
-import sendEmailOTP from "../../utils/sendEmailOTP.js";
+import Otp from "../../models/OTPModel.js";
+import sendOTPEmail from "../../utils/sendEmailOTP.js";
+import { generateHashedOTP, saveOTP } from "../../utils/otpUtils.js";
 
 export const signupUser = async (userData) => {
   const { email } = userData;
@@ -57,12 +59,26 @@ export const loginUser = async ({ identifier, password }) => {
   return { user: userObj, token };
 };
 
-export const forgotPassword = async (email) => {
+export const requestOTP = async (email) => {
   const user = await User.findOne({ email });
-  console.log(email);
   if (!user) {
     throw new AppError(401, "INVALID_CREDENTIALS", "Invalid email");
   }
-  const result = await sendEmailOTP(email, user._id);
-  return result;
+
+  const { otp, otpHash } = await generateHashedOTP();
+  await saveOTP(user._id, email, otpHash);
+  await sendOTPEmail(email, otp);
+  return { message: "OTP sent successfully" };
+};
+
+export const verifyOtp = async (identifier, otp) => {
+  const otpRecord = await Otp.findOne({ identifier });
+  if (!otpRecord) throw new AppError(404, "OTP_NOT_FOUND", "OTP not found");
+  if (otpRecord.expiresAt < new Date())
+    throw new AppError(400, "OTP_EXPIRED", "OTP expired");
+  const isOtpCorrect = await bcrypt.compare(otp, otpRecord.otpHash);
+  if (!isOtpCorrect) throw new AppError(401, "INVALID_OTP", "OTP invalid");
+  await Otp.deleteOne({ _id: otpRecord._id });
+  const resetToken = generateToken({ id: otpRecord.userId }, "15m");
+  return { message: "OTP verified successfully.", resetToken };
 };
