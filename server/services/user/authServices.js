@@ -2,6 +2,7 @@ import User from "../../models/userModel.js";
 import bcrypt from "bcrypt";
 import { AppError } from "../../utils/appError.js";
 import { generateToken } from "../../utils/jwt.js";
+import sendEmailOTP from "../../utils/sendEmailOTP.js";
 
 export const signupUser = async (userData) => {
   const { email } = userData;
@@ -54,4 +55,14 @@ export const loginUser = async ({ identifier, password }) => {
   const userObj = user.toObject();
   delete userObj.password;
   return { user: userObj, token };
+};
+
+export const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  console.log(email);
+  if (!user) {
+    throw new AppError(401, "INVALID_CREDENTIALS", "Invalid email");
+  }
+  const result = await sendEmailOTP(email, user._id);
+  return result;
 };

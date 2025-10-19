@@ -1,6 +1,7 @@
 import express from "express";
 import { validateSignupData } from "../../middlewares/user/validateSigupData.js";
 import {
+  forgotPasswordController,
   userLoginController,
   userSignupController,
 } from "../../controllers/user/authController.js";
@@ -10,5 +11,6 @@ const router = express.Router();
 
 router.post("/signup", validateSignupData, userSignupController);
 router.post("/login", validateUserLoginData, userLoginController);
+router.post("/forgot-password", forgotPasswordController);
 
 export default router;
