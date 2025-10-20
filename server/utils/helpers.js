@@ -32,7 +32,7 @@ export const getDaysAgoDate = (daysAgo) => {
 export const buildUserQuery = ({ status, search }) => {
   const query = {};
   if (status) query.status = status;
-  if (search) {
+  if (search && search.trim() !== "") {
     query.$or = [
       { firstName: { $regex: search, $options: "i" } },
       { lastName: { $regex: search, $options: "i" } },

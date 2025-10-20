@@ -1,5 +1,8 @@
 import User from "../../models/userModel.js";
+import mongoose from "mongoose";
+
 import {
+  AppError,
   buildUserQuery,
   getDaysAgoDate,
   getPagination,
@@ -108,4 +111,30 @@ export const deactivateInactiveUsers = async () => {
   );
 
   return result;
+};
+
+export const updateUserStatus = async (userId, isBlocked) => {
+  if (typeof isBlocked !== "boolean") {
+    throw new AppError(400, "INVALID_STATUS", "Status should be boolean");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new AppError(400, "INVALID_ID", "Provided userId is invalid");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { isBlocked },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new AppError(
+      404,
+      "USER_NOT_FOUND",
+      "The user with the specified ID could not be found."
+    );
+  }
+
+  return user;
 };
