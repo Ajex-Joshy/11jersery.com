@@ -13,25 +13,24 @@ const validateCategory = (req, res, next) => {
     maxReedemable,
   } = req.body || {};
 
-  if (!title || typeof title !== "string") {
-    errors.push("Title is required and must be a string");
-  }
-
-  if (!cloudinaryImageId || typeof cloudinaryImageId !== "string") {
-    errors.push("cloudinaryImageId is required and must be a string");
+  if (title !== undefined && typeof title !== "string") {
+    errors.push("Title must be a string");
   }
 
   if (
-    typeof isListed === "undefined" ||
-    !validator.isBoolean(String(isListed))
+    cloudinaryImageId !== undefined &&
+    typeof cloudinaryImageId !== "string"
   ) {
-    errors.push("isListed is required and must be a boolean");
+    errors.push("cloudinaryImageId must be a string");
   }
 
-  if (typeof inHome === "undefined" || !validator.isBoolean(String(inHome))) {
-    errors.push("inHome is required and must be a boolean");
+  if (isListed !== undefined && !validator.isBoolean(String(isListed))) {
+    errors.push("isListed must be a boolean");
   }
 
+  if (inHome !== undefined && !validator.isBoolean(String(inHome))) {
+    errors.push("inHome must be a boolean");
+  }
   if (
     discount !== undefined &&
     discount !== null &&

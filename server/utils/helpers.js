@@ -1,3 +1,5 @@
+import slugify from "slugify";
+
 export class AppError extends Error {
   constructor(
     status = 500,
@@ -52,3 +54,12 @@ export const getPagination = (page = 1, limit = 10, maxLimit = 25) => {
 export const getSortOption = (sortBy = "createdAt", sortOrder = "desc") => ({
   [sortBy]: sortOrder === "asc" ? 1 : -1,
 });
+
+export const createSlug = (text) => {
+  if (!text || typeof text !== "string") return "";
+  return slugify(text, {
+    lower: true,
+    strict: true, // removes special characters
+    trim: true, // trims whitespace
+  });
+};
