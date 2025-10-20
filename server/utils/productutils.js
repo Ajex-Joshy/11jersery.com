@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 import { AppError } from "./helpers.js";
 import { createSlug } from "./helpers.js";
 import Faq from "../models/faqModel.js";
+import Category from "../models/categoryModel.js";
 
-export const validateObjectId = (id, entity = "item") => {
+export const validateObjectId = (id, entity = "Category") => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError(400, "INVALID_ID", `Provided ${entity} ID is invalid`);
   }
@@ -80,4 +81,35 @@ export const saveFaqs = async (faqs, productId, replaceExisting = false) => {
   }));
 
   return Faq.insertMany(faqsWithProductId);
+};
+
+export const buildProductQuery = async ({ search, category }) => {
+  const query = {};
+
+  if (search) {
+    query.title = { $regex: search, $options: "i" };
+  }
+
+  if (category) {
+    const slugs = Array.isArray(category)
+      ? category
+      : category.split(",").map((s) => s.trim());
+
+    // Get category IDs matching the given slugs
+    const categories = await Category.find({ slug: { $in: slugs } }).select(
+      "_id"
+    );
+
+    // Extract only the IDs
+    const categoryIds = categories.map((cat) => cat._id);
+
+    // If no category matches, return empty result condition
+    if (categoryIds.length === 0) {
+      query.categories = { $in: [] }; // ensures no product matches
+    } else {
+      query.categoryIds = { $in: categoryIds };
+    }
+  }
+
+  return query;
 };

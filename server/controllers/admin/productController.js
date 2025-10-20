@@ -1,6 +1,7 @@
 import { asyncHandler, sendResponse } from "../../utils/helpers.js";
 import {
   addProduct,
+  getProducts,
   updateProduct,
 } from "../../services/admin/productServices.js";
 
@@ -53,4 +54,9 @@ export const updateProductStatus = asyncHandler(async (req, res) => {
   });
 
   sendResponse(res, { product: updatedProduct });
+});
+
+export const getProductsController = asyncHandler(async (req, res) => {
+  const result = await getProducts(req.query);
+  sendResponse(res, result);
 });

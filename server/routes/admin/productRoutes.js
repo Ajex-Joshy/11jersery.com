@@ -4,6 +4,7 @@ import validateProduct from "../../middlewares/admin/validateProduct.js";
 import {
   createProductController,
   deleteProductController,
+  getProductsController,
   updateProductController,
   updateProductStatus,
 } from "../../controllers/admin/productController.js";
@@ -11,6 +12,7 @@ import validateCreateProduct from "../../middlewares/admin/validateCreateProduct
 
 const router = express.Router();
 
+router.get("/", verifyAdminToken, getProductsController);
 router.post(
   "/",
   verifyAdminToken,

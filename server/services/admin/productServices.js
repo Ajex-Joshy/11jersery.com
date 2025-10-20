@@ -1,6 +1,7 @@
 import Product from "../../models/productModel.js";
-import { AppError } from "../../utils/helpers.js";
+import { AppError, getPagination, getSortOption } from "../../utils/helpers.js";
 import {
+  buildProductQuery,
   checkSlugUniqueness,
   saveFaqs,
   validateObjectId,
@@ -52,3 +53,33 @@ export async function updateProduct(productId, updateData) {
   const updatedFaqs = await saveFaqs(faqs, updatedProduct._id, true);
   return { product: updatedProduct, faqs: updatedFaqs };
 }
+
+export const getProducts = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    search = "",
+    category,
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = queryParams;
+  const query = await buildProductQuery({ search, category });
+
+  const { pageNumber, pageSize, skip } = getPagination(page, limit);
+  const sort = getSortOption(sortBy, sortOrder);
+
+  const [result, totalProducts] = await Promise.all([
+    Product.find(query).sort(sort).skip(skip).limit(pageSize),
+    Product.countDocuments(query),
+  ]);
+
+  return {
+    products: result,
+    pagination: {
+      totalProducts,
+      currentpage: pageNumber,
+      totalPages: Math.ceil(totalProducts / pageSize),
+      limit: pageSize,
+    },
+  };
+};
