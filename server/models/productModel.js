@@ -43,6 +43,10 @@ const productSchema = mongoose.Schema(
       average: { type: Number, min: 0, max: 5, default: 3.5 },
       count: { type: Number, min: 0 },
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     details: [
       {
         attribute: { type: String, required: true },

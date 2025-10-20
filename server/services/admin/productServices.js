@@ -2,7 +2,6 @@ import Product from "../../models/productModel.js";
 import { AppError } from "../../utils/helpers.js";
 import {
   checkSlugUniqueness,
-  ensureUniqueSlug,
   saveFaqs,
   validateObjectId,
 } from "../../utils/productutils.js";
@@ -27,6 +26,7 @@ export async function updateProduct(productId, updateData) {
   validateObjectId(productId);
 
   const { product: productInfo = {}, faqs } = updateData;
+  console.log(updateData);
 
   if (productInfo.title) {
     productInfo.slug = await checkSlugUniqueness(
@@ -50,6 +50,6 @@ export async function updateProduct(productId, updateData) {
     );
   }
 
-  const updatedFaqs = await saveFaqs(faqs, updatedProduct._id);
+  const updatedFaqs = await saveFaqs(faqs, updatedProduct._id, true);
   return { product: updatedProduct, faqs: updatedFaqs };
 }

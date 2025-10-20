@@ -3,6 +3,7 @@ import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 import validateProduct from "../../middlewares/admin/validateProduct.js";
 import {
   createProductController,
+  deleteProductController,
   updateProductController,
 } from "../../controllers/admin/productController.js";
 import validateCreateProduct from "../../middlewares/admin/validateCreateProduct.js";
@@ -22,5 +23,7 @@ router.patch(
   validateProduct,
   updateProductController
 );
+
+router.delete("/:productId", verifyAdminToken, deleteProductController);
 
 export default router;

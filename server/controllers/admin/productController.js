@@ -20,3 +20,16 @@ export const updateProductController = asyncHandler(async (req, res) => {
 
   sendResponse(res, { product: updatedProduct, faqs });
 });
+
+export const deleteProductController = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  const { product: updatedProduct } = await updateProduct(productId, {
+    product: {
+      isDeleted: true,
+      isListed: false,
+    },
+  });
+
+  sendResponse(res, { product: updatedProduct });
+});
