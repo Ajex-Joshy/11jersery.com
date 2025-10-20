@@ -3,6 +3,7 @@ import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 import validateCategory from "../../middlewares/admin/validateCategory.js";
 import {
   createCategoryController,
+  deleteCategoryController,
   updateCategoryController,
 } from "../../controllers/admin/categoryController.js";
 
@@ -15,5 +16,6 @@ router.patch(
   validateCategory,
   updateCategoryController
 );
+router.delete("/:categoryId", verifyAdminToken, deleteCategoryController);
 
 export default router;
