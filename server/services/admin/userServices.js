@@ -1,4 +1,18 @@
 import User from "../../models/userModel.js";
+import {
+  buildUserQuery,
+  getDaysAgoDate,
+  getPagination,
+  getSortOption,
+} from "../../utils/helpers.js";
+import {
+  calcPercentageChange,
+  getDailyActivity,
+  getNewCustomers,
+  getRepeatCustomers,
+  getTotalCustomers,
+  getVisitors,
+} from "./userMetrics.js";
 
 export const getUsers = async (queryParams) => {
   const {
@@ -10,19 +24,10 @@ export const getUsers = async (queryParams) => {
     sortOrder = "desc",
   } = queryParams;
 
-  const query = {};
-  if (status) query.status = status;
-  if (search) {
-    query.$or = [
-      { firstName: { $regex: search, $options: "i" } },
-      { lastName: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } },
-    ];
-  }
-  const pageNumber = parseInt(page);
-  const pageSize = parseInt(limit) > 25 ? 25 : parseInt(limit);
-  const skip = (pageNumber - 1) * pageSize;
-  const sort = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+  const query = buildUserQuery({ status, search });
+
+  const { pageNumber, pageSize, skip } = getPagination(page, limit);
+  const sort = getSortOption(sortBy, sortOrder);
 
   const [result, totalUsers] = await Promise.all([
     User.find(query).sort(sort).skip(skip).limit(pageSize).select("-password"),
@@ -37,6 +42,59 @@ export const getUsers = async (queryParams) => {
       totalPages: Math.ceil(totalUsers / pageSize),
       limit: pageSize,
     },
+  };
+};
+
+export const getUsersStats = async () => {
+  const now = new Date();
+  const sevenDaysAgo = getDaysAgoDate(6);
+  const fourteenDaysAgo = getDaysAgoDate(13);
+
+  const [
+    totalCustomers,
+    newCustomersLast7,
+    newCustomersPrev7,
+    visitorsLast7,
+    visitorsPrev7,
+    repeatCustomers,
+    dailyActivity,
+  ] = await Promise.all([
+    getTotalCustomers(),
+    getNewCustomers(sevenDaysAgo, now),
+    getNewCustomers(fourteenDaysAgo, sevenDaysAgo),
+    getVisitors(sevenDaysAgo, now),
+    getVisitors(fourteenDaysAgo, sevenDaysAgo),
+    getRepeatCustomers(),
+    getDailyActivity(sevenDaysAgo, now),
+  ]);
+
+  return {
+    totalCustomers: {
+      value: totalCustomers,
+      percentageChange: calcPercentageChange(
+        newCustomersLast7,
+        newCustomersPrev7
+      ),
+    },
+    newCustomers: {
+      count: newCustomersLast7,
+      percentageChange: calcPercentageChange(
+        newCustomersLast7,
+        newCustomersPrev7
+      ),
+    },
+    visitors: {
+      count: visitorsLast7,
+      percentageChange: calcPercentageChange(visitorsLast7, visitorsPrev7),
+    },
+    customerOverview: {
+      active: totalCustomers,
+      repeat: repeatCustomers,
+      shopVisitor: visitorsLast7,
+      conversionRate:
+        visitorsLast7 === 0 ? 0 : (newCustomersLast7 / visitorsLast7) * 100,
+    },
+    dailyActivity,
   };
 };
 

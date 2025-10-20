@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["active", "inactive", "blocked"],
+      default: "active",
     },
     dob: {
       type: Date,
@@ -61,6 +62,7 @@ const userSchema = new mongoose.Schema(
     },
     lastLogin: {
       type: Date,
+      default: Date.now,
     },
   },
   {

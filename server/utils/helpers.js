@@ -20,3 +20,35 @@ export const sendResponse = (res, data, statusCode = 200) => {
 export const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
+
+// Returns a Date object representing 'n' days ago from today
+export const getDaysAgoDate = (daysAgo) => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  date.setHours(0, 0, 0, 0); // Optional: reset to start of the day
+  return date;
+};
+
+export const buildUserQuery = ({ status, search }) => {
+  const query = {};
+  if (status) query.status = status;
+  if (search) {
+    query.$or = [
+      { firstName: { $regex: search, $options: "i" } },
+      { lastName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
+  }
+  return query;
+};
+
+export const getPagination = (page = 1, limit = 10, maxLimit = 25) => {
+  const pageNumber = parseInt(page);
+  const pageSize = Math.min(parseInt(limit), maxLimit);
+  const skip = (pageNumber - 1) * pageSize;
+  return { pageNumber, pageSize, skip };
+};
+
+export const getSortOption = (sortBy = "createdAt", sortOrder = "desc") => ({
+  [sortBy]: sortOrder === "asc" ? 1 : -1,
+});
