@@ -55,3 +55,27 @@ export const softDeleteCategory = async (categoryId) => {
 
   return deletedCategory;
 };
+
+export const updateCategoryStatus = async (categoryId, status) => {
+  validateObjectId(categoryId);
+  if (typeof status !== "boolean") {
+    throw new AppError(400, "INVALID_STATUS", "Status must be a boolean value");
+  }
+
+  // Update category to mark as deleted
+  const updateCategory = await Category.findByIdAndUpdate(
+    categoryId,
+    { isListed: status },
+    { new: true, runValidators: true }
+  );
+
+  if (!updateCategory) {
+    throw new AppError(
+      404,
+      "CATEGORY_NOT_FOUND",
+      "Category not found with this ID"
+    );
+  }
+
+  return updateCategory;
+};

@@ -5,6 +5,7 @@ import {
   createCategoryController,
   deleteCategoryController,
   updateCategoryController,
+  updateCategoryStatusController,
 } from "../../controllers/admin/categoryController.js";
 
 const router = express.Router();
@@ -15,6 +16,11 @@ router.patch(
   verifyAdminToken,
   validateCategory,
   updateCategoryController
+);
+router.patch(
+  "/:categoryId/status",
+  verifyAdminToken,
+  updateCategoryStatusController
 );
 router.delete("/:categoryId", verifyAdminToken, deleteCategoryController);
 
