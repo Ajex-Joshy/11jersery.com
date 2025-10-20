@@ -1,5 +1,5 @@
 import validator from "validator";
-import { AppError } from "../../utils/appError.js";
+import { AppError } from "../../utils/helpers.js";
 
 export const validateLoginData = (req, res, next) => {
   try {

@@ -1,10 +1,10 @@
 import User from "../../models/userModel.js";
 import bcrypt from "bcrypt";
-import { AppError } from "../../utils/appError.js";
 import { generateToken } from "../../utils/jwt.js";
 import Otp from "../../models/OTPModel.js";
 import sendOTPEmail from "../../utils/sendEmailOTP.js";
 import { generateHashedOTP, saveOTP } from "../../utils/otpUtils.js";
+import { AppError } from "../../utils/helpers.js";
 
 export const signupUser = async (userData) => {
   const { email, phone } = userData;

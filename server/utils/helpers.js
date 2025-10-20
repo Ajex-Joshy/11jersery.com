@@ -10,3 +10,13 @@ export class AppError extends Error {
     this.isOperational = true;
   }
 }
+
+export const sendResponse = (res, data, statusCode = 200) => {
+  res.status(statusCode).json({
+    data,
+  });
+};
+
+export const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};

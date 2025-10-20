@@ -1,4 +1,4 @@
-import { AppError } from "../../../utils/appError.js";
+import { AppError } from "../../../utils/helpers.js";
 import validator from "validator";
 
 export const validateSignupData = async (req, res, next) => {

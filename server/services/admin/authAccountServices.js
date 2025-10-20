@@ -1,7 +1,7 @@
 import Admin from "../../models/adminModel.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/jwt.js";
-import { AppError } from "../../utils/appError.js";
+import { AppError } from "../../utils/helpers.js";
 
 export const loginAdmin = async (email, password) => {
   try {

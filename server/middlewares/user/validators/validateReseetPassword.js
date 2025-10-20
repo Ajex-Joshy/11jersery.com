@@ -1,5 +1,5 @@
 import validator from "validator";
-import { AppError } from "../../../utils/appError.js";
+import { AppError } from "../../../utils/helpers.js";
 
 export const validateResetPassword = (req, res, next) => {
   const { password, confirmPassword } = req.body;

@@ -1,11 +1,10 @@
 import { verifyToken } from "../../utils/jwt.js";
-import { AppError } from "../../utils/appError.js";
 import User from "../../models/userModel.js";
+import { AppError } from "../../utils/helpers.js";
 
 export const authenticateUser = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       throw new AppError(
         401,

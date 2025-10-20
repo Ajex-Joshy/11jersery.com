@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["male", "female", "other"],
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "blocked"],
+    },
     dob: {
       type: Date,
     },
