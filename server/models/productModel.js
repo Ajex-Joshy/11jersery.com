@@ -29,17 +29,7 @@ const productSchema = mongoose.Schema(
     shortDescription: { type: String, maxlength: 500 },
     price: {
       list: { type: Number, required: true, min: 0 },
-      sale: {
-        type: Number,
-        min: 0,
-        validate: {
-          validator: function (v) {
-            // 'this' refers to the current document
-            return v === undefined || v <= this.price.list;
-          },
-          message: "Sale price must be less than or equal to list price",
-        },
-      },
+      sale: { type: Number, min: 0 },
     },
     cloudinaryImageIds: [{ type: String }],
     variants: [

@@ -1,19 +1,31 @@
 import Category from "../../models/categoryModel.js";
 import { AppError } from "../../utils/helpers.js";
-import { validateObjectId } from "../../utils/productutils.js";
+import {
+  checkSlugUniqueness,
+  validateObjectId,
+} from "../../utils/productutils.js";
 
 export const createCategory = async (categoryData) => {
-  return (category = await Category.create({
+  const slug = await checkSlugUniqueness(
+    Category,
+    categoryData.title,
+    "Category"
+  );
+  return await Category.create({
     ...categoryData,
     slug,
-  }));
+  });
 };
 
 export const updateCategory = async (categoryId, updateData) => {
   validateObjectId(categoryId);
 
   if (updateData.title) {
-    updateData.slug = await checkDuplicateSlug(updateData.title, categoryId);
+    updateData.slug = await checkSlugUniqueness(
+      Category,
+      updateData.title,
+      "Category"
+    );
   }
   const updatedCategory = await Category.findByIdAndUpdate(
     categoryId,

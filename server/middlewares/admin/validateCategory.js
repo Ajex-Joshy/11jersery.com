@@ -10,7 +10,7 @@ const validateCategory = (req, res, next) => {
     inHome,
     discount,
     discountType,
-    maxReedemable,
+    maxRedeemable,
   } = req.body || {};
 
   if (title !== undefined && typeof title !== "string") {
@@ -47,9 +47,9 @@ const validateCategory = (req, res, next) => {
     }
 
     if (
-      maxReedemable === undefined ||
-      maxReedemable === null ||
-      Number(maxReedemable) <= 0
+      maxRedeemable === undefined ||
+      maxRedeemable === null ||
+      Number(maxRedeemable) <= 0
     ) {
       errors.push(
         "maxRedeemable must be greater than 0 when discount is applied"
