@@ -33,3 +33,24 @@ export const deleteProductController = asyncHandler(async (req, res) => {
 
   sendResponse(res, { product: updatedProduct });
 });
+
+export const updateProductStatus = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  const { isListed } = req.body;
+
+  if (typeof isListed !== "boolean") {
+    throw new AppError(
+      400,
+      "VALIDATION_ERROR",
+      "isListed must be a boolean value"
+    );
+  }
+
+  const { product: updatedProduct } = await updateProduct(productId, {
+    product: {
+      isListed,
+    },
+  });
+
+  sendResponse(res, { product: updatedProduct });
+});

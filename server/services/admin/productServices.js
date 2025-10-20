@@ -23,10 +23,9 @@ export async function addProduct(productData) {
 }
 
 export async function updateProduct(productId, updateData) {
-  validateObjectId(productId);
+  validateObjectId(productId, "product");
 
   const { product: productInfo = {}, faqs } = updateData;
-  console.log(updateData);
 
   if (productInfo.title) {
     productInfo.slug = await checkSlugUniqueness(

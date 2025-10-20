@@ -5,6 +5,7 @@ import {
   createProductController,
   deleteProductController,
   updateProductController,
+  updateProductStatus,
 } from "../../controllers/admin/productController.js";
 import validateCreateProduct from "../../middlewares/admin/validateCreateProduct.js";
 
@@ -24,6 +25,7 @@ router.patch(
   updateProductController
 );
 
+router.patch("/:productId/status", verifyAdminToken, updateProductStatus);
 router.delete("/:productId", verifyAdminToken, deleteProductController);
 
 export default router;

@@ -3,7 +3,7 @@ import { AppError } from "./helpers.js";
 import { createSlug } from "./helpers.js";
 import Faq from "../models/faqModel.js";
 
-export const validateObjectId = (id, entity = "Category") => {
+export const validateObjectId = (id, entity = "item") => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError(400, "INVALID_ID", `Provided ${entity} ID is invalid`);
   }
