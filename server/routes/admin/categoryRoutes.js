@@ -4,12 +4,14 @@ import validateCategory from "../../middlewares/admin/validateCategory.js";
 import {
   createCategoryController,
   deleteCategoryController,
+  getCategoriescontroller,
   updateCategoryController,
   updateCategoryStatusController,
 } from "../../controllers/admin/categoryController.js";
 
 const router = express.Router();
 
+router.get("/", verifyAdminToken, getCategoriescontroller);
 router.post("/", verifyAdminToken, validateCategory, createCategoryController);
 router.patch(
   "/:categoryId",

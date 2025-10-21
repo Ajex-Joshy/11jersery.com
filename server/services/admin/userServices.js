@@ -16,6 +16,7 @@ import {
   getTotalCustomers,
   getVisitors,
 } from "./userMetrics.js";
+import { validateObjectId } from "../../utils/productutils.js";
 
 export const getUsers = async (queryParams) => {
   const {
@@ -118,9 +119,7 @@ export const updateUserStatus = async (userId, isBlocked) => {
     throw new AppError(400, "INVALID_STATUS", "Status should be boolean");
   }
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new AppError(400, "INVALID_ID", "Provided userId is invalid");
-  }
+  validateObjectId(userId);
 
   const user = await User.findByIdAndUpdate(
     userId,

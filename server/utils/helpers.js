@@ -43,6 +43,14 @@ export const buildUserQuery = ({ status, search }) => {
   }
   return query;
 };
+export const buildCategoryQuery = ({ status, search }) => {
+  const query = {};
+  if (status) query.status = status;
+  if (search && search.trim() !== "") {
+    query.title = { $regex: search, $options: "i" };
+  }
+  return query;
+};
 
 export const getPagination = (page = 1, limit = 10, maxLimit = 25) => {
   const pageNumber = parseInt(page);

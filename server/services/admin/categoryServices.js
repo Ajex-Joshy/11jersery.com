@@ -1,9 +1,15 @@
 import Category from "../../models/categoryModel.js";
-import { AppError } from "../../utils/helpers.js";
+import {
+  AppError,
+  buildCategoryQuery,
+  getPagination,
+  getSortOption,
+} from "../../utils/helpers.js";
 import {
   checkSlugUniqueness,
   validateObjectId,
 } from "../../utils/productutils.js";
+import { buildCategoryStockPipeline } from "./queryHelpers.js";
 
 export const createCategory = async (categoryData) => {
   const slug = await checkSlugUniqueness(
@@ -14,6 +20,7 @@ export const createCategory = async (categoryData) => {
   return await Category.create({
     ...categoryData,
     slug,
+    s,
   });
 };
 
@@ -90,4 +97,67 @@ export const updateCategoryStatus = async (categoryId, status) => {
   }
 
   return updateCategory;
+};
+
+// const buildCategoryStockPipeline = (query, sort, skip, pageSize) => [
+//   { $match: query },
+//   { $sort: sort },
+//   { $skip: skip },
+//   { $limit: pageSize },
+//   {
+//     $lookup: {
+//       from: "products",
+//       let: { categoryId: "$_id" },
+//       pipeline: [
+//         { $match: { $expr: { $in: ["$$categoryId", "$categoryIds"] } } },
+//         { $unwind: "$variants" },
+//         {
+//           $group: {
+//             _id: null,
+//             totalStock: { $sum: "$variants.stock" },
+//             productCount: { $sum: 1 },
+//           },
+//         },
+//       ],
+//       as: "meta",
+//     },
+//   },
+//   {
+//     $addFields: {
+//       totalStock: { $ifNull: [{ $first: "$meta.totalStock" }, 0] },
+//       productCount: { $ifNull: [{ $first: "$meta.productCount" }, 0] },
+//     },
+//   },
+//   { $project: { meta: 0 } },
+// ];
+
+export const getCategories = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    status,
+    search = "",
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = queryParams;
+
+  const query = buildCategoryQuery({ status, search });
+  const { pageNumber, pageSize, skip } = getPagination(page, limit);
+  const sort = getSortOption(sortBy, sortOrder);
+
+  const pipeline = buildCategoryStockPipeline(query, sort, skip, pageSize);
+  const [categories, totalCategories] = await Promise.all([
+    Category.aggregate(pipeline),
+    Category.countDocuments(query),
+  ]);
+
+  return {
+    categories,
+    pagination: {
+      totalCategories,
+      currentPage: pageNumber,
+      totalPages: Math.ceil(totalCategories / pageSize),
+      limit: pageSize,
+    },
+  };
 };

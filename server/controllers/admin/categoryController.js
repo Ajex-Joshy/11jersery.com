@@ -1,6 +1,7 @@
 import { asyncHandler, sendResponse } from "../../utils/helpers.js";
 import {
   createCategory,
+  getCategories,
   softDeleteCategory,
   updateCategoryStatus,
 } from "../../services/admin/categoryServices.js";
@@ -34,4 +35,9 @@ export const updateCategoryStatusController = asyncHandler(async (req, res) => {
 
   const updatedCategory = await updateCategoryStatus(categoryId, isListed);
   sendResponse(res, updatedCategory);
+});
+
+export const getCategoriescontroller = asyncHandler(async (req, res) => {
+  const result = await getCategories(req.query);
+  sendResponse(res, result);
 });
