@@ -6,18 +6,10 @@ import {
   getSortOption,
 } from "../../utils/helpers.js";
 import {
-  AppError,
-  buildCategoryQuery,
-  getPagination,
-  getSortOption,
-} from "../../utils/helpers.js";
-import {
   checkSlugUniqueness,
   validateObjectId,
 } from "../../utils/productutils.js";
 import { buildCategoryStockPipeline } from "./queryHelpers.js";
-import { buildCategoryStockPipeline } from "./queryHelpers.js";
-
 export const createCategory = async (categoryData) => {
   const slug = await checkSlugUniqueness(
     Category,
