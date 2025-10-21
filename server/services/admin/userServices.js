@@ -30,9 +30,6 @@ export const getUsers = async (queryParams) => {
 
   const query = buildUserQuery({ status, search });
 
-  const { pageNumber, pageSize, skip } = getPagination(page, limit);
-  const sort = getSortOption(sortBy, sortOrder);
-
   const [result, totalUsers] = await Promise.all([
     User.find(query).sort(sort).skip(skip).limit(pageSize).select("-password"),
     User.countDocuments(query),
