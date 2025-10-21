@@ -6,8 +6,17 @@ import { initCronJobs } from "./jobs/index.js";
 import { config } from "dotenv";
 import { errorHandler } from "./middlewares/common/errorHandler.js";
 config();
+import cors from "cors";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
 
 const startServer = async () => {
   try {

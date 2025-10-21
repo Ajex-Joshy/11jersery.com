@@ -1,49 +1,53 @@
 import Category from "../../models/categoryModel.js";
-import { AppError } from "../../utils/helpers.js";
-import { buildCategoryProductPipeline } from "./categoryPipeline.js";
+import Product from "../../models/productModel.js";
 
-export const fetchCategoriesWithProducts = async (pipeline) => {
-  if (!Array.isArray(pipeline)) {
-    throw new Error("Pipeline must be an array");
-  }
-
-  try {
-    const categories = await Category.aggregate(pipeline);
-    return categories;
-  } catch (error) {
-    console.error("Error fetching categories with products:", error);
-    throw error;
-  }
-};
-
-export const getLandingCategoriesWithProducts = async (queryParams) => {
-  const pipeline = buildCategoryProductPipeline({
-    ...queryParams,
+export const getLandingCategoriesWithProducts = async (
+  page = 1,
+  limit = 10
+) => {
+  const categories = await Category.find({
     inHome: true,
-  });
-  const categories = await fetchCategoriesWithProducts(pipeline);
-  return categories;
-};
-
-export const getCategoryBySlugWithProducts = async (slug, queryParams) => {
-  const category = await Category.findOne({
-    slug,
-    isListed: true,
     isDeleted: false,
-  }).lean();
-  if (!category)
-    throw new AppError(
-      404,
-      "CATEGORY_NOT_FOUND",
-      `Category with slug "${slug}" not found`
-    );
+    isListed: true,
+  })
+    .select("_id title")
+    .lean();
 
-  const pipeline = buildCategoryProductPipeline({
-    ...queryParams,
-    categoryId: category._id,
-  });
-  const results = await fetchCategoriesWithProducts(pipeline);
-  return results[0] || null;
+  const categoriesWithProducts = await Promise.all(
+    categories.map(async (cat) => {
+      const skip = (page - 1) * limit;
+
+      const products = await Product.find({
+        categoryIds: { $in: [cat._id] },
+        isDeleted: false,
+        isListed: true,
+      })
+        .select("_id title slug price rating cloudinaryImageIds")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      const totalProducts = await Product.countDocuments({
+        categoryIds: { $in: [cat._id] },
+        isDeleted: false,
+        isListed: true,
+      });
+
+      return {
+        title: cat.title,
+        products,
+        pagination: {
+          totalProducts,
+          limit,
+          currentPage: page,
+          totalPages: Math.ceil(totalProducts / limit),
+        },
+      };
+    })
+  );
+
+  return categoriesWithProducts;
 };
 
 export const getCollectionsData = async () => {
