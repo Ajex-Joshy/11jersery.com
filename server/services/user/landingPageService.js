@@ -1,10 +1,8 @@
-import {
-  getCollectionsData,
-  getLandingCategoriesWithProducts,
-} from "../common/categoryService.js";
-import { getPaginatedReviews } from "../common/reviewsService.js";
+import { getLandingCategoriesWithProducts } from "./landingPageServiceHelpers.js/getCategoriesWithProducts.js";
+import { getCollectionsData } from "./landingPageServiceHelpers.js/getCollectionData.js";
+import { getPaginatedReviews } from "./landingPageServiceHelpers.js/getRevies.js";
 
-export const getLandingPageData = async (queryParams) => {
+export const getLandingPageData = async () => {
   const [categories, collections, reviews] = await Promise.all([
     getLandingCategoriesWithProducts(),
     getCollectionsData(),

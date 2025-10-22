@@ -1,7 +1,7 @@
-import { Routes } from "react-router-dom";
+import React from "react";
 
-const userRoutes = () => {
-  <Routes></Routes>;
+const UserRoutes = () => {
+  return <div>UserRoutes</div>;
 };
 
-export default userRoutes;
+export default UserRoutes;

@@ -1,7 +1,7 @@
-import Review from "../../models/reviewModel.js";
-import { getPagination } from "../../utils/helpers.js";
+import Review from "../../../models/reviewModel.js";
+import { getPagination } from "../../../utils/helpers.js";
 
-export const buildReviewQuery = ({ productId, minRating = 3.5 } = {}) => {
+const buildReviewQuery = ({ productId, minRating = 3.5 } = {}) => {
   const query = {};
   if (productId) query.productId = productId;
   if (minRating) query.rating = { $gte: minRating };
