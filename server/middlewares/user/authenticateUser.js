@@ -1,6 +1,7 @@
 import { verifyToken } from "../../utils/jwt.js";
 import User from "../../models/userModel.js";
 import { AppError } from "../../utils/helpers.js";
+import logger from "../../utils/logger.js";
 
 export const authenticateUser = async (req, res, next) => {
   try {
@@ -18,6 +19,7 @@ export const authenticateUser = async (req, res, next) => {
     try {
       decoded = verifyToken(token);
     } catch (err) {
+      logger.error(err.message);
       throw new AppError(401, "INVALID_TOKEN", "Token invalid or expired");
     }
     if (!decoded.id)

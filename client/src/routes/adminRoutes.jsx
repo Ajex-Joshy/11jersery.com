@@ -1,19 +1,27 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import AdminLogin from "../pages/admin/AdminLogin";
-import Dashboard from "../pages/admin/dashboard";
-import ProtectedRoute from "./ProtectedRoute";
+import AdminLoginPage from "../features/admin/auth/adminLoginPage";
+import Dashboard from "../features/admin/dashboard/Dashboard";
+import AdminProtectedRoute from "./AdminProtectedRoute";
+import AdminLayout from "../layouts/adminLayout";
 
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<AdminLogin />} />
-      <Route
-        element={
-          <ProtectedRoute tokenKey="adminToken" loginPath="/admin/login" />
-        }
-      >
-        <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/login" element={<AdminLoginPage />} />
+      <Route element={<AdminProtectedRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          {/* <Route path="/customers" element={<CustomerManagement />} />
+          <Route path="/orders" element={<OrderMangement />} />
+          <Route path="/categories" element={<CategoryManagement />} />
+          <Route path="/transactions" element={<TransactionManagement />} />
+          <Route path="/coupons" element={<CouponManagement />} />
+          <Route path="/add-product" element={<AddProducts />} />
+          <Route path="/products" element={<ProductMangement />} />
+          <Route path="/profile" element={<AdminProfile />} />
+          <Route path="/inbox" element={<Inbox />} /> */}
+        </Route>
       </Route>
     </Routes>
   );

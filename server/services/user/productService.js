@@ -1,7 +1,6 @@
 import Product from "../../models/productModel.js";
 import Review from "../../models/reviewModel.js";
 import { AppError } from "../../utils/helpers.js";
-import mongoose from "mongoose";
 
 export const getProductDetailsService = async (productSlug) => {
   // 1. Fetch product details by slug

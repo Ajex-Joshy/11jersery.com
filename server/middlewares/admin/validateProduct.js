@@ -74,7 +74,7 @@ const validateUpdateProduct = (req, res, next) => {
       if (!Array.isArray(variants)) {
         errors.push("Variants must be an array.");
       } else {
-        variants.forEach((variant, index) => {
+        variants.forEach((variant) => {
           if (!variant || typeof variant !== "object") {
             errors.push("Variant must be an object.");
             return;
@@ -102,7 +102,7 @@ const validateUpdateProduct = (req, res, next) => {
       if (!Array.isArray(categoryIds)) {
         errors.push("categoryIds must be an array.");
       } else {
-        categoryIds.forEach((id, index) => {
+        categoryIds.forEach((id) => {
           if (!mongoose.Types.ObjectId.isValid(id)) {
             errors.push("Each categoryId must be a valid Mongo ObjectId.");
           }
@@ -118,7 +118,7 @@ const validateUpdateProduct = (req, res, next) => {
         if (tags.length > 10) {
           errors.push("Tags array must not exceed 10 items.");
         }
-        tags.forEach((tag, index) => {
+        tags.forEach((tag) => {
           if (typeof tag !== "string") {
             errors.push("Each tag must be a string.");
           }
@@ -131,7 +131,7 @@ const validateUpdateProduct = (req, res, next) => {
       if (!Array.isArray(cloudinaryImageIds)) {
         errors.push("cloudinaryImageIds must be an array.");
       } else {
-        cloudinaryImageIds.forEach((id, index) => {
+        cloudinaryImageIds.forEach((id) => {
           if (typeof id !== "string") {
             errors.push("Each cloudinaryImageId must be a string.");
           }
@@ -152,7 +152,7 @@ const validateUpdateProduct = (req, res, next) => {
     if (!Array.isArray(faqs)) {
       errors.push("faqs must be an array if provided.");
     } else {
-      faqs.forEach((faq, index) => {
+      faqs.forEach((faq) => {
         if (!faq || typeof faq !== "object") {
           errors.push("Each faq must be an object.");
           return;

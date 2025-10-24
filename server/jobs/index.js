@@ -1,5 +1,6 @@
+import logger from "../utils/logger.js";
 import "./deactivateUsersJob.js";
 
 export const initCronJobs = () => {
-  console.log("Cron jobs initialized");
+  logger.info("Cron jobs initialized");
 };

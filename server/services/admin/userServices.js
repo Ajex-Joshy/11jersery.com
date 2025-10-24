@@ -1,5 +1,4 @@
 import User from "../../models/userModel.js";
-import mongoose from "mongoose";
 
 import {
   AppError,
@@ -30,6 +29,9 @@ export const getUsers = async (queryParams) => {
 
   const query = buildUserQuery({ status, search });
 
+  const sort = getSortOption(sortBy, sortOrder);
+  const { pageNumber, pageSize, skip } = getPagination(page, limit);
+
   const [result, totalUsers] = await Promise.all([
     User.find(query).sort(sort).skip(skip).limit(pageSize).select("-password"),
     User.countDocuments(query),
@@ -39,7 +41,7 @@ export const getUsers = async (queryParams) => {
     users: result,
     pagination: {
       totalUsers,
-      currentpage: pageNumber,
+      currentPage: pageNumber,
       totalPages: Math.ceil(totalUsers / pageSize),
       limit: pageSize,
     },

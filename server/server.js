@@ -7,6 +7,8 @@ import { config } from "dotenv";
 import { errorHandler } from "./middlewares/common/errorHandler.js";
 config();
 import cors from "cors";
+import logger from "./utils/logger.js";
+import { pinoHttp } from "pino-http";
 
 const app = express();
 
@@ -18,25 +20,29 @@ app.use(
   })
 );
 
+const httpLogger = pinoHttp({
+  logger,
+  customSuccessMessage: (res) => `Request completed in ${res.responseTime}ms`,
+});
+app.use(httpLogger);
+app.use(express.json());
+
+app.use("/admin", adminRoutes);
+app.use("/", userRoutes);
+
+app.use(errorHandler);
+
 const startServer = async () => {
   try {
     await connectDB();
     app.listen(process.env.PORT, () =>
-      console.log(
-        `server running on PORT: ${process.env.PORT} -> http://localhost:3000/`
-      )
+      logger.info("Server started successfully")
     );
   } catch (err) {
-    console.log(`ERROR: ${err.message}`);
+    logger.error(err.message);
     process.exit(1);
   }
 };
 
 startServer();
 initCronJobs();
-
-app.use(express.json());
-app.use("/admin", adminRoutes);
-app.use("/", userRoutes);
-
-app.use(errorHandler);

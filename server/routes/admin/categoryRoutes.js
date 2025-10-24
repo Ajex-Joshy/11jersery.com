@@ -1,5 +1,4 @@
 import express from "express";
-import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 import validateCategory from "../../middlewares/admin/validateCategory.js";
 import {
   createCategoryController,
@@ -8,6 +7,7 @@ import {
   updateCategoryController,
   updateCategoryStatusController,
 } from "../../controllers/admin/categoryController.js";
+import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 
 const router = express.Router();
 

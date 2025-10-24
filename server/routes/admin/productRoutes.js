@@ -1,5 +1,4 @@
 import express from "express";
-import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 import validateProduct from "../../middlewares/admin/validateProduct.js";
 import {
   createProductController,
@@ -9,6 +8,7 @@ import {
   updateProductStatus,
 } from "../../controllers/admin/productController.js";
 import validateCreateProduct from "../../middlewares/admin/validateCreateProduct.js";
+import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 
 const router = express.Router();
 
@@ -26,7 +26,6 @@ router.patch(
   validateProduct,
   updateProductController
 );
-
 router.patch("/:productId/status", verifyAdminToken, updateProductStatus);
 router.delete("/:productId", verifyAdminToken, deleteProductController);
 

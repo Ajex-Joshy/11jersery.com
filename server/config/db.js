@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import logger from "../utils/logger.js";
 dotenv.config();
 
 const connectDB = async () => {
@@ -8,9 +9,9 @@ const connectDB = async () => {
       tls: true,
       tlsAllowInvalidCertificates: false,
     });
-    console.log("MongoDB connected successfully");
+    logger.info("MongoDB connected successfully");
   } catch (err) {
-    console.log(`ERROR: ${err.message}`);
+    logger.error(`ERROR: ${err.message}`);
   }
 };
 

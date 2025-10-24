@@ -10,14 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-keycloak/web": "^3.4.0",
     "@reduxjs/toolkit": "^2.9.1",
     "@tailwindcss/vite": "^4.1.15",
     "axios": "^1.12.2",
+    "keycloak-js": "^26.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.65.0",
+    "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.4",
+    "redux-persist": "^6.0.0",
     "tailwindcss": "^4.1.15"
   },
   "devDependencies": {

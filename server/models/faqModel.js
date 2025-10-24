@@ -20,6 +20,7 @@ const faqSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true,
+      index: true,
     },
   },
   { timestamps: true }

@@ -7,6 +7,6 @@ export const adminLoginController = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const adminLogoutController = (req, res, next) => {
+export const adminLogoutController = (req, res) => {
   res.send(req.admin);
 };

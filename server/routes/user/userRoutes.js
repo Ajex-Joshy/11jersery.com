@@ -4,6 +4,7 @@ import { getLandingPageController } from "../../controllers/user/landingPageCont
 import productRoutes from "./productRoutes.js";
 
 const userRouter = express.Router();
+
 userRouter.get("/home", getLandingPageController);
 userRouter.use("/auth", authRoutes);
 userRouter.use("/product", productRoutes);

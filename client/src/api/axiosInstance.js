@@ -9,18 +9,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor (e.g., attach token)
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token"); // or from Redux state
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
 // Response interceptor (optional: handle global errors)
 axiosInstance.interceptors.response.use(
   (response) => response,

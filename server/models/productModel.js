@@ -24,6 +24,7 @@ const productSchema = mongoose.Schema(
         },
         message: "At least one categoryId is required",
       },
+      index: true,
     },
     description: { type: String, maxlength: 2000 },
     shortDescription: { type: String, maxlength: 500 },
