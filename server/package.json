@@ -22,6 +22,8 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
     "express-session": "^1.18.2",
+    "joi": "^18.0.1",
+    "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
     "keycloak-connect": "^26.1.1",
     "mongoose": "^8.19.1",

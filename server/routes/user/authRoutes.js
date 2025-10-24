@@ -1,5 +1,4 @@
 import express from "express";
-import { validateSignupData } from "../../middlewares/user/validators/validateSigupData.js";
 import {
   forgotPasswordController,
   resetPasswordController,
@@ -7,27 +6,41 @@ import {
   userSignupController,
   verifyOtpController,
 } from "../../controllers/user/authController.js";
-import { validateUserLoginData } from "../../middlewares/user/validators/validateUserLoginData.js";
 import { otpLimiter } from "../../utils/otpUtils.js";
-import { validateForgotPassword } from "../../middlewares/user/validators/validateForgotPassword.js";
-import { validateVerifyOtp } from "../../middlewares/user/validators/validateVerifyOtp.js";
 import { authenticateUser } from "../../middlewares/user/authenticateUser.js";
-import { validateResetPassword } from "../../middlewares/user/validators/validateReseetPassword.js";
+
+import { validate } from "../../middlewares/common/validate.js";
+import {
+  signupSchema,
+  forgotPasswordSchema,
+  verifyOtpSchema,
+  resetPasswordSchema,
+} from "../../validators/user/authValidators.js";
+import { loginSchema } from "../../validators/common/loginSchema.js";
 
 const router = express.Router();
 
-router.post("/signup", validateSignupData, userSignupController);
-router.post("/login", validateUserLoginData, userLoginController);
+router.post("/signup", validate(signupSchema), userSignupController);
+
+router.post("/login", validate(loginSchema), userLoginController);
+
 router.post(
   "/forgot-password",
-  validateForgotPassword,
+  validate(forgotPasswordSchema),
   otpLimiter,
   forgotPasswordController
 );
-router.post("/verify-otp", validateVerifyOtp, otpLimiter, verifyOtpController);
+
+router.post(
+  "/verify-otp",
+  validate(verifyOtpSchema),
+  otpLimiter,
+  verifyOtpController
+);
+
 router.post(
   "/reset-password",
-  validateResetPassword,
+  validate(resetPasswordSchema),
   authenticateUser,
   resetPasswordController
 );
