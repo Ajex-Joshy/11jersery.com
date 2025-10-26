@@ -4,6 +4,9 @@ import AdminLoginPage from "../features/admin/auth/adminLoginPage";
 import Dashboard from "../features/admin/dashboard/Dashboard";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminLayout from "../layouts/adminLayout";
+import CustomerManagement from "../features/admin/customerManagement/CustomerManagement";
+import CategoryManagement from "../features/admin/categoryManagement/CategoryManagement";
+import AddCategory from "../features/admin/categoryManagement/AddCategory";
 
 const AdminRoutes = () => {
   return (
@@ -12,7 +15,10 @@ const AdminRoutes = () => {
       <Route element={<AdminProtectedRoute />}>
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/customers" element={<CustomerManagement />} />
+          <Route path="/customers" element={<CustomerManagement />} />
+          <Route path="/categories" element={<CategoryManagement />} />
+          <Route path="/add-category" element={<AddCategory />} />
+          {/* 
           <Route path="/orders" element={<OrderMangement />} />
           <Route path="/categories" element={<CategoryManagement />} />
           <Route path="/transactions" element={<TransactionManagement />} />

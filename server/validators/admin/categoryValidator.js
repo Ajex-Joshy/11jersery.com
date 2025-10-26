@@ -16,6 +16,9 @@ const categoryBaseSchema = {
   inHome: Joi.boolean().messages({
     "boolean.base": "inHome must be a boolean",
   }),
+  inCollections: Joi.boolean().messages({
+    "boolean.base": "inHome must be a boolean",
+  }),
 
   discount: Joi.number().min(0).default(0).messages({
     "number.base": "discount must be a number",

@@ -95,7 +95,9 @@ export const getUsersStats = async () => {
       repeat: repeatCustomers,
       shopVisitor: visitorsLast7,
       conversionRate:
-        visitorsLast7 === 0 ? 0 : (newCustomersLast7 / visitorsLast7) * 100,
+        visitorsLast7 === 0
+          ? 0
+          : ((newCustomersLast7 / visitorsLast7) * 100).toFixed(2),
     },
     dailyActivity,
   };

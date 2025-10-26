@@ -19,8 +19,6 @@ export const createCategory = async (categoryData) => {
   return await Category.create({
     ...categoryData,
     slug,
-    s,
-    s,
   });
 };
 
@@ -98,38 +96,6 @@ export const updateCategoryStatus = async (categoryId, status) => {
 
   return updateCategory;
 };
-
-// const buildCategoryStockPipeline = (query, sort, skip, pageSize) => [
-//   { $match: query },
-//   { $sort: sort },
-//   { $skip: skip },
-//   { $limit: pageSize },
-//   {
-//     $lookup: {
-//       from: "products",
-//       let: { categoryId: "$_id" },
-//       pipeline: [
-//         { $match: { $expr: { $in: ["$$categoryId", "$categoryIds"] } } },
-//         { $unwind: "$variants" },
-//         {
-//           $group: {
-//             _id: null,
-//             totalStock: { $sum: "$variants.stock" },
-//             productCount: { $sum: 1 },
-//           },
-//         },
-//       ],
-//       as: "meta",
-//     },
-//   },
-//   {
-//     $addFields: {
-//       totalStock: { $ifNull: [{ $first: "$meta.totalStock" }, 0] },
-//       productCount: { $ifNull: [{ $first: "$meta.productCount" }, 0] },
-//     },
-//   },
-//   { $project: { meta: 0 } },
-// ];
 
 export const getCategories = async (queryParams) => {
   const {

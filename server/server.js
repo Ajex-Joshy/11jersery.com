@@ -24,7 +24,7 @@ const httpLogger = pinoHttp({
   logger,
   customSuccessMessage: (res) => `Request completed in ${res.responseTime}ms`,
 });
-app.use(httpLogger);
+// app.use(httpLogger);
 app.use(express.json());
 
 app.use("/admin", adminRoutes);

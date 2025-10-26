@@ -6,11 +6,18 @@ import {
   updateCategoryStatus,
 } from "../../services/admin/categoryServices.js";
 import { updateCategory } from "../../services/admin/categoryServices.js";
+import { uploadFileToS3 } from "../../services/admin/s3Service.js";
 
 export const createCategoryController = asyncHandler(async (req, res) => {
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({ message: "Image is required" });
+  }
   const categoryData = req.body;
 
-  const category = await createCategory(categoryData);
+  const imageId = await uploadFileToS3(file);
+
+  const category = await createCategory({ ...categoryData, imageId });
   sendResponse(res, category);
 });
 

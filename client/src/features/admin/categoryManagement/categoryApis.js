@@ -1,0 +1,30 @@
+import axiosInstance from "../../../api/axiosInstance";
+
+export const getCategories = async ({ queryKey }) => {
+  const [, params] = queryKey;
+  const { data } = await axiosInstance.get("/admin/categories", { params });
+
+  return data;
+};
+
+export const addCategory = async (formData) => {
+  const { data } = await axiosInstance.post("/admin/categories", formData);
+  return data;
+};
+
+export const toggleCategoryList = async ({ categoryId, isListed }) => {
+  const { data } = await axiosInstance.patch(
+    `/admin/categories/${categoryId}/status`,
+    {
+      isListed,
+    }
+  );
+  return data;
+};
+
+export const deleteCategory = async (categoryId) => {
+  const { data } = await axiosInstance.delete(
+    `/admin/categories/${categoryId}`
+  );
+  return data;
+};

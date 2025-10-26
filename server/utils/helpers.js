@@ -44,11 +44,15 @@ export const buildUserQuery = ({ status, search }) => {
   return query;
 };
 export const buildCategoryQuery = ({ status, search }) => {
-  const query = {};
-  if (status) query.status = status;
+  const query = { isDeleted: false };
+  if (status) {
+    if (status === "active") query.isListed = true;
+    else query.isListed = false;
+  }
   if (search && search.trim() !== "") {
     query.title = { $regex: search, $options: "i" };
   }
+  console.log(query);
   return query;
 };
 

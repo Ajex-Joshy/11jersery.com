@@ -12,12 +12,17 @@ import {
   createCategorySchema,
   updateCategorySchema,
 } from "../../validators/admin/categoryValidator.js";
+import multer from "multer";
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.get("/", verifyAdminToken, getCategoriescontroller);
 router.post(
   "/",
+  upload.single("image"),
   verifyAdminToken,
   validate(createCategorySchema),
   createCategoryController

@@ -15,7 +15,7 @@ const categorySchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    cloudinaryImageId: {
+    imageId: {
       type: String,
     },
     isListed: {
