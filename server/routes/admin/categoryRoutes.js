@@ -3,6 +3,7 @@ import {
   createCategoryController,
   deleteCategoryController,
   getCategoriescontroller,
+  getCategoryBySlugController,
   updateCategoryController,
   updateCategoryStatusController,
 } from "../../controllers/admin/categoryController.js";
@@ -19,7 +20,9 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+router.get("/:slug", verifyAdminToken, getCategoryBySlugController);
 router.get("/", verifyAdminToken, getCategoriescontroller);
+
 router.post(
   "/",
   upload.single("image"),
@@ -30,6 +33,7 @@ router.post(
 router.patch(
   "/:categoryId",
   verifyAdminToken,
+  upload.single("image"),
   validate(updateCategorySchema),
   updateCategoryController
 );

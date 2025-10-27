@@ -6,19 +6,51 @@ import {
   saveFaqs,
   validateObjectId,
 } from "../../utils/productutils.js";
+import { uploadFileToS3 } from "./s3Service.js";
 
-export async function addProduct(productData) {
-  const productInfo = productData.product;
-  const faqs = productData.faqs;
-  productInfo.slug = await checkSlugUniqueness(
-    Product,
-    productInfo.title,
-    "Product"
-  );
+export async function addProduct(productDataString, faqsDataString, files) {
+  const productInfo = productDataString;
+  const faqs = faqsDataString;
 
-  const savedProduct = await Product.create(productInfo);
+  if (!files || files.length === 0) {
+    throw new Error("At least one product image is required.");
+  }
 
-  let savedFaqs = await saveFaqs(faqs, savedProduct._id);
+  const uploadPromises = files.map((file) => uploadFileToS3(file));
+  const imageUrls = await Promise.all(uploadPromises); // Get all S3 URLs
+
+  const slug = await checkSlugUniqueness(Product, productInfo.title, "Product");
+
+  const variantsWithSku = productInfo.variants.map((variant) => ({
+    ...variant,
+    sku: `${productInfo.title.substring(0, 3).toUpperCase()}-${variant.size}`,
+  }));
+
+  const newProductData = {
+    title: productInfo.title,
+    slug: slug,
+    description: productInfo.description,
+    shortDescription: productInfo.shortDescription,
+    price: {
+      list: productInfo.price.list,
+      sale: productInfo.price.sale,
+    },
+    variants: variantsWithSku,
+    categoryIds: productInfo.categoryIds,
+    tags: productInfo.tags,
+    isListed: productInfo.isListed,
+    imageIds: imageUrls,
+    details: productInfo.details || [],
+  };
+
+  // 6. Create the Product in MongoDB
+  const savedProduct = await Product.create(newProductData);
+
+  // 7. Save FAQs (assuming saveFaqs handles an array)
+  let savedFaqs = [];
+  if (faqs && faqs.length > 0) {
+    savedFaqs = await saveFaqs(faqs, savedProduct._id);
+  }
 
   return { product: savedProduct, faqs: savedFaqs };
 }
@@ -59,11 +91,12 @@ export const getProducts = async (queryParams) => {
     page = 1,
     limit = 10,
     search = "",
+    status = "",
     category,
     sortBy = "createdAt",
     sortOrder = "desc",
   } = queryParams;
-  const query = await buildProductQuery({ search, category });
+  const query = await buildProductQuery({ search, category, status });
 
   const { pageNumber, pageSize, skip } = getPagination(page, limit);
   const sort = getSortOption(sortBy, sortOrder);

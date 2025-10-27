@@ -122,9 +122,10 @@ export const updateUserStatus = async (userId, isBlocked) => {
 
   validateObjectId(userId);
 
+  const status = isBlocked ? "blocked" : "active";
   const user = await User.findByIdAndUpdate(
     userId,
-    { isBlocked },
+    { isBlocked, status },
     { new: true }
   );
 

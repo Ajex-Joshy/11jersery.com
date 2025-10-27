@@ -9,6 +9,7 @@ config();
 import cors from "cors";
 import logger from "./utils/logger.js";
 import { pinoHttp } from "pino-http";
+import webhookRoutes from "./routes/webhookRoutes.js";
 
 const app = express();
 
@@ -19,13 +20,18 @@ app.use(
     credentials: true,
   })
 );
+app.use(
+  "/api/webhooks",
+  express.raw({ type: "application/json" }),
+  webhookRoutes
+);
 
 const httpLogger = pinoHttp({
   logger,
-  customSuccessMessage: (res) => `Request completed in ${res.responseTime}ms`,
 });
-// app.use(httpLogger);
+
 app.use(express.json());
+// app.use(httpLogger);
 
 app.use("/admin", adminRoutes);
 app.use("/", userRoutes);

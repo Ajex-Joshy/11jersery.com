@@ -140,8 +140,7 @@ const CategoryManagement = () => {
       sortable: false,
       render: (item) => (
         <ActionIconButtons
-          // Navigate to an edit page (you'll need to create this route/page)
-          onEdit={() => navigate(`/admin/edit-category/${item._id}`)}
+          onEdit={() => navigate(`/admin/edit-category/${item.slug}`)}
           // Open delete confirmation modal
           onDelete={() => openModal(item, "delete")}
         />

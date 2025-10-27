@@ -83,11 +83,15 @@ export const saveFaqs = async (faqs, productId, replaceExisting = false) => {
   return Faq.insertMany(faqsWithProductId);
 };
 
-export const buildProductQuery = async ({ search, category }) => {
-  const query = {};
+export const buildProductQuery = async ({ search, category, status }) => {
+  const query = { isDeleted: false };
 
   if (search) {
     query.title = { $regex: search, $options: "i" };
+  }
+  if (status) {
+    if (status === "active") query.isListed = true;
+    else query.isListed = false;
   }
 
   if (category) {

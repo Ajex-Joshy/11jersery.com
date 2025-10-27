@@ -13,6 +13,7 @@ import {
   FiInbox,
   FiExternalLink,
 } from "react-icons/fi";
+import { useSelector } from "react-redux";
 
 // Define links with sections
 const sidebarSections = [
@@ -52,6 +53,7 @@ const sidebarSections = [
 ];
 
 const Sidebar = () => {
+  const admin = useSelector((store) => store.admin.admin);
   // Classes for NavLink state based on the image
   const getNavLinkClass = ({ isActive }) =>
     `group flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
@@ -79,7 +81,6 @@ const Sidebar = () => {
                   key={link.path}
                   to={link.path}
                   className={getNavLinkClass}
-                  // Use 'end' for exact matching if needed, e.g., for dashboard
                   end={link.path === "/admin/dashboard"}
                 >
                   <link.icon
@@ -102,10 +103,13 @@ const Sidebar = () => {
         <div className="flex items-center space-x-3 mb-4">
           <img
             className="h-10 w-10 rounded-full"
-            src="https://placehold.co/40x40/black/white?text=A"
+            src={`https://placehold.co/40x40/black/white?text=${admin.firstName[0]}`}
             alt="Admin Avatar"
           />
-          <div></div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">{`${admin.firstName} ${admin.lastName}`}</p>
+            <p className="text-xs text-gray-500 truncate">{admin.email}</p>
+          </div>
         </div>
         {/* Visit Store Link */}
         <a

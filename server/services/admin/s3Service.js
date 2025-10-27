@@ -34,7 +34,6 @@ export const uploadFileToS3 = async (file) => {
     await s3Client.send(command);
     return imageName;
   } catch (error) {
-    console.error("Error uploading to S3:", error);
     throw error;
   }
 };

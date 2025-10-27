@@ -127,3 +127,25 @@ export const getCategories = async (queryParams) => {
     },
   };
 };
+
+export const getCategoryDetails = async (slug) => {
+  if (!slug || typeof slug !== "string") {
+    throw new AppError(
+      400,
+      "INVALID_SLUG",
+      "A valid category slug is required"
+    );
+  }
+
+  const category = await Category.findOne({ slug, isDeleted: false });
+
+  if (!category) {
+    throw new AppError(
+      404,
+      "CATEGORY_NOT_FOUND",
+      "Category not found with this slug"
+    );
+  }
+
+  return category;
+};

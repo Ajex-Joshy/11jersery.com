@@ -32,7 +32,7 @@ const productSchema = mongoose.Schema(
       list: { type: Number, required: true, min: 0 },
       sale: { type: Number, min: 0 },
     },
-    cloudinaryImageIds: [{ type: String }],
+    imageIds: [{ type: String }],
     variants: [
       {
         sku: { type: String, required: true },

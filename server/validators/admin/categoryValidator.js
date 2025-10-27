@@ -63,6 +63,9 @@ export const createCategorySchema = Joi.object({
 
 export const updateCategorySchema = Joi.object({
   ...categoryBaseSchema,
+  discountType: Joi.string().valid("flat", "percent").optional().messages({
+    "any.only": "discountType must be either flat or percent",
+  }),
 })
   .min(1)
   .messages({

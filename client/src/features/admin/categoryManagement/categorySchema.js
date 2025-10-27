@@ -24,14 +24,41 @@ export const categorySchema = z.object({
   inHome: z.boolean().default(false),
   inCollections: z.boolean().default(false),
 
+  // Image validation (Works for Add and Edit)
   image: z
-    .instanceof(File, { message: "Header image is required" })
+    .union([
+      // Allows either a File or null/undefined initially
+      z.instanceof(File),
+      z.null(),
+      z.undefined(),
+    ])
     .refine(
-      (file) => file.size <= 5_000_000, // 5MB limit
+      (file) => !file || file.size <= 5_000_000, // Check size only if file exists
       "Image must be 5MB or less (after crop)"
     )
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+      (file) =>
+        !file || ["image/jpeg", "image/png", "image/webp"].includes(file.type), // Check type only if file exists
       "Only .jpg, .png, and .webp formats are supported"
+    ),
+
+  images: z
+    .array(z.instanceof(File))
+    .optional()
+    .refine(
+      (files) =>
+        !files ||
+        files.length === 0 ||
+        files.every((file) => file.size <= 5 * 1024 * 1024),
+      `Each image must be 5MB or less.`
+    )
+    .refine(
+      (files) =>
+        !files ||
+        files.length === 0 ||
+        files.every((file) =>
+          ["image/jpeg", "image/png", "image/webp"].includes(file.type)
+        ),
+      "Only .jpg, .png, and .webp formats are supported."
     ),
 });

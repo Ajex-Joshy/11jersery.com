@@ -22,7 +22,7 @@ export const getLandingCategoriesWithProducts = async (
         isDeleted: false,
         isListed: true,
       })
-        .select("_id title slug price rating cloudinaryImageIds")
+        .select("_id title slug price rating imageIds")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

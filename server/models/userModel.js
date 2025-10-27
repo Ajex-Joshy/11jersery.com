@@ -3,6 +3,10 @@ import validator from "validator";
 
 const userSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      required: true,
+    },
     firstName: {
       type: String,
       required: [true, "First name is required"],
@@ -24,12 +28,6 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       validate: [validator.isEmail, "Please provide a valid email address"],
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: 8,
-      select: false,
     },
     phone: {
       type: String,

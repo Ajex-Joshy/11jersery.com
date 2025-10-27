@@ -52,7 +52,6 @@ export const buildCategoryQuery = ({ status, search }) => {
   if (search && search.trim() !== "") {
     query.title = { $regex: search, $options: "i" };
   }
-  console.log(query);
   return query;
 };
 

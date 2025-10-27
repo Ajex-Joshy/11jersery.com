@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.917.0",
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -35,6 +36,7 @@
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
     "slugify": "^1.6.6",
+    "svix": "^1.80.0",
     "validator": "^13.15.15"
   },
   "devDependencies": {

@@ -80,7 +80,6 @@ export const useCustomerManagement = () => {
     },
     {
       header: "Name",
-      // FIXED: Key must match the `sortBy` param
       key: "firstName",
       sortable: true,
       render: (item) => (
@@ -109,7 +108,7 @@ export const useCustomerManagement = () => {
       sortable: false,
       render: (item) => (
         <span className="text-gray-700">
-          ${(item.totalSpend || 3450.0).toFixed(2)}
+          ₹{(item.totalSpend || 3450.0).toFixed(2)}
         </span>
       ), // Placeholder
     },

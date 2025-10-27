@@ -3,13 +3,16 @@ import {
   addCategory,
   deleteCategory,
   getCategories,
+  getCategoryDetails,
   toggleCategoryList,
+  updateCategory,
 } from "./categoryApis.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export const CUSTOMER_STATS_QUERY_KEY = "customerStats";
 export const CATEGORIES_QUERY_KEY = "categories";
+export const CATEGORY_DETAILS_KEY = "categoryDetails";
 
 export const useCategories = (params) => {
   return useQuery({
@@ -67,6 +70,44 @@ export const useDeleteCategory = () => {
     onError: (error) => {
       toast.error(
         error.response?.data?.message || "Failed to delete category."
+      );
+    },
+  });
+};
+
+export const useCategoryDetails = (slug) => {
+  return useQuery({
+    // Key includes the ID so it refetches if the ID changes
+    queryKey: [CATEGORY_DETAILS_KEY, slug],
+    queryFn: () => getCategoryDetails(slug),
+    // Only run the query if categoryId is truthy
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5, // 5 minutes stale time
+  });
+};
+
+/**
+ * Hook for updating a category.
+ */
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: updateCategory,
+    onSuccess: (data, variables) => {
+      // 'variables' holds { slug, formData }
+      toast.success(data.message || "Category updated successfully!");
+      queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
+      // Invalidate the specific details query using the slug
+      queryClient.invalidateQueries({
+        queryKey: [CATEGORY_DETAILS_KEY, variables.slug],
+      });
+      navigate("/admin/categories");
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Failed to update category."
       );
     },
   });

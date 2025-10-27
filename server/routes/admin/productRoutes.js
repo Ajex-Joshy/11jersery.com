@@ -8,29 +8,22 @@ import {
 } from "../../controllers/admin/productController.js";
 import { verifyAdminToken } from "../../middlewares/admin/verifyAdminToken.js";
 
-import { validate } from "../../middlewares/common/validate.js";
-import {
-  createProductSchema,
-  updateProductSchema,
-} from "../../validators/admin/productValidators.js";
+import multer from "multer";
 
 const router = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.get("/", verifyAdminToken, getProductsController);
 
 router.post(
   "/",
   verifyAdminToken,
-  validate(createProductSchema),
+  upload.array("images", 4),
   createProductController
 );
 
-router.patch(
-  "/:productId",
-  verifyAdminToken,
-  validate(updateProductSchema),
-  updateProductController
-);
+router.patch("/:productId", verifyAdminToken, updateProductController);
 
 router.patch("/:productId/status", verifyAdminToken, updateProductStatus);
 router.delete("/:productId", verifyAdminToken, deleteProductController);

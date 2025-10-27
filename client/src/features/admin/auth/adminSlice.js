@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../api/axiosInstance";
 
+const storedAdmin = localStorage.getItem("admin");
+
 const initialState = {
-  admin: null,
-  token: null,
+  admin: storedAdmin ? JSON.parse(storedAdmin) : null,
   status: "idle",
   error: null,
 };
@@ -15,7 +16,7 @@ export const loginAdmin = createAsyncThunk(
       const response = await axiosInstance.post("/admin/auth/login", loginData);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.error);
+      return rejectWithValue(error.response?.data?.error || "Login failed");
     }
   }
 );
@@ -26,9 +27,10 @@ const adminSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.admin = null;
-      state.token = null;
       state.status = "idle";
       state.error = null;
+      localStorage.removeItem("admin");
+      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -40,11 +42,14 @@ const adminSlice = createSlice({
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.admin = action.payload.admin;
+        state.token = action.payload.token;
+
         localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("admin", JSON.stringify(action.payload.admin));
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload.message || "Login failed";
+        state.error = action.payload || "Login failed";
       });
   },
 });

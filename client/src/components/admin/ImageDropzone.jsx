@@ -2,28 +2,34 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, X, Image as ImageIcon } from "lucide-react";
-import ImageCropperModal from "./ImageCropperModal"; // Import the new modal
+import ImageCropperModal from "./ImageCropperModal";
 
-const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
+const ImageDropzone = ({
+  onChange,
+  value,
+  aspect = 16 / 9,
+  initialImageUrl,
+}) => {
+  // Added initialImageUrl prop
   const [uncroppedImage, setUncroppedImage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [preview, setPreview] = useState(null);
 
-  // When the RHF value changes (e.g., loading an edit form),
-  // create a preview URL for the *final* file.
   useEffect(() => {
     if (value instanceof File) {
       const objectUrl = URL.createObjectURL(value);
       setPreview(objectUrl);
-      // Clean up the object URL when the component unmounts
       return () => URL.revokeObjectURL(objectUrl);
+    } else if (initialImageUrl && !value) {
+      setPreview(initialImageUrl);
+    } else {
+      setPreview(null);
     }
-  }, [value]);
+  }, [value, initialImageUrl]);
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
-      // Use FileReader to get a data URL for the cropper modal
       const reader = new FileReader();
       reader.onloadend = () => {
         setUncroppedImage(reader.result);
@@ -40,7 +46,6 @@ const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
   });
 
   const handleCropComplete = (croppedFile) => {
-    // This is the key: Set the RHF value to the new cropped File
     onChange(croppedFile);
     setModalOpen(false);
     setUncroppedImage(null);
@@ -48,12 +53,11 @@ const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
 
   const removeImage = (e) => {
     e.stopPropagation();
-    onChange(null); // Clear the value in RHF
+    onChange(null);
     setPreview(null);
   };
 
   if (preview) {
-    // --- Final Preview (shows the cropped image) ---
     return (
       <div className="relative w-full h-64 rounded-lg overflow-hidden">
         <img
@@ -74,7 +78,6 @@ const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
 
   return (
     <>
-      {/* --- The Dropzone UI --- */}
       <div
         {...getRootProps()}
         className={`w-full h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition ${
@@ -84,6 +87,7 @@ const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
         }`}
       >
         <input {...getInputProps()} />
+        {/* ... (Dropzone placeholder UI) ... */}
         <div className="p-4 rounded-full bg-gray-100 mb-4">
           <UploadCloud className="w-10 h-10 text-gray-500" />
         </div>
@@ -94,7 +98,6 @@ const ImageDropzone = ({ onChange, value, aspect = 16 / 9 }) => {
         </p>
       </div>
 
-      {/* --- The Modal (conditionally rendered) --- */}
       {modalOpen && (
         <ImageCropperModal
           imageSrc={uncroppedImage}

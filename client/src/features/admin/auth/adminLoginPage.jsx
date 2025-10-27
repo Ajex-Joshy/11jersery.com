@@ -13,12 +13,16 @@ const AdminLogin = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const admin = useSelector((store) => store.admin.admin);
 
   const { status, error: adminError } = useSelector((store) => store.admin);
 
   const onSubmit = async (data) => {
     dispatch(loginAdmin(data));
   };
+  useEffect(() => {
+    if (admin) navigate("/admin/dashboard");
+  });
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
