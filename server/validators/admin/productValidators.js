@@ -17,7 +17,7 @@ const priceValidationSchema = Joi.object({
   sale: Joi.number()
     .min(0)
     .optional()
-    .allow(null)
+    .allow(null) // Allow null if no sale price
     .less(Joi.ref("list"))
     .messages({
       "number.base": "Sale price must be a number",
@@ -26,11 +26,8 @@ const priceValidationSchema = Joi.object({
     }),
 });
 
-// Validates variants AFTER SKU is added by the service (if validating there)
-// OR validates {size, stock} BEFORE SKU generation
 const variantValidationSchema = Joi.object({
   size: Joi.string().trim().required().messages({
-    // Make size required per variant
     "string.empty": "Variant size is required",
     "any.required": "Variant size is required",
   }),
@@ -40,7 +37,7 @@ const variantValidationSchema = Joi.object({
     "number.min": "Variant stock cannot be negative",
     "any.required": "Variant stock is required",
   }),
-  // SKU is typically generated/validated in the service, not here
+  // SKU is generated/validated in the service
 });
 
 const detailValidationSchema = Joi.object({
@@ -75,11 +72,9 @@ export const parsedProductDataSchema = Joi.object({
   }),
   // Slug is generated/validated in service
   description: Joi.string().trim().max(2000).allow("").optional().messages({
-    // Allow empty, optional
     "string.max": "Description cannot exceed 2000 characters",
   }),
   shortDescription: Joi.string().trim().max(500).allow("").optional().messages({
-    // Allow empty, optional
     "string.max": "Short description cannot exceed 500 characters",
   }),
   price: priceValidationSchema.required().messages({
@@ -87,11 +82,12 @@ export const parsedProductDataSchema = Joi.object({
   }),
   variants: Joi.array()
     .items(variantValidationSchema)
-    // .min(1) // Ensure at least one has stock is better handled in Zod/Service logic
     .required() // Array itself is required
     .messages({
       "array.base": "Variants must be an array",
       "any.required": "Product variants are required",
+      // Note: Ensuring at least one variant has stock > 0 might be better handled in service logic
+      // or frontend validation (Zod refine), as Joi validation runs before file processing.
     }),
   categoryIds: Joi.array()
     .items(mongoIdSchema.label("Category ID"))
@@ -102,7 +98,7 @@ export const parsedProductDataSchema = Joi.object({
       "array.min": "At least one category is required",
       "any.required": "Category IDs are required",
     }),
-  // imageIds are added by the service after S3 upload, not validated here
+  // imageIds are added by the service after S3 upload
   details: Joi.array().items(detailValidationSchema).optional().messages({
     "array.base": "Details must be an array of attribute/description pairs",
   }),
@@ -111,11 +107,21 @@ export const parsedProductDataSchema = Joi.object({
     "array.max": "Cannot have more than 10 tags",
   }),
   isListed: Joi.boolean().required().messages({
-    // Required from frontend
     "boolean.base": "Listing status must be true or false",
     "any.required": "Listing status is required",
   }),
-  // rating, isDeleted, slug, imageIds, timestamps are handled by Mongoose/Service
+
+  // --- Added coverImageIndex ---
+  coverImageIndex: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .default(0)
+    .messages({
+      "number.base": "Cover image index must be a number",
+      "number.integer": "Cover image index must be a whole number",
+      "number.min": "Cover image index cannot be negative",
+    }),
 });
 
 // --- Schema for Parsed FAQ Data ---
@@ -125,3 +131,10 @@ export const parsedFaqsDataSchema = Joi.array()
   .messages({
     "array.base": "FAQs must be an array",
   });
+
+// --- Schema Options (for use with .validate()) ---
+export const validationOptions = {
+  abortEarly: false, // Show all errors
+  allowUnknown: true, // Allow fields not in schema (like _id on update)
+  stripUnknown: true, // Remove fields not in schema
+};

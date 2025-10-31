@@ -1,3 +1,4 @@
+import Faq from "../../models/faqModel.js";
 import Product from "../../models/productModel.js";
 import Review from "../../models/reviewModel.js";
 import { AppError } from "../../utils/helpers.js";
@@ -19,13 +20,13 @@ export const getProductDetailsService = async (productSlug) => {
   }
   // 2. Fetch reviews for the product
 
-  const reviews = await Review.find({ productId: product._id })
+  const reviews = await Review.find({ productId: product._id }) // productId: product._id
     .select("_id rating userName place comment createdAt productId")
     .sort({ createdAt: -1 })
     .lean();
 
   // 3. Fetch up to 4 other products from the same category
-  const sameCategoryProducts = await Product.find({
+  const otherProducts = await Product.find({
     categoryIds: { $in: product.categoryIds },
     _id: { $ne: product._id },
     isListed: true,
@@ -38,6 +39,24 @@ export const getProductDetailsService = async (productSlug) => {
   return {
     product,
     reviews,
-    sameCategoryProducts,
+    otherProducts,
   };
+};
+
+export const getProductFaqs = async (slug) => {
+  const product = await Product.findOne({
+    slug,
+    isListed: true,
+    isDeleted: false,
+  }).lean();
+
+  if (!product) {
+    throw new AppError(
+      404,
+      "PRODUCT_NOT_FOUND",
+      `Product with slug "${slug}" not found`
+    );
+  }
+  const faqs = await Faq.find({ productId: product._id });
+  return faqs;
 };

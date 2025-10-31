@@ -26,22 +26,16 @@ router.get("/", verifyAdminToken, getCategoriescontroller);
 router.post(
   "/",
   upload.single("image"),
-  verifyAdminToken,
   validate(createCategorySchema),
   createCategoryController
 );
 router.patch(
   "/:categoryId",
-  verifyAdminToken,
   upload.single("image"),
   validate(updateCategorySchema),
   updateCategoryController
 );
-router.patch(
-  "/:categoryId/status",
-  verifyAdminToken,
-  updateCategoryStatusController
-);
-router.delete("/:categoryId", verifyAdminToken, deleteCategoryController);
+router.patch("/:categoryId/status", updateCategoryStatusController);
+router.delete("/:categoryId", deleteCategoryController);
 
 export default router;

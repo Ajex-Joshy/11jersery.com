@@ -1,50 +1,36 @@
 import UserLayout from "../layouts/UserLayout";
-import Profile from "../features/user/account/profile";
 import { Route, Routes } from "react-router-dom";
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 import LandingPage from "../features/user/landingPage/LandingPage";
+import ProductOverview from "../features/user/productPages/ProductDetailsPage";
+import ProductDetailsPage from "../features/user/productPages/ProductDetailsPage";
+import ResetPasswordPage from "../features/user/account/components/ResetPasswordPage.jsx";
+import ForgotPasswordForm from "../features/user/account/components/ForgotPasswordForm.jsx";
+import AccountLayout from "../layouts/AccountLayout.jsx";
+import AccountOverview from "../features/user/account/AccountOverview.jsx";
 
 const UserRoutes = () => {
   return (
     <Routes>
       <Route element={<UserLayout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/product/:slug" element={<ProductDetailsPage />} />
       </Route>
-      <Route
-        path="/sign-in/*"
-        element={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100vh",
-              background: "linear-gradient(135deg, #000000 0%, #434343 100%)",
-            }}
-          >
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.05)",
-                padding: "2rem",
-                borderRadius: "12px",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <SignIn routing="path" path="/sign-in" />
-            </div>
-          </div>
-        }
-      />
-      <Route
-        path="/sign-up/*"
-        element={<SignUp routing="path" path="/sign-up" />}
-      />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       <Route element={<ProtectedRoutes />}>
-        <Route path="/account" element={<Profile />} />
-        <Route path="/orders" element={<Profile />} />
+        <Route path="/account" element={<AccountLayout />}>
+          {/* 'index' is the default page for "/account" */}
+          <Route index element={<AccountOverview />} />
+          {/* <Route path="orders" element={<OrderHistory />} />
+            <Route path="wishlist" element={<Wishlist />} />
+           <Route path="addresses" element={<Addresses />} />
+            <Route path="wallet" element={<Wallet />} />
+            <Route path="coupons" element={<Coupons />} />
+            <Route path="settings" element={<AccountSettings />} />
+            */}
+        </Route>
       </Route>
     </Routes>
   );

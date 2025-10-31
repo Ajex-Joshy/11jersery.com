@@ -10,14 +10,42 @@ import {
   validateObjectId,
 } from "../../utils/productutils.js";
 import { buildCategoryStockPipeline } from "./queryHelpers.js";
+
 export const createCategory = async (categoryData) => {
   const slug = await checkSlugUniqueness(
     Category,
     categoryData.title,
     "Category"
   );
+
+  let finalData = {
+    title: categoryData.title,
+    slug: slug,
+    imageId: categoryData.imageId,
+    isListed: categoryData.isListed,
+    inHome: categoryData.inHome ?? false,
+    inCollections: categoryData.inCollections ?? false,
+    discount: 0,
+    discountType: undefined,
+    minPurchaseAmount: 0,
+    maxRedeemable: 0,
+  };
+
+  if (categoryData.discountType && categoryData.discount > 0) {
+    finalData.discountType = categoryData.discountType;
+    finalData.discount = categoryData.discount;
+
+    if (categoryData.discountType === "flat") {
+      finalData.minPurchaseAmount = categoryData.minPurchaseAmount ?? 0;
+      finalData.maxRedeemable = 0;
+    } else if (categoryData.discountType === "percent") {
+      finalData.maxRedeemable = categoryData.maxRedeemable ?? 0;
+      finalData.minPurchaseAmount = 0;
+    }
+  }
+
   return await Category.create({
-    ...categoryData,
+    ...finalData,
     slug,
   });
 };
@@ -79,7 +107,6 @@ export const updateCategoryStatus = async (categoryId, status) => {
     throw new AppError(400, "INVALID_STATUS", "Status must be a boolean value");
   }
 
-  // Update category to mark as deleted
   const updateCategory = await Category.findByIdAndUpdate(
     categoryId,
     { isListed: status },

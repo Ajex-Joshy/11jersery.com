@@ -9,7 +9,9 @@ export const getCategories = async ({ queryKey }) => {
 };
 
 export const addCategory = async (formData) => {
+  console.log("data");
   const { data } = await axiosInstance.post("/admin/categories", formData);
+  console.log(data);
   return data;
 };
 
@@ -36,10 +38,6 @@ export const getCategoryDetails = async (slug) => {
 };
 
 export const updateCategory = async ({ id, formData }) => {
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
-
   const { data } = await axiosInstance.patch(
     `/admin/categories/${id}`,
     formData

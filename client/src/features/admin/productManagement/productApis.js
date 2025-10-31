@@ -37,20 +37,35 @@ export const deleteProduct = async (productId) => {
 export const getAllCategories = async () => {
   // Assuming a simple GET route without pagination needed for the filter
   const response = await axiosInstance.get("/admin/categories"); // Or adjust endpoint
-  return response.data; // Expects { data: { categories: [{_id, title}] } }
+  return response.data;
+};
+
+export const getProductDetails = async ({ queryKey }) => {
+  const [_, slug] = queryKey;
+  const response = await axiosInstance.get(`/admin/products/${slug}`); // Or adjust endpoint
+  return response.data;
 };
 
 /**
  * Adds a new product. Sends FormData including stringified JSON.
  */
 export const addProduct = async (formData) => {
-  console.log("done");
   const { data } = await axiosInstance.post("/admin/products", formData, {
     headers: {
       // Axios usually sets this automatically for FormData, but being explicit is fine
       "Content-Type": "multipart/form-data",
     },
   });
-  console.log(data);
+  return data;
+};
+
+export const updateProduct = async ({ slug, formData }) => {
+  const { data } = await axiosInstance.patch(
+    `/admin/products/${slug}`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
   return data;
 };

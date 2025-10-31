@@ -11,11 +11,32 @@ import {
   Facebook,
   Instagram,
   Github,
+  LogOut,
 } from "lucide-react";
+import AuthModal from "../features/user/account/components/AuthModal";
+import {
+  selectIsAuthenticated,
+  selectCurrentUser,
+  logOut,
+  openAuthModal,
+} from "../features/user/account/authSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { Toaster } from "react-hot-toast";
 
 // --- Header Component ---
 const Header = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logOut()); // Dispatch logout action
+  };
+
+  const handleOpenLogin = () => {
+    dispatch(openAuthModal("login")); // Dispatch open modal action
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-40">
@@ -100,9 +121,19 @@ const Header = () => {
             {/* Add badge if cart has items */}
             {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">3</span> */}
           </Link>
-          <Link to="/account" className="text-gray-600 hover:text-black">
-            <User size={22} />
-          </Link>
+          {isAuthenticated ? (
+            <div className="relative group">
+              <Link to="/account" className="...">
+                {" "}
+                <User />{" "}
+              </Link>
+            </div>
+          ) : (
+            <button onClick={handleOpenLogin} className="...">
+              {" "}
+              <User />{" "}
+            </button>
+          )}
           {/* Mobile Menu Button - Placeholder */}
           <button className="md:hidden text-gray-600 hover:text-black">
             {/* Add Menu icon here */}
@@ -116,9 +147,9 @@ const Header = () => {
 // --- Footer Component ---
 const Footer = () => {
   return (
-    <footer className="bg-stone-200 border-t border-gray-100">
+    <footer className=" bg-stone-200 ">
       {/* Newsletter Section */}
-      <div className="bg-black text-white py-12 px-4 rounded-lg my-12 max-w-6xl mx-auto">
+      <div className="bg-black text-white py-6 rounded-lg my-12 w-[80%] px-14 mx-auto">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
           <h2 className="text-2xl md:text-3xl font-bold leading-tight">
             Get exclusive access, new
@@ -147,7 +178,7 @@ const Footer = () => {
       </div>
 
       {/* Main Footer Links */}
-      <div className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="w-full py-12 flex flex-col p-8 md:flex-row md:justify-around bg-stone-200">
         {/* Brand & Social */}
         <div className="md:col-span-1">
           <h3 className="text-xl font-bold mb-3">11jersey.com</h3>
@@ -279,14 +310,10 @@ const UserLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <AuthModal />
+      <Toaster position="top-right" />
     </div>
   );
 };
 
 export default UserLayout;
-
-{
-  /* <SignedIn>
-        <UserButton afterSignOutUrl="/" />
-      </SignedIn> */
-}

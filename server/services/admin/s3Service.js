@@ -21,7 +21,7 @@ const randomImageName = (bytes = 16) =>
 
 export const uploadFileToS3 = async (file) => {
   const imageName = randomImageName();
-  const key = `categories/${imageName}`; // Folder structure in S3
+  const key = `images/${imageName}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,

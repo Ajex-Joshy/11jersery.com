@@ -27,31 +27,28 @@ export const verifyOtpSchema = Joi.object({
 
 export const resetPasswordSchema = Joi.object({
   password: passwordComplexity({
-    // 2. Use passwordComplexity here
     min: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
+    max: 26,
+    lowerCase: 1,
+    upperCase: 1,
+    numeric: 1,
+    symbol: 1,
+    requirementCount: 4,
   })
     .required()
     .messages({
       "any.required": "Password is required",
-      // 3. The error message key changes
-      "password.complexity":
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol",
-    }),
-
-  confirmPassword: Joi.string()
-    .valid(Joi.ref("password"))
-    .required()
-    .label("Confirm Password")
-    .messages({
-      "any.required": "Confirm Password is required",
-      "any.only": "Password and Confirm Password do not match",
+      "passwordComplexity.tooShort":
+        "Password must be at least 8 characters long",
+      "passwordComplexity.uppercase":
+        "Password must include at least one uppercase letter",
+      "passwordComplexity.lowercase":
+        "Password must include at least one lowercase letter",
+      "passwordComplexity.numeric": "Password must include at least one number",
+      "passwordComplexity.symbol":
+        "Password must include at least one special symbol",
     }),
 });
-
 // Reusable name validation
 const nameValidation = (label) =>
   Joi.string()
@@ -77,7 +74,7 @@ export const signupSchema = Joi.object({
   }),
 
   phone: Joi.string()
-    .pattern(/^[6-9]\d{9}$/)
+    .pattern(/^(\+91[\-\s]?)?[6-9]\d{9}$/)
     .required()
     .messages({
       "string.pattern.base": "Please provide a valid 10-digit phone number",
@@ -85,15 +82,29 @@ export const signupSchema = Joi.object({
 
   password: passwordComplexity({
     min: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
+    max: 26,
+    lowerCase: 1,
+    upperCase: 1,
+    numeric: 1,
+    symbol: 1,
+    requirementCount: 4,
   })
     .required()
     .messages({
       "any.required": "Password is required",
-      "password.complexity":
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol",
+      "passwordComplexity.tooShort":
+        "Password must be at least 8 characters long",
+      "passwordComplexity.uppercase":
+        "Password must include at least one uppercase letter",
+      "passwordComplexity.lowercase":
+        "Password must include at least one lowercase letter",
+      "passwordComplexity.numeric": "Password must include at least one number",
+      "passwordComplexity.symbol":
+        "Password must include at least one special symbol",
     }),
+  firebaseToken: Joi.string().required().messages({
+    "string.base": "Firebase token must be a string",
+    "string.empty": "Firebase token is required",
+    "any.required": "Firebase token is required",
+  }),
 });

@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./components/admin/Sidebar";
+import { Toaster } from "react-hot-toast";
 
 const AdminLayout = () => {
   return (
@@ -9,6 +10,7 @@ const AdminLayout = () => {
 
       <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
         <Outlet />
+        <Toaster position="top-right" />
       </main>
     </div>
   );

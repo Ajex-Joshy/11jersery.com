@@ -7,7 +7,7 @@ const ProductCard = ({ product }) => {
   // --- 1. Use correct image ID field and path ---
   const imageId = product.imageIds?.[0];
   const imageUrl = imageId
-    ? `${S3_URL}/categories/${imageId}`
+    ? `${S3_URL}/images/${imageId}`
     : "https://acube.delighterp.com/uploaded/acube_delighterp_com/product/default_product_image.jpg"; // Fallback image
 
   // --- 2. Calculate discount ---
@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
       className="group block overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col" // Added flex-col
     >
       {/* Image container with background */}
-      <div className="aspect-[1/1] overflow-hidden bg-gray-100 p-4 rounded-t-xl">
+      <div className="aspect-[1/1] overflow-hidden bg-gray-100 rounded-t-xl">
         {" "}
         <img
           src={imageUrl}

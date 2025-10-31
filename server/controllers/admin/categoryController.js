@@ -9,17 +9,30 @@ import {
 import { updateCategory } from "../../services/admin/categoryServices.js";
 import { uploadFileToS3 } from "../../services/admin/s3Service.js";
 import logger from "../../utils/logger.js";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "../../validators/admin/categoryValidator.js";
+import { parseAndValidateCategoryData } from "./controllerHelpers.js/parseAndValidateCategoryData.js";
 
 export const createCategoryController = asyncHandler(async (req, res) => {
   const file = req.file;
   if (!file) {
     return res.status(400).json({ message: "Image is required" });
   }
-  const categoryData = req.body;
+  let validatedData;
+  try {
+    validatedData = parseAndValidateCategoryData(
+      req.body,
+      createCategorySchema
+    );
+  } catch (error) {
+    throw error;
+  }
 
   const imageId = await uploadFileToS3(file);
 
-  const category = await createCategory({ ...categoryData, imageId });
+  const category = await createCategory({ ...validatedData, imageId });
   sendResponse(res, category);
 });
 
@@ -27,18 +40,14 @@ export const updateCategoryController = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
   const updateData = req.body || {};
   const file = req.file;
-  if (updateData.isListed !== undefined) {
-    updateData.isListed = updateData.isListed === "true";
-  }
-  if (updateData.isFeatured !== undefined) {
-    updateData.isFeatured = updateData.isFeatured === "true";
-  }
-  // Convert numbers if needed
-  if (updateData.categoryOffer !== undefined) {
-    updateData.categoryOffer = Number(updateData.categoryOffer);
-  }
-  if (updateData.maxRedeemable !== undefined) {
-    updateData.maxRedeemable = Number(updateData.maxRedeemable);
+  let validatedData;
+  try {
+    validatedData = parseAndValidateCategoryData(
+      req.body,
+      updateCategorySchema
+    );
+  } catch (error) {
+    throw error;
   }
 
   let newImageId = null;
@@ -47,7 +56,6 @@ export const updateCategoryController = asyncHandler(async (req, res) => {
       newImageId = await uploadFileToS3(file);
       updateData.imageId = newImageId;
     } catch (s3Error) {
-      // Handle S3 upload error specifically
       logger.error("S3 Upload Error:", s3Error);
       res.status(500);
       throw new Error("Failed to upload new category image.");

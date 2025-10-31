@@ -1,6 +1,9 @@
 import { asyncHandler } from "../../utils/helpers.js";
 import { sendResponse } from "../../utils/helpers.js";
-import { getProductDetailsService } from "../../services/user/productService.js";
+import {
+  getProductDetailsService,
+  getProductFaqs,
+} from "../../services/user/productService.js";
 
 export const getProductDetailsController = asyncHandler(async (req, res) => {
   const { slug } = req.params;
@@ -8,4 +11,12 @@ export const getProductDetailsController = asyncHandler(async (req, res) => {
   const productData = await getProductDetailsService(slug);
 
   sendResponse(res, productData);
+});
+
+export const getProductFaqsController = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+
+  const faqs = await getProductFaqs(slug);
+
+  sendResponse(res, faqs);
 });

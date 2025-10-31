@@ -18,6 +18,7 @@ const AdminLogin = () => {
   const { status, error: adminError } = useSelector((store) => store.admin);
 
   const onSubmit = async (data) => {
+    console.log(data);
     dispatch(loginAdmin(data));
   };
   useEffect(() => {
@@ -45,7 +46,7 @@ const AdminLogin = () => {
               className={`border p-2 rounded ${
                 errors.email ? "border-red-500" : "border-gray-300"
               }`}
-              {...register("email", {
+              {...register("identifier", {
                 required: "Email is required",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,

@@ -6,12 +6,15 @@ import {
   deleteProduct,
   getAllCategories,
   addProduct,
+  getProductDetails,
+  updateProduct,
 } from "./productApis.js";
 
 import { CATEGORIES_QUERY_KEY } from "../categoryManagement/categoryHooks.js";
 import { useNavigate } from "react-router-dom";
 
 export const PRODUCTS_QUERY_KEY = "products";
+export const PRODUCT_DETAILS_KEY = "productDetails";
 
 /**
  * Hook to fetch paginated/filtered products.
@@ -21,6 +24,13 @@ export const useProducts = (params) => {
     queryKey: [PRODUCTS_QUERY_KEY, params],
     queryFn: getProducts,
     keepPreviousData: true,
+  });
+};
+
+export const useProductDetails = (slug) => {
+  return useQuery({
+    queryKey: [PRODUCT_DETAILS_KEY, slug],
+    queryFn: getProductDetails,
   });
 };
 
@@ -80,6 +90,31 @@ export const useAddProduct = () => {
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to add product.");
+    },
+  });
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: updateProduct,
+    onSuccess: (data, variables) => {
+      toast.success(data.message || "Product updated successfully!");
+
+      queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
+
+      // Invalidate the specific product details query that was just updated
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_DETAILS_KEY, variables.slug],
+      });
+
+      navigate("/admin/products");
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to update product.");
     },
   });
 };

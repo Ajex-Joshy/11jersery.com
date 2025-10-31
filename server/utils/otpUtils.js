@@ -33,7 +33,7 @@ export const saveOTP = async (
 
 export const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 4,
+  max: 10,
   message: {
     code: "TOO_MANY_REQUESTS",
     message: "Too many OTP verification attempts. Try again later.",

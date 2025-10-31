@@ -103,18 +103,6 @@ export const getUsersStats = async () => {
   };
 };
 
-export const deactivateInactiveUsers = async () => {
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-  const result = await User.updateMany(
-    { lastLogin: { $lt: threeMonthsAgo }, status: "active" },
-    { $set: { status: "inactive" } }
-  );
-
-  return result;
-};
-
 export const updateUserStatus = async (userId, isBlocked) => {
   if (typeof isBlocked !== "boolean") {
     throw new AppError(400, "INVALID_STATUS", "Status should be boolean");
@@ -138,4 +126,16 @@ export const updateUserStatus = async (userId, isBlocked) => {
   }
 
   return user;
+};
+
+export const deactivateInactiveUsers = async () => {
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+  const result = await User.updateMany(
+    { lastLogin: { $lt: threeMonthsAgo }, status: "active" },
+    { $set: { status: "inactive" } }
+  );
+
+  return result;
 };

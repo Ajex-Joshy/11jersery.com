@@ -19,7 +19,7 @@ import { ChevronDown, Plus, Search } from "lucide-react";
 
 const ProductImage = ({ imageId, title }) => (
   <img
-    src={`${S3_URL}/categories/${imageId}`}
+    src={`${S3_URL}/images/${imageId}`}
     alt={title}
     className="w-12 h-12 object-cover rounded-md border border-gray-200"
     onError={(e) => {
@@ -112,7 +112,9 @@ const ProductList = () => {
       key: "title",
       sortable: true,
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.title}</span>
+        <span className="font-medium text-gray-900  w-40  break-words whitespace-normal">
+          {item.title}
+        </span>
       ),
     },
     {
@@ -127,7 +129,7 @@ const ProductList = () => {
           .filter(Boolean) // Remove undefined if category not found
           .join(", ");
         return (
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-600 w-40 break-words whitespace-normal">
             {categoryNames || "N/A"}
           </span>
         );

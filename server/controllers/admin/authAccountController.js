@@ -1,10 +1,11 @@
 import { loginAdmin } from "../../services/admin/authAccountServices.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 import { asyncHandler } from "../../utils/helpers.js";
 
 export const adminLoginController = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const result = await loginAdmin(email, password);
-  res.status(200).json(result);
+  const { identifier, password } = req.body;
+  const result = await loginAdmin(identifier, password);
+  res.status(STATUS_CODES.OK).json(result);
 });
 
 export const adminLogoutController = (req, res) => {

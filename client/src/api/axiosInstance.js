@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = localStorage.getItem("token");
 
     if (token) {
@@ -25,7 +25,6 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      // e.g., logout on 401
       if (error.response.status === 401) {
         localStorage.removeItem("token");
         window.location.href = "/login";

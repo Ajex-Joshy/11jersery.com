@@ -20,7 +20,7 @@ const DiscoverCard = ({ data }) => (
     <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
       {data?.imageId ? (
         <img
-          src={`${S3_URL}/categories/${data.imageId}`}
+          src={`${S3_URL}/images/${data.imageId}`}
           alt={data.title}
           className="w-16 h-16 object-cover rounded-md"
         />
@@ -79,7 +79,7 @@ const CategoryManagement = () => {
     }
   };
 
-  // --- COLUMN DEFINITIONS  ---
+  // --- COLUMN DEFINITIONS ---
   const categoryColumns = [
     {
       header: "SNO",
@@ -87,14 +87,13 @@ const CategoryManagement = () => {
       sortable: false,
       render: (_, index) => (
         <span className="font-medium text-gray-900">
-          {/* Calculate index based on pagination */}
           {(queryParams.page - 1) * queryParams.limit + index + 1}
         </span>
       ),
     },
     {
       header: "Category Name",
-      key: "title", // Matches API `sortBy` value
+      key: "title", // API sort field
       sortable: true,
       render: (item) => (
         <span className="font-medium text-gray-900">{item.title}</span>
@@ -102,19 +101,20 @@ const CategoryManagement = () => {
     },
     {
       header: "Stock",
-      key: "totalStock", // Assuming API supports sorting by this
-      sortable: true,
+      key: "totalStock",
+      sortable: true, // If backend supports
       render: (item) => (
-        <span className="text-gray-700">{item.totalStock}</span>
+        <span className="text-gray-700">{item.totalStock ?? "N/A"}</span>
       ),
     },
     {
       header: "Date Added",
-      key: "createdAt", // Matches API `sortBy` value
+      key: "createdAt", // API sort field
       sortable: true,
       render: (item) => (
         <span className="text-gray-700">
-          {new Date(item.createdAt).toLocaleDateString("en-US", {
+          {new Date(item.createdAt).toLocaleDateString("en-IN", {
+            // Use locale for India
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -123,13 +123,45 @@ const CategoryManagement = () => {
       ),
     },
     {
-      header: "List / Unlist",
-      key: "list",
-      sortable: false, // Usually not sortable
+      header: "Offer Details",
+      key: "discount", // API sort field (sorts by discount value)
+      sortable: true,
+      render: (item) => {
+        if (item.discount > 0 && item.discountType) {
+          if (item.discountType === "flat") {
+            return (
+              <div className="text-sm">
+                <span className="font-semibold text-gray-800">
+                  ₹{item.discount.toLocaleString()} Off
+                </span>
+                <span className="block text-xs text-gray-500">
+                  Min: ₹{item.minPurchaseAmount?.toLocaleString() || 0}
+                </span>
+              </div>
+            );
+          } else if (item.discountType === "percent") {
+            return (
+              <div className="text-sm">
+                <span className="font-semibold text-gray-800">
+                  {item.discount}% Off
+                </span>
+                <span className="block text-xs text-gray-500">
+                  Max: ₹{item.maxRedeemable?.toLocaleString() || 0}
+                </span>
+              </div>
+            );
+          }
+        }
+        return <span className="text-gray-500 text-sm">-</span>; // No offer
+      },
+    },
+    {
+      header: "Status",
+      key: "isListed",
+      sortable: true,
       render: (item) => (
         <ListToggleButton
           isListed={item.isListed}
-          // Open modal on click, pass item and action type
           onClick={() => openModal(item, "toggleList")}
         />
       ),
@@ -141,32 +173,14 @@ const CategoryManagement = () => {
       render: (item) => (
         <ActionIconButtons
           onEdit={() => navigate(`/admin/edit-category/${item.slug}`)}
-          // Open delete confirmation modal
           onDelete={() => openModal(item, "delete")}
         />
-      ),
-    },
-    {
-      header: "Offer %",
-      key: "discount", // Assuming API supports sorting
-      sortable: true,
-      render: (item) => <span className="text-gray-700">{item.discount}</span>,
-    },
-    {
-      header: "Max Reedmable",
-      key: "maxReedemable", // Assuming API supports sorting
-      sortable: true,
-      render: (item) => (
-        <span className="text-gray-700">{item.maxReedemable}</span>
       ),
     },
   ];
   // --- DATA ---
   const categories = categoryData?.data?.categories || [];
   const pagination = categoryData?.data?.pagination;
-  const discoverCategories = categories.filter(
-    (cat) => cat.inHome || cat.inCollections
-  );
 
   return (
     <div className="p-6 bg-gray-50/50 min-h-screen">

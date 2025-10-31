@@ -3,9 +3,11 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/jwt.js";
 import { AppError } from "../../utils/helpers.js";
 
-export const loginAdmin = async (email, password) => {
+export const loginAdmin = async (identifier, password) => {
+  console.log(identifier, password);
   try {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ email: identifier });
+    console.log(admin);
     if (!admin)
       throw new AppError(
         400,

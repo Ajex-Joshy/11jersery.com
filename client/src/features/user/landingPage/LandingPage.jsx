@@ -11,15 +11,13 @@ import ReviewCard from "./components/ReviewCard.jsx";
 // Placeholder components for sections not fully implemented yet
 const HeroSection = () => (
   <div className="relative bg-gray-100 py-16 md:py-24 overflow-hidden">
-    <div
-      className="absolute right-0 top-[30px] h-full "
-      style={{
-        width: "42%",
-        backgroundImage: "url('/images/home.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    ></div>
+    <div className="flex justify-end items-center px-4 md:px-8">
+      <img
+        src="/images/home.png"
+        alt="Hero"
+        className="w-full md:w-[60%] lg:w-[48%] absolute md: mt-130  object-cover"
+      />
+    </div>
     <div className="container mx-auto px-4 relative z-10 text-center md:text-left">
       <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">
         Authentic Jerseys
@@ -79,7 +77,6 @@ const TeamLogos = () => (
 
 const ProductSection = ({ title, products }) => (
   <section className="py-12 bg-gray-50">
-    {console.log(products)}
     <div className="container mx-auto px-4">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
         {title}
@@ -110,7 +107,6 @@ const ReviewSection = ({ reviews }) => {
           </div>
         </div>
         <div className="flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-          {console.log(reviews)}
           {reviews?.reviews?.map((review) => (
             <ReviewCard key={review._id} review={review} />
           ))}

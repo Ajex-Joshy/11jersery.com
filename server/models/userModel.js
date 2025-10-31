@@ -3,10 +3,6 @@ import validator from "validator";
 
 const userSchema = new mongoose.Schema(
   {
-    id: {
-      type: String,
-      required: true,
-    },
     firstName: {
       type: String,
       required: [true, "First name is required"],
@@ -33,6 +29,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Phone number is required"],
       unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: 6,
     },
     gender: {
       type: String,
@@ -62,6 +63,8 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
   },
   {
     timestamps: true,

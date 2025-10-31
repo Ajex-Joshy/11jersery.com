@@ -5,10 +5,9 @@ import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Image as ImageIcon } from "lucide-react"; // Add icons
-
 import { productSchema } from "./productSchema";
 import { useAddProduct, useAllCategories } from "./productHooks";
-import ImageDropzone from "../../../components/admin/ImageDropZone";
+import ProductImageDropzone from "../../../components/admin/ProductImageDropZone";
 
 // --- Reusable FormInput ---
 const FormInput = ({ label, id, error, ...props }) => (
@@ -72,6 +71,7 @@ const AddProduct = () => {
       detailsSleeveType: "",
       detailsInstructions: "",
       images: [],
+      coverImageIndex: 0,
     },
   });
   console.log(errors);
@@ -126,6 +126,7 @@ const AddProduct = () => {
       tags: data.tags,
       isListed: data.isListed,
       details: detailsArray,
+      coverImageIndex: data.coverImageIndex,
     };
     // 2. Prepare the 'faqs' array
     const faqsData = data.faqs;
@@ -135,10 +136,12 @@ const AddProduct = () => {
     formData.append("faqsData", JSON.stringify(faqsData));
 
     // 4. Append the main image file
-    if (data.image instanceof File) {
-      formData.append("images", data.image); // Use 'images' if backend expects multiple
+    if (data.images && data.images.length > 0) {
+      data.images.forEach((file) => {
+        // Use the same key 'images' for all files
+        formData.append(`images`, file);
+      });
     }
-    // TODO: Append secondary images when implemented
 
     // 5. Call the mutation
     addProductMutate(formData, {
@@ -173,6 +176,7 @@ const AddProduct = () => {
               id="title"
               {...register("title")}
               error={errors.title?.message}
+              s
             />
             <FormTextarea
               label="Product Description"
@@ -207,49 +211,31 @@ const AddProduct = () => {
 
           {/* Right Column: Image Upload, Short Desc */}
           <div className="lg:col-span-1 space-y-6 bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-lg font-semibold border-b pb-2">
-              Upload Product Image
-            </h2>
             <Controller
-              name="image"
+              name="images" // RHF field for File[]
               control={control}
-              render={({ field }) => (
-                <ImageDropzone
-                  onChange={field.onChange}
-                  value={field.value}
-                  aspect={1 / 1}
-                /> // Square aspect for product?
+              render={(
+                { field: imageField } // Rename field to avoid conflict
+              ) => (
+                <Controller
+                  name="coverImageIndex" // RHF field for the index
+                  control={control}
+                  render={({ field: coverIndexField }) => (
+                    <ProductImageDropzone
+                      label="Upload Product Images "
+                      onChangeFiles={imageField.onChange}
+                      valueFiles={imageField.value}
+                      onChangeCoverIndex={coverIndexField.onChange}
+                      valueCoverIndex={coverIndexField.value}
+                      error={
+                        errors.images?.message || errors.images?.root?.message
+                      }
+                      aspect={1 / 1}
+                    />
+                  )}
+                />
               )}
             />
-            {errors.image && (
-              <span className="text-red-500 text-sm">
-                {errors.image.message}
-              </span>
-            )}
-            {/* TODO: Add inputs/buttons for secondary images */}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="flex-1 border border-dashed border-gray-300 rounded h-20 flex items-center justify-center text-gray-400 hover:border-gray-500"
-              >
-                {" "}
-                <ImageIcon size={24} />{" "}
-              </button>
-              <button
-                type="button"
-                className="flex-1 border border-dashed border-gray-300 rounded h-20 flex items-center justify-center text-gray-400 hover:border-gray-500"
-              >
-                {" "}
-                <ImageIcon size={24} />{" "}
-              </button>
-              <button
-                type="button"
-                className="flex-1 border border-dashed border-gray-300 rounded h-20 flex items-center justify-center text-gray-400 hover:border-gray-500"
-              >
-                {" "}
-                <ImageIcon size={24} />{" "}
-              </button>
-            </div>
 
             <FormTextarea
               label="Short Description"

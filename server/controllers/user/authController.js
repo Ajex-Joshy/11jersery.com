@@ -1,14 +1,20 @@
 import {
-  requestOTP,
+  forgotPassword,
   resetPassword,
   signupUser,
-  verifyOtp,
 } from "../../services/user/authServices.js";
-import { sendResponse } from "../../utils/helpers.js";
+import { AppError, sendResponse } from "../../utils/helpers.js";
 import { loginUser } from "../../services/user/authServices.js";
 import { asyncHandler } from "../../utils/helpers.js";
 
 export const userSignupController = asyncHandler(async (req, res) => {
+  if (!req.body.firebaseToken) {
+    throw new AppError(
+      400,
+      "VALIDATION_ERROR",
+      "Firebase verification token is missing."
+    );
+  }
   const { user, token } = await signupUser(req.body);
   sendResponse(res, { user, token }, 201);
 });
@@ -20,7 +26,7 @@ export const userLoginController = asyncHandler(async (req, res) => {
 
 export const forgotPasswordController = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  const result = await requestOTP(email);
+  const result = await forgotPassword(email);
   res.status(200).send(result);
 });
 
@@ -32,8 +38,13 @@ export const verifyOtpController = asyncHandler(async (req, res) => {
 });
 
 export const resetPasswordController = asyncHandler(async (req, res) => {
+  const { token } = req.params;
   const { password } = req.body;
-  const user = req.user;
-  const result = await resetPassword(user, password);
+  console.log(token, password);
+
+  if (!password)
+    throw new AppError(400, "VALIDATION_ERROR", "New password is required");
+
+  const result = await resetPassword(token, password);
   res.status(200).send(result);
 });

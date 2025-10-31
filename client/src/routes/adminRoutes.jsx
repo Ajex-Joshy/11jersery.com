@@ -12,6 +12,7 @@ import AddProduct from "../features/admin/productManagement/AddProduct";
 import EditCategory from "../features/admin/categoryManagement/EditCategory";
 import Profile from "../features/admin/account/Profile";
 import Admin404 from "../components/admin/404";
+import EditProduct from "../features/admin/productManagement/EditProduct";
 
 const AdminRoutes = () => {
   return (
@@ -31,6 +32,7 @@ const AdminRoutes = () => {
           <Route path="/products" element={<ProductManagement />} />
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/edit-product/:slug" element={<EditProduct />} />
           {/* 
           <Route path="/orders" element={<OrderMangement />} />
           <Route path="/categories" element={<CategoryManagement />} />

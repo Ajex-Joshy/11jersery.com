@@ -11,7 +11,6 @@ const categorySchema = new mongoose.Schema(
     slug: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -24,16 +23,40 @@ const categorySchema = new mongoose.Schema(
     },
     discount: {
       type: Number,
+      min: [0, "Discount cannot be negative"], // Added min validation
       default: 0,
     },
     discountType: {
       type: String,
       enum: ["flat", "percent"],
+      required: [
+        function () {
+          return this.discount > 0;
+        },
+        "Discount type is required when discount value is set",
+      ],
     },
-    maxReedemable: {
+    minPurchaseAmount: {
       type: Number,
+      min: [0, "Minimum purchase amount cannot be negative"],
+      required: [
+        function () {
+          return this.discountType === "flat" && this.discount > 0;
+        },
+        "Minimum purchase amount is required for flat discounts",
+      ],
       default: 0,
-      min: 0,
+    },
+    maxRedeemable: {
+      type: Number,
+      min: [0, "Max redeemable amount cannot be negative"],
+      required: [
+        function () {
+          return this.discountType === "percent" && this.discount > 0;
+        },
+        "Maximum redeemable amount is required for percent discounts",
+      ],
+      default: 0,
     },
     inHome: {
       type: Boolean,
