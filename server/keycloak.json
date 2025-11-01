@@ -1,9 +1,0 @@
-{
-  "realm": "11jersey.com",
-  "auth-server-url": "http://127.0.0.1:8080/",
-  "ssl-required": "external",
-  "resource": "11jersey.com-api",
-  "use-resource-role-mappings": false,
-  "bearer-only": true,
-  "confidential-port": 0
-}

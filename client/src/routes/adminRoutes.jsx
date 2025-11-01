@@ -13,6 +13,7 @@ import EditCategory from "../features/admin/categoryManagement/EditCategory";
 import Profile from "../features/admin/account/Profile";
 import Admin404 from "../components/admin/404";
 import EditProduct from "../features/admin/productManagement/EditProduct";
+import ErrorPage from "../features/user/company/ErrorPage";
 
 const AdminRoutes = () => {
   return (
@@ -20,7 +21,7 @@ const AdminRoutes = () => {
       <Route
         path="/login"
         element={<AdminLoginPage />}
-        errorElement={<Admin404 />}
+        errorElement={<ErrorPage />}
       />
       <Route element={<AdminProtectedRoute />}>
         <Route element={<AdminLayout />}>
@@ -41,7 +42,9 @@ const AdminRoutes = () => {
           <Route path="/profile" element={<AdminProfile />} />
           <Route path="/inbox" element={<Inbox />} /> */}
         </Route>
+        <Route path="*" element={<Admin404 />} />
       </Route>
+      <Route path="*" element={<Admin404 />} />
     </Routes>
   );
 };

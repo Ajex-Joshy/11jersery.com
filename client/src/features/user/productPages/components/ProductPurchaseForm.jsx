@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Minus, Plus, Heart } from "lucide-react";
-import StarRating from "../../../../components/common/StarRating";
 import toast from "react-hot-toast";
+import StarRating from "../../../../components/common/StarRating";
 
-const ProductPurchaseForm = ({ product }) => {
+const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
 
   // State for user selections
@@ -11,7 +11,7 @@ const ProductPurchaseForm = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
 
   // Create a map for quick stock lookup
-  const stockMap = new Map(variants.map((v) => [v.size, v.stock]));
+  const stockMap = new Map((variants || []).map((v) => [v.size, v.stock]));
 
   // Calculate discount
   const hasDiscount = price.sale < price.list;
@@ -21,24 +21,23 @@ const ProductPurchaseForm = ({ product }) => {
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
-    setQuantity(1); // Reset quantity when size changes
+    setQuantity(1); // Reset quantity
   };
 
   const handleQuantityChange = (amount) => {
-    setQuantity((prev) => Math.max(1, prev + amount)); // Ensure quantity is at least 1
+    setQuantity((prev) => Math.max(1, prev + amount)); // Min quantity 1
   };
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      toast.error("Please select a size."); // Use toast for feedback
+      toast.error("Please select a size.");
       return;
     }
-    // Add to cart logic here (e.g., dispatch to Redux or call context)
+    // Add to cart logic would go here
     console.log(`Adding ${quantity} of size ${selectedSize} to cart.`);
     toast.success("Added to cart!");
   };
 
-  // Check stock for the *selected* size
   const selectedStock = stockMap.get(selectedSize) || 0;
   const isOutOfStock = selectedSize && selectedStock === 0;
   const isAddToCartDisabled =
@@ -81,11 +80,23 @@ const ProductPurchaseForm = ({ product }) => {
 
       {/* Size Selector */}
       <div>
-        <span className="text-sm font-semibold text-gray-700 mb-2 block">
-          Choose Size
-        </span>
+        {/* --- ADDED THIS SECTION --- */}
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold text-gray-700">
+            Choose Size
+          </span>
+          <button
+            type="button"
+            onClick={onOpenSizeGuide} // Calls the function from props
+            className="text-sm font-medium text-blue-600 hover:underline"
+          >
+            See size guide
+          </button>
+        </div>
+        {/* --- END OF ADDED SECTION --- */}
+
         <div className="flex flex-wrap gap-2">
-          {variants.map((variant) => {
+          {(variants || []).map((variant) => {
             const isAvailable = variant.stock > 0;
             const isSelected = selectedSize === variant.size;
             return (
@@ -93,19 +104,15 @@ const ProductPurchaseForm = ({ product }) => {
                 key={variant.sku}
                 onClick={() => handleSizeSelect(variant.size)}
                 disabled={!isAvailable}
-                className={`
-                  px-4 py-2 rounded-md text-sm font-medium border
-                  ${
-                    isSelected
-                      ? "bg-black text-white border-black" // Selected style
-                      : "bg-white text-gray-700 border-gray-300" // Default style
-                  }
-                  ${
-                    isAvailable
-                      ? "hover:border-black cursor-pointer" // Available
-                      : "opacity-50 cursor-not-allowed bg-gray-100 line-through" // Out of stock
-                  }
-                `}
+                className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                  isSelected
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-gray-700 border-gray-300"
+                } ${
+                  isAvailable
+                    ? "hover:border-black cursor-pointer"
+                    : "opacity-50 cursor-not-allowed bg-gray-100 line-through"
+                }`}
               >
                 {variant.size}
               </button>

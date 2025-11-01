@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, Link, NavLink } from "react-router-dom";
+import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Search,
   Heart,
@@ -30,8 +30,14 @@ const Header = () => {
   const user = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logOut()); // Dispatch logout action
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate(); // Get the navigate function
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+    }
   };
 
   const handleOpenLogin = () => {
@@ -100,17 +106,22 @@ const Header = () => {
         {/* Search and Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}
-          <div className="relative hidden lg:block">
-            <input
-              type="search"
-              placeholder="Search for products..."
-              className="bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            />
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-            />
-          </div>
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative hidden lg:block">
+              <input
+                type="search"
+                placeholder="Search for products..."
+                className="bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                // --- 5. Connect input to React state ---
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Search
+                size={18}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
+            </div>
+          </form>
 
           {/* Icons */}
           <Link to="/wishlist" className="text-gray-600 hover:text-black">
@@ -218,12 +229,12 @@ const Footer = () => {
           <h4 className="font-semibold mb-4 text-gray-800">COMPANY</h4>
           <ul className="space-y-2 text-sm text-gray-600">
             <li>
-              <Link to="/about" className="hover:underline">
+              <Link to="/about-us" className="hover:underline">
                 About Us
               </Link>
             </li>
             <li>
-              <Link to="/story" className="hover:underline">
+              <Link to="/our-story" className="hover:underline">
                 Our Story
               </Link>
             </li>
@@ -234,12 +245,12 @@ const Footer = () => {
           <h4 className="font-semibold mb-4 text-gray-800">HELP</h4>
           <ul className="space-y-2 text-sm text-gray-600">
             <li>
-              <Link to="/terms" className="hover:underline">
+              <Link to="/terms-and-conditions" className="hover:underline">
                 Terms & Conditions
               </Link>
             </li>
             <li>
-              <Link to="/privacy" className="hover:underline">
+              <Link to="/privacy-policy" className="hover:underline">
                 Privacy Policy
               </Link>
             </li>

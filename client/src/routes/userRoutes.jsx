@@ -9,13 +9,29 @@ import ResetPasswordPage from "../features/user/account/components/ResetPassword
 import ForgotPasswordForm from "../features/user/account/components/ForgotPasswordForm.jsx";
 import AccountLayout from "../layouts/AccountLayout.jsx";
 import AccountOverview from "../features/user/account/AccountOverview.jsx";
+import ProductListingPage from "../features/user/productPages/ProductListingPage.jsx";
+import AboutUsPage from "../features/user/company/AboutUs.jsx";
+import OurStoryPage from "../features/user/company/OurStory.jsx";
+import TermsAndConditionsPage from "../features/user/company/TermsAndConditionsPage.jsx";
+import PrivacyPolicyPage from "../features/user/company/PrivacyPolicyPage.jsx";
+import NotFoundPage from "../features/user/company/NotFoundPage.jsx";
+import ErrorPage from "../features/user/company/ErrorPage.jsx";
 
 const UserRoutes = () => {
   return (
     <Routes>
-      <Route element={<UserLayout />}>
+      <Route element={<UserLayout />} errorElement={<ErrorPage />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/product/:slug" element={<ProductDetailsPage />} />
+        <Route path="/products" element={<ProductListingPage />} />
+        <Route path="/about-us" element={<AboutUsPage />} />
+        <Route path="/our-story" element={<OurStoryPage />} />
+        <Route
+          path="/terms-and-conditions"
+          element={<TermsAndConditionsPage />}
+        />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
@@ -31,7 +47,9 @@ const UserRoutes = () => {
             <Route path="settings" element={<AccountSettings />} />
             */}
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

@@ -1,0 +1,140 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { LegalPageLayout, LegalSection } from "./LegalLayout";
+// TODO: Update this date when you finalize the document
+const LAST_UPDATED = "October 31, 2025";
+
+const TermsAndConditionsPage = () => {
+  return (
+    <LegalPageLayout title="Terms and Conditions" lastUpdated={LAST_UPDATED}>
+      <LegalSection title="1. Introduction">
+        <p>
+          Welcome to 11jersey.com (the "Site"). These terms and conditions
+          ("Terms") govern your use of our website and the purchase of products
+          from us. By accessing the Site or placing an order, you agree to be
+          bound by these Terms. If you do not agree to all of these Terms,
+          please do not use this Site.
+        </p>
+        <p>
+          Throughout the site, the terms “we”, “us” and “our” refer to
+          11jersey.com.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="2. Use of Our Site">
+        <p>
+          You represent that you are at least the age of majority in your state
+          or province of residence, or that you are the age of majority and have
+          given us your consent to allow any of your minor dependents to use
+          this site. You may not use our products for any illegal or
+          unauthorized purpose.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="3. Products and Pricing">
+        <p>
+          We specialize in high-quality fan version football jerseys. These are
+          not official, licensed, or authentic "match-day" jerseys but are
+          premium reproductions intended for fans.
+        </p>
+        <p>
+          We have made every effort to display as accurately as possible the
+          colors and images of our products. We cannot guarantee that your
+          computer monitor's display of any color will be accurate.
+        </p>
+        <p>
+          Prices for our products are subject to change without notice. We
+          reserve the right to refuse or cancel any order placed for a product
+          listed at an incorrect price, whether or not the order has been
+          confirmed and your payment processed.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="4. Orders, Payment, and Billing">
+        <p>
+          Placing an order constitutes an offer to purchase a product. All
+          orders are subject to acceptance by us. We reserve the right to refuse
+          or cancel an order for any reason, including but not limited to
+          product availability, errors in product descriptions or pricing, or
+          issues identified by our payment processor.
+        </p>
+        <p>
+          By providing payment information, you represent and warrant that the
+          information is accurate, that you are authorized to use the payment
+          method, and that you authorize us to charge your payment method for
+          the total amount of your order (including taxes and shipping).
+        </p>
+      </LegalSection>
+
+      <LegalSection title="5. Shipping and Delivery">
+        <p>
+          We currently ship to addresses within India. Shipping times are
+          estimates only and are not guaranteed. Risk of loss and title for
+          items purchased from us pass to you upon our delivery to the shipping
+          carrier. We are not responsible for delays, lost, or stolen packages.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="6. Returns and Refunds">
+        <p>
+          We accept returns for products within 15 days of delivery. To be
+          eligible for a return, your item must be unused, unwashed, in the same
+          condition that you received it, and with all original tags intact.
+        </p>
+        <p>
+          To initiate a return, please contact our customer support. You will be
+          responsible for paying your own shipping costs for returning your
+          item. Once your return is received and inspected, we will notify you
+          of the approval or rejection of your refund.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="7. Intellectual Property">
+        <p>
+          All content on this Site, including but not limited to text, graphics,
+          logos, images, and software, is the property of 11jersey.com or its
+          content suppliers and is protected by Indian and international
+          copyright laws. You may not reproduce, distribute, or otherwise use
+          any content without our express written permission.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="8. Limitation of Liability">
+        <p>
+          To the fullest extent permitted by law, 11jersey.com shall not be
+          liable for any indirect, incidental, special, or consequential damages
+          that result from the use of, or the inability to use, the Site or the
+          performance of the products purchased through the Site.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="9. Governing Law">
+        <p>
+          These Terms shall be governed by and construed in accordance with the
+          laws of India. Any disputes relating to these Terms will be subject to
+          the exclusive jurisdiction of the courts located in Ernakulam, Kerala.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="10. Changes to Terms">
+        <p>
+          We reserve the right to update, change, or replace any part of these
+          Terms and Conditions by posting updates to our website. It is your
+          responsibility to check this page periodically for changes.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="11. Contact Information">
+        <p>
+          Questions about the Terms and Conditions should be sent to us at
+          <Link to="mailto:support@11jersey.com" className="ml-1">
+            support@11jersey.com
+          </Link>
+          .
+        </p>
+      </LegalSection>
+    </LegalPageLayout>
+  );
+};
+
+export default TermsAndConditionsPage;

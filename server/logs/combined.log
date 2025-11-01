@@ -1,0 +1,19 @@
+{"level":30,"time":1761990474433,"pid":56104,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761990475111,"pid":56104,"hostname":"Ajexs-MacBook-Air.local","msg":"MongoDB connected successfully"}
+{"level":30,"time":1761990475113,"pid":56104,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":30,"time":1761990486647,"pid":56184,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761990487269,"pid":56184,"hostname":"Ajexs-MacBook-Air.local","msg":"MongoDB connected successfully"}
+{"level":30,"time":1761990487277,"pid":56184,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":30,"time":1761990555753,"pid":56607,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761990556581,"pid":56607,"hostname":"Ajexs-MacBook-Air.local","msg":"MongoDB connected successfully"}
+{"level":30,"time":1761990556584,"pid":56607,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":30,"time":1761991344586,"pid":59930,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761991372549,"pid":60109,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761991376270,"pid":60109,"hostname":"Ajexs-MacBook-Air.local","msg":"MongoDB connected successfully"}
+{"level":30,"time":1761991376273,"pid":60109,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":30,"time":1761991417758,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1761991418321,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"MongoDB connected successfully"}
+{"level":30,"time":1761991418323,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":50,"time":1761991425836,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"test"}
+{"level":50,"time":1761991425840,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"test"}
+{"level":50,"time":1761991425854,"pid":60365,"hostname":"Ajexs-MacBook-Air.local","msg":"test"}

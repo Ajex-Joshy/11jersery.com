@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Home, ChevronRight } from "lucide-react";
 import { useProductPageData } from "./productHooks";
@@ -7,6 +7,7 @@ import ProductImageGallery from "./components/ProductImageGallery";
 import ProductPurchaseForm from "./components/ProductPurchaseForm";
 import ProductInfoTabs from "./components/ProductInfoTabs";
 import ProductCarousel from "./components/ProductCarousel";
+import SizeGuideModal from "./components/SizeGuideModal";
 
 // Loading Skeleton
 const ProductPageSkeleton = () => (
@@ -42,6 +43,11 @@ const ProductPageSkeleton = () => (
 const ProductDetailsPage = () => {
   const { slug } = useParams(); // Get slug from URL
   const { data, isLoading, isError, error } = useProductPageData(slug);
+
+  const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
+  const openSizeModal = () => setIsSizeModalOpen(true);
+  const closeSizeModal = () => setIsSizeModalOpen(false);
+  console.log(isSizeModalOpen);
 
   if (isLoading) {
     return <ProductPageSkeleton />;
@@ -109,7 +115,10 @@ const ProductDetailsPage = () => {
             imageIds={product.imageIds}
             title={product.title}
           />
-          <ProductPurchaseForm product={product} />
+          <ProductPurchaseForm
+            product={product}
+            onOpenSizeGuide={openSizeModal}
+          />
         </div>
       </div>
 
@@ -123,6 +132,7 @@ const ProductDetailsPage = () => {
           products={otherProducts.products}
         />
       )}
+      <SizeGuideModal isOpen={isSizeModalOpen} onClose={closeSizeModal} />
     </div>
   );
 };

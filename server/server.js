@@ -1,15 +1,19 @@
 import express from "express";
 import connectDB from "./config/db.js";
-import adminRoutes from "./routes/admin/adminRoutes.js";
-import userRoutes from "./routes/user/userRoutes.js";
-import { initCronJobs } from "./jobs/index.js";
+import adminRoutes from "./routes/admin/admin.routes.js";
+import userRoutes from "./routes/user/user.routes.js";
+import { initCronJobs } from "./jobs/index.job.js";
 import { config } from "dotenv";
-import { errorHandler } from "./middlewares/common/errorHandler.js";
+import { errorHandler } from "./middlewares/common/error-handler.js";
 config();
 import cors from "cors";
-import logger from "./utils/logger.js";
+import logger from "./config/logger.js";
 import { pinoHttp } from "pino-http";
-import webhookRoutes from "./routes/webhookRoutes.js";
+import {
+  register,
+  httpRequestCounter,
+  httpRequestDurationMicroseconds,
+} from "./config/metrics.js";
 
 const app = express();
 
@@ -20,12 +24,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  "/api/webhooks",
-  express.raw({ type: "application/json" }),
-  webhookRoutes
-);
-
 const httpLogger = pinoHttp({
   logger,
 });
@@ -33,10 +31,40 @@ const httpLogger = pinoHttp({
 app.use(express.json());
 // app.use(httpLogger);
 
+app.use((req, res, next) => {
+  // Start a timer for request duration
+  const end = httpRequestDurationMicroseconds.startTimer();
+
+  const route = req.originalUrl.split("?")[0];
+
+  res.on("finish", () => {
+    // When the response finishes, record the metrics
+    const labels = {
+      method: req.method,
+      route: route,
+      status_code: res.statusCode,
+    };
+
+    // Increment the counter
+    httpRequestCounter.inc(labels);
+    // Observe the duration
+    end(labels);
+  });
+
+  next();
+});
+
 app.use("/admin", adminRoutes);
 app.use("/", userRoutes);
-
 app.use(errorHandler);
+app.get("/metrics", async (req, res) => {
+  try {
+    res.set("Content-Type", register.contentType);
+    res.end(await register.metrics());
+  } catch (ex) {
+    res.status(500).end(ex);
+  }
+});
 
 const startServer = async () => {
   try {
