@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useResetPassword } from "../authHooks";
-import FormInput from "../../../../components/common/FormInput";
+import FormInput from "../../../../components/common/FormComponents";
 import { Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 

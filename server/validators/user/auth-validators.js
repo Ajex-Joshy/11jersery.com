@@ -102,6 +102,7 @@ export const signupSchema = Joi.object({
       "passwordComplexity.symbol":
         "Password must include at least one special symbol",
     }),
+  imageId: Joi.string().optional(),
   firebaseToken: Joi.string().required().messages({
     "string.base": "Firebase token must be a string",
     "string.empty": "Firebase token is required",

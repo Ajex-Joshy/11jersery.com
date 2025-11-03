@@ -1,59 +1,22 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, data } from "react-router-dom";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import toast from "react-hot-toast";
-import { Plus, Trash2 } from "lucide-react"; // Removed ImageIcon, assuming it's inside Dropzone
-
-// --- FIX: Import the EDIT schema ---
+import { Plus, Trash2 } from "lucide-react";
 import { productSchema } from "./productSchema.js";
 import {
   useProductDetails,
   useUpdateProduct,
   useAllCategories,
 } from "./productHooks.js";
-// --- FIX: Rename imported Dropzone component ---
-import ProductImageDropzone from "../../../components/admin/ProductImageDropZone.jsx";
-import { S3_URL } from "../../../utils/constants"; // Adjust path if needed
 
-// --- Reusable FormInput & FormTextarea ---
-const FormInput = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      className={`border p-2 rounded-md ${
-        error
-          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-          : "border-gray-300 focus:border-green-500 focus:ring-green-500"
-      } focus:outline-none focus:ring-1`}
-      {...props}
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
-const FormTextarea = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <textarea
-      id={id}
-      className={`border p-2 rounded-md ${
-        error
-          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-          : "border-gray-300 focus:border-green-500 focus:ring-green-500"
-      } focus:outline-none focus:ring-1`}
-      {...props}
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
-// ---
+import ProductImageDropzone from "../../../components/admin/ProductImageDropZone.jsx";
+import { S3_URL } from "../../../utils/constants";
+import FormInput from "../../../components/common/FormComponents.jsx";
+import { FormTextarea } from "../../../components/common/FormComponents.jsx";
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
@@ -61,19 +24,18 @@ const EditProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  // --- Data Fetching ---
   const {
     data: productDetailsPayload,
     isLoading: isLoadingDetails,
     isError,
     error: fetchError,
   } = useProductDetails(slug);
+  console.log(productDetailsPayload);
   const { data: categoriesData } = useAllCategories();
 
   // --- Mutation ---
   const { mutate: updateMutate, isLoading: isUpdating } = useUpdateProduct();
 
-  // Store original data *once* fetched for reference using useMemo
   const originalData = useMemo(
     () => productDetailsPayload?.data?.product,
     [productDetailsPayload]
@@ -83,10 +45,8 @@ const EditProduct = () => {
     [productDetailsPayload]
   );
 
-  // --- FIX: State to track IDs of existing images marked for deletion ---
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
-  // --- Form Hook ---
   const {
     register,
     handleSubmit,
@@ -98,9 +58,7 @@ const EditProduct = () => {
     formState: { errors, isDirty, dirtyFields }, // isDirty tracks if any field changed from defaultValues
   } = useForm({
     resolver: zodResolver(productSchema), // Use the EDIT schema
-    defaultValues: {
-      /* Keep sparse or match initial state */
-    },
+    defaultValues: {},
   });
 
   const { fields: variantFields } = useFieldArray({
@@ -114,7 +72,6 @@ const EditProduct = () => {
     remove: removeFaq,
   } = useFieldArray({ control, name: "faqs" });
 
-  // --- Populate Form Effect ---
   useEffect(() => {
     // Only reset if originalData exists and categories are loaded (or category part isn't needed for reset)
     if (originalData && categoriesData?.data?.categories) {
@@ -146,13 +103,10 @@ const EditProduct = () => {
         return acc;
       }, {});
 
-      // --- FIX: CoverImageIndex should ideally come from backend if first image isn't always cover ---
-      // For now, assume cover is always the first in the stored imageIds array
-      const initialCoverIndex = 0; // Or calculate based on a specific 'isCover' flag if backend provides it
+      const initialCoverIndex = 0;
 
       reset(
         {
-          // Reset the form with fetched data
           title: originalData.title,
           description: originalData.description || "",
           shortDescription: originalData.shortDescription || "",
@@ -168,7 +122,7 @@ const EditProduct = () => {
           detailsSleeveType: detailsMap["Sleeve Type"] || "",
           detailsInstructions: detailsMap["Instructions"] || "",
           images: [], // Reset 'new images' field
-          coverImageIndex: initialCoverIndex, // Set initial cover index based on existing data
+          coverImageIndex: initialCoverIndex,
         },
         {
           keepDirty: false, // Reset dirty state after populating
@@ -183,32 +137,23 @@ const EditProduct = () => {
     }
   }, [originalData, originalFaqs, categoriesData, reset, replaceFaqs]);
 
-  // --- Image Handling ---
   const existingImageIds = originalData?.imageIds || [];
-  // --- FIX: Correct S3 URL Construction (assuming imageId is the key/path) ---
   const existingImageUrls = existingImageIds.map(
     (id) => `${S3_URL}/images/${id}`
-  ); // Removed '/categories/' assuming ID is full path or root relative
-
-  // --- FIX: Handler for marking existing images for deletion ---
+  );
   const handleRemoveInitialImage = (urlToRemove) => {
-    // Extract the ID (key/path) from the full URL
-    const imageIdToRemove = urlToRemove.replace(`${S3_URL}/`, ""); // Adjust if base URL structure differs
+    const imageIdToRemove = urlToRemove.replace(`${S3_URL}/`, "");
     setImagesToDelete((prev) => [...prev, imageIdToRemove]);
   };
 
-  // Filter existing URLs to display, excluding those marked for deletion
   const filteredInitialUrls = existingImageUrls.filter(
     (url) => !imagesToDelete.includes(url.replace(`${S3_URL}/`, ""))
   );
 
-  // --- Submit Handler (Sends Only Changed Data) ---
   const onSubmit = (data) => {
     if (!originalData) return;
 
-    // --- FIX: Check for actual changes before submitting ---
-    const newImages = data.images || []; // New files added by user
-    // isDirty might be true just from focusing fields, dirtyFields is more specific
+    const newImages = data.images || [];
     const hasMeaningfulChanges =
       Object.keys(dirtyFields).length > 0 ||
       newImages.length > 0 ||
@@ -221,18 +166,9 @@ const EditProduct = () => {
     }
 
     const formData = new FormData();
-    const productChanges = {}; // Build object of changed fields ONLY
+    const productChanges = {};
 
-    // Helper to check if a simple value changed (handles undefined/null/empty string equivalence for optional fields)
-    const simpleFieldChanged = (fieldName) => {
-      const currentValue = data[fieldName] || ""; // Treat undefined/null as empty string for comparison
-      const originalValue = originalData[fieldName] || "";
-      return currentValue !== originalValue;
-    };
-
-    // Iterate over dirtyFields reported by RHF
     Object.keys(dirtyFields).forEach((key) => {
-      // Handle fields based on key name
       switch (key) {
         case "title":
           productChanges.title = data.title;
@@ -244,9 +180,8 @@ const EditProduct = () => {
           productChanges.shortDescription = data.shortDescription;
           break;
         case "isListed":
-          productChanges.isListed = data.isListed === "true";
+          productChanges.isListed = data.isListed;
           break;
-        // Group price changes
         case "priceList":
         case "priceSale":
           if (!productChanges.price) productChanges.price = {};
@@ -291,6 +226,8 @@ const EditProduct = () => {
         // Ignore 'images' and 'faqs' - handled separately below
       }
     });
+    console.log(data);
+    console.log(productChanges);
 
     // --- Append Changes to FormData ---
     let formDataHasData = false; // Flag to check if anything is appended
@@ -323,7 +260,6 @@ const EditProduct = () => {
     }
 
     // --- Final check if FormData is actually empty ---
-    // (This replaces the complex key check)
     if (!formDataHasData) {
       toast("No effective changes detected to save.");
       navigate("/admin/products");
@@ -335,7 +271,10 @@ const EditProduct = () => {
       { slug, formData },
       {
         onError: (err) => {
-          /* ... error handling ... */
+          console.error("Error updating product:", err);
+          const errorMessage = err?.response?.data?.error.message;
+          ("Something went wrong while updating the product.");
+          toast.error(errorMessage);
         },
       }
     );
@@ -696,7 +635,3 @@ const EditProduct = () => {
 };
 
 export default EditProduct;
-
-// --- IMPORTANT: Adapt AdvancedImageDropzone ---
-// Needs `initialImageUrls` (string[]) and `onRemoveInitialImage` (function taking URL string) props
-// And logic to display initial URLs, then switch to new file previews.

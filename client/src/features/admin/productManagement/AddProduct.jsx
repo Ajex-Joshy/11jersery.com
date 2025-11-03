@@ -8,39 +8,8 @@ import { Plus, Trash2, Image as ImageIcon } from "lucide-react"; // Add icons
 import { productSchema } from "./productSchema";
 import { useAddProduct, useAllCategories } from "./productHooks";
 import ProductImageDropzone from "../../../components/admin/ProductImageDropZone";
-
-// --- Reusable FormInput ---
-const FormInput = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      className={`border p-2 rounded-md ${
-        error ? "border-red-500" : "border-gray-300"
-      }`}
-      {...props}
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
-// A simple reusable textarea component for the form
-const FormTextarea = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <textarea
-      id={id}
-      className={`border p-2 rounded-md ${
-        error ? "border-red-500" : "border-gray-300"
-      }`}
-      {...props} // Spreads other props like rows, placeholder, register, etc.
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
+import { FormInput } from "../../../components/common/FormComponents";
+import { FormTextarea } from "../../../components/common/FormComponents";
 
 // --- Sizes for Variants ---
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -441,7 +410,27 @@ const AddProduct = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex items-center gap-6">
-                  {/* ... (Radio buttons for Listed/Unlisted, same as AddCategory) ... */}
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="true"
+                      checked={field.value === "true"}
+                      onChange={() => field.onChange("true")}
+                      className="text-green-600 focus:ring-green-500"
+                    />
+                    <span className="text-gray-700 font-medium">Listed</span>
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="false"
+                      checked={field.value === "false"}
+                      onChange={() => field.onChange("false")}
+                      className="text-red-600 focus:ring-red-500"
+                    />
+                    <span className="text-gray-700 font-medium">Unlisted</span>
+                  </label>
                 </div>
               )}
             />

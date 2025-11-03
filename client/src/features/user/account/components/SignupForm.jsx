@@ -6,11 +6,10 @@ import { useDispatch } from "react-redux";
 import { useSignup } from "../authHooks";
 import { setAuthModalView } from "../authSlice";
 import { signupSchema } from "./authSchemas";
-import FormInput from "../../../../components/common/FormInput";
+import FormInput from "../../../../components/common/FormComponents";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
-// --- Import Firebase ---
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "../../../../config/firebaseConfig";
 const SignupForm = () => {
@@ -34,10 +33,10 @@ const SignupForm = () => {
       firstName: "Ajex",
       lastName: "Joshy",
       email: "test@gmail.com",
-      phone: "+918547677320", // User will type +91
+      phone: "+918547677320",
       password: "Test@123",
       confirmPassword: "Test@123",
-      otp: "", // Add otp to default values
+      otp: "",
     },
   });
 
@@ -60,9 +59,7 @@ const SignupForm = () => {
     }
   }, []);
 
-  // --- Firebase: Step 1 - Send OTP ---
   const handleSendOtp = async () => {
-    // Validate all fields *except* OTP before sending
     const fieldsToValidate = [
       "firstName",
       "lastName",
@@ -107,15 +104,13 @@ const SignupForm = () => {
     }
   };
 
-  // --- Firebase: Step 2 - Verify OTP & Final Submit ---
-  // This is the main form's onSubmit
   const onSubmit = async (data) => {
     if (!confirmationResult) {
       toast.error("Please send and verify your OTP first.");
       return;
     }
 
-    // Manually check if OTP is present (since it's optional in schema)
+    // Manually check if OTP is present
     if (!data.otp || data.otp.length !== 6) {
       setError("otp", { type: "manual", message: "OTP must be 6 digits." });
       return;
@@ -124,21 +119,17 @@ const SignupForm = () => {
     toast.loading("Verifying OTP...");
 
     try {
-      // 1. Confirm the OTP with Firebase
       const userCredential = await confirmationResult.confirm(data.otp);
       const user = userCredential.user;
 
-      // 2. Get the Firebase ID Token
       const firebaseToken = await user.getIdToken();
       toast.dismiss();
 
-      // 3. Prepare data for *your* backend
       const { confirmPassword, otp, ...signupData } = data;
-
-      // 4. Call your backend mutation
+      console.log(signupData);
       signupMutate({
         ...signupData,
-        firebaseToken, // Send the Firebase token for backend verification
+        firebaseToken,
       });
     } catch (error) {
       toast.dismiss();
@@ -244,8 +235,8 @@ const SignupForm = () => {
         </button>
       ) : (
         <button
-          type="submit" // This is the real submit button
-          disabled={isSigningUp} // Disabled by the main mutation
+          type="submit"
+          disabled={isSigningUp}
           className="w-full bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 flex items-center justify-center"
         >
           {isSigningUp && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

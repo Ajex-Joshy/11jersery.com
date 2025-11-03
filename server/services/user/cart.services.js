@@ -19,15 +19,6 @@ export const getCart = async (userId) => {
   return cart;
 };
 
-/**
- * Adds an item to the user's cart.
- * If the item (product + size) already exists, its quantity is increased.
- * Performs stock checks and price snapshotting.
- *
- * @param {string} userId - The user's MongoDB ObjectId.
- * @param {object} itemData - { productId, size, quantity }
- * @returns {Promise<object>} The updated, populated cart.
- */
 export const addItem = async (userId, { productId, size, quantity }) => {
   // 1. Validate the product and stock
   const product = await Product.findById(productId);

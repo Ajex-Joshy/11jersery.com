@@ -1,6 +1,6 @@
 import React from "react";
 
-const FormInput = ({ id, label, error, ...props }) => (
+export const FormInput = ({ id, label, error, ...props }) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
       {label}
@@ -15,6 +15,22 @@ const FormInput = ({ id, label, error, ...props }) => (
       {...props}
     />
     {error && <span className="text-red-600 text-xs mt-1">{error}</span>}
+  </div>
+);
+
+export const FormTextarea = ({ label, id, error, ...props }) => (
+  <div className="flex flex-col">
+    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <textarea
+      id={id}
+      className={`border p-2 rounded-md ${
+        error ? "border-red-500" : "border-gray-300"
+      }`}
+      {...props} // Spreads other props like rows, placeholder, register, etc.
+    />
+    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
   </div>
 );
 

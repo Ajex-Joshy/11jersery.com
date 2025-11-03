@@ -18,8 +18,8 @@ const AdminLogin = () => {
   const { status, error: adminError } = useSelector((store) => store.admin);
 
   const onSubmit = async (data) => {
-    console.log(data);
     dispatch(loginAdmin(data));
+    navigate("/admin/dashboard");
   };
   useEffect(() => {
     if (admin) navigate("/admin/dashboard");

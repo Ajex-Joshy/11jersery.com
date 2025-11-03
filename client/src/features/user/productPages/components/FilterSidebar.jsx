@@ -1,8 +1,5 @@
 import React from "react";
 import { X, SlidersHorizontal } from "lucide-react";
-// import CategoryFilter from "./CategoryFilter";
-// import SizeFilter from "./SizeFilter";
-// import PriceFilter from "./PriceFilter";
 
 const FilterSidebar = ({
   metadata,
@@ -53,9 +50,8 @@ const FilterSidebar = ({
           onPriceChange={onPriceChange}
         />
 
-        {/* 'Apply Filter' button (needed for price range) */}
         <button
-          onClick={() => onPriceChange(activeFilters.price)} // Re-apply to trigger submit
+          onClick={() => onPriceChange(activeFilters.price)}
           className="w-full bg-black text-white py-2.5 rounded-lg font-semibold hover:bg-gray-800 transition"
         >
           Apply Filter
@@ -65,11 +61,9 @@ const FilterSidebar = ({
   );
 };
 
-// --- Sub-Components (can be in the same file or separate) ---
-
 const CategoryFilter = ({ categories, activeCategory, onCategoryChange }) => (
   <div>
-    <h3 className="font-semibold mb-3">Club</h3>
+    <h3 className="font-semibold mb-3">Categories</h3>
     <ul className="space-y-1.5 max-h-60 overflow-y-auto">
       {categories.map((cat) => (
         <li key={cat.slug}>
@@ -115,8 +109,6 @@ const SizeFilter = ({ sizes, activeSize, onSizeChange }) => (
 );
 
 const PriceFilter = ({ range, activePrice, onPriceChange }) => {
-  // Internal state for inputs, only call parent `onPriceChange` on 'Apply'
-  // Or, for simplicity here, we'll just link directly
   const handleMinChange = (e) =>
     onPriceChange({ ...activePrice, min: e.target.value });
   const handleMaxChange = (e) =>

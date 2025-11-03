@@ -18,11 +18,11 @@ const priceValidationSchema = Joi.object({
     .min(0)
     .optional()
     .allow(null) // Allow null if no sale price
-    .less(Joi.ref("list"))
+    .max(Joi.ref("list"))
     .messages({
       "number.base": "Sale price must be a number",
       "number.min": "Sale price cannot be negative",
-      "number.less": "Sale price cannot be greater than list price",
+      "number.max": "Sale price cannot be greater than list price",
     }),
 });
 

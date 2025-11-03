@@ -1,3 +1,5 @@
+import logger from "../../config/logger.js";
+import redisClient from "../../config/redis-client.js";
 import Faq from "../../models/faq.model.js";
 import Product from "../../models/product.model.js";
 import { AppError, getPagination, getSortOption } from "../../utils/helpers.js";
@@ -9,6 +11,20 @@ import {
 } from "../../utils/product.utils.js";
 import { updateFaqs } from "./service-helpers/query-helpers.js";
 import { uploadFileToS3 } from "./service-helpers/s3.service.js";
+
+const clearProductListingCache = async () => {
+  try {
+    const keys = await redisClient.keys("products:listing:*");
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+      logger.info(
+        `Cache Inavalidated: cleared ${keys.length} productlisting caches`
+      );
+    }
+  } catch (err) {
+    logger.error(`Redis cache invalidation error`, err);
+  }
+};
 
 export async function addProduct(productDataString, faqsDataString, files) {
   const productInfo = productDataString;
@@ -52,7 +68,7 @@ export async function addProduct(productDataString, faqsDataString, files) {
   if (faqs && faqs.length > 0) {
     savedFaqs = await saveFaqs(faqs, savedProduct._id);
   }
-
+  await clearProductListingCache();
   return { product: savedProduct, faqs: savedFaqs };
 }
 
@@ -145,7 +161,7 @@ export const updateProductBySlug = async (
     faqsUpdateData || [],
     updatedProduct._id
   );
-
+  await clearProductListingCache();
   return { product: updatedProduct, faqs: updatedFaqs };
 };
 
@@ -168,6 +184,7 @@ export const getProducts = async (queryParams) => {
     Product.find(query).sort(sort).skip(skip).limit(pageSize),
     Product.countDocuments(query),
   ]);
+  console.log(result);
 
   return {
     products: result,
@@ -218,5 +235,7 @@ export async function updateProduct(productId, updateData) {
   }
 
   const updatedFaqs = await saveFaqs(faqs, updatedProduct._id, true);
+  await clearProductListingCache();
+
   return { product: updatedProduct, faqs: updatedFaqs };
 }

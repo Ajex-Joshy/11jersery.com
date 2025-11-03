@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: 6,
     },
+    imageId: {
+      type: String,
+      default: "default-profile",
+    },
     gender: {
       type: String,
       enum: ["male", "female", "other"],

@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
-// --- Initial State ---
 const initialState = {
   user: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -10,7 +9,6 @@ const initialState = {
   authModalView: "login",
 };
 
-// --- Create Slice ---
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -32,7 +30,6 @@ const authSlice = createSlice({
       state.user = null;
       toast.success("Logged out successfully.");
     },
-    // Actions for modal control
     openAuthModal: (state, action) => {
       state.isAuthModalOpen = true;
       state.authModalView = action.payload || "login";
@@ -43,7 +40,6 @@ const authSlice = createSlice({
     setAuthModalView: (state, action) => {
       state.authModalView = action.payload;
     },
-    // Action to check auth status on load (can be dispatched from App.jsx)
     checkAuth: (state) => {
       const storedUser = localStorage.getItem("user");
       state.user = storedUser ? JSON.parse(storedUser) : null;
@@ -51,7 +47,6 @@ const authSlice = createSlice({
   },
 });
 
-// Export actions
 export const {
   setUser,
   logOut,
@@ -61,10 +56,8 @@ export const {
   checkAuth,
 } = authSlice.actions;
 
-// Export reducer
 export default authSlice.reducer;
 
-// Export selectors (optional but good practice)
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectAuthToken = (state) => state.auth.token;
 export const selectIsAuthModalOpen = (state) => state.auth.isAuthModalOpen;

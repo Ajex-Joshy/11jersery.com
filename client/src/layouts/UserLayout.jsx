@@ -69,7 +69,7 @@ const Header = () => {
           </Link>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
             <NavLink
-              to="/collections/club"
+              to="/"
               className={({ isActive }) =>
                 isActive ? "text-black" : "hover:text-black"
               }
@@ -77,7 +77,7 @@ const Header = () => {
               Club
             </NavLink>
             <NavLink
-              to="/collections/player"
+              to="/products?category=player-edition-jerseys"
               className={({ isActive }) =>
                 isActive ? "text-black" : "hover:text-black"
               }

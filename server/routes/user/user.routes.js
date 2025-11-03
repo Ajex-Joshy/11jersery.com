@@ -5,6 +5,7 @@ import productRoutes from "./product.routes.js";
 import checkUserStatus from "../../middlewares/user/check-user-status.js";
 import { getProductsController } from "../../controllers/user/product.controller.js";
 import cartRoutes from "./cart.routes.js";
+import accountRouter from "./account.routes.js";
 
 const userRouter = express.Router();
 userRouter.get("/orders", checkUserStatus);
@@ -12,6 +13,7 @@ userRouter.get("/landing-page", getLandingPageController);
 userRouter.use("/auth", authRoutes);
 userRouter.use("/product", productRoutes);
 userRouter.use("/cart", cartRoutes);
+userRouter.use("/account", accountRouter);
 
 userRouter.get("/products", getProductsController);
 export default userRouter;

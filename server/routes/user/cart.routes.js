@@ -7,11 +7,11 @@ import {
   mergeCartController,
   clearCartController,
 } from "../../controllers/user/cart.controller.js";
+import { authenticateUser } from "../../middlewares/user/authenticate-user.js";
 
 const router = express.Router();
 
-// --- All cart routes are protected and require a logged-in user ---
-// router.use(verifyUserToken);
+router.use(authenticateUser);
 
 router.get("/", getCartController);
 

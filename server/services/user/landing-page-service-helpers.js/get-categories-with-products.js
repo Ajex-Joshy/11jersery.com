@@ -34,7 +34,6 @@ export const getLandingCategoriesWithProducts = async (
         isDeleted: false,
         isListed: true,
       });
-      logger.error("test");
       return {
         title: cat.title,
         products,

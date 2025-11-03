@@ -1,13 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { loginUser, signupUser } from "./authApis";
+import { getAccountDetails, loginUser, signupUser } from "./authApis";
 import { setAuthModalView, setUser } from "./authSlice";
 import { requestPasswordReset, resetPassword } from "./authApis";
 import { useNavigate } from "react-router-dom";
 
+export const USER_PROFILE_KEY = "user";
 export const useLogin = () => {
-  const dispatch = useDispatch(); // Get dispatch function
+  const dispatch = useDispatch();
 
   return useMutation({
     mutationFn: loginUser,
@@ -20,7 +21,8 @@ export const useLogin = () => {
     },
     onError: (error) => {
       toast.error(
-        error.response?.data?.message || "Login failed. Check credentials."
+        error.response?.data?.error?.message ||
+          "Login failed. Check credentials."
       );
     },
   });
@@ -33,8 +35,7 @@ export const useSignup = () => {
     mutationFn: signupUser,
     onSuccess: (data) => {
       toast.success(data.message || "Signup successful! Happy shopping..");
-      // Dispatch action to switch modal view
-      //   dispatch(setAuthModalView("login"));
+
       if (data) {
         dispatch(setUser(data.data));
       } else {
@@ -43,7 +44,8 @@ export const useSignup = () => {
     },
     onError: (error) => {
       toast.error(
-        error.response?.data?.message || "Signup failed. Please try again."
+        error.response?.data?.error.message ||
+          "Signup failed. Please try again."
       );
     },
   });
@@ -59,7 +61,7 @@ export const useForgotPassword = () => {
     },
     onError: (error) => {
       toast.error(
-        error.response?.data?.message || "Failed to send reset link."
+        error.response?.data?.error?.message || "Failed to send reset link."
       );
     },
   });
@@ -78,7 +80,9 @@ export const useResetPassword = () => {
       openLoginModal(); // Open the login modal
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Invalid or expired token.");
+      toast.error(
+        error.response?.data?.error?.message || "Invalid or expired token."
+      );
     },
   });
 };

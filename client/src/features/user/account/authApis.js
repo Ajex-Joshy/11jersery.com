@@ -1,4 +1,3 @@
-import { da } from "zod/v4/locales";
 import axiosInstance from "../../../api/axiosInstance";
 
 export const loginUser = async (credentials) => {
@@ -21,5 +20,25 @@ export const resetPassword = async ({ token, password }) => {
   const { data } = await axiosInstance.post(`/auth/reset-password/${token}`, {
     password,
   });
+  return data;
+};
+
+export const getAccountDetails = async (userId) => {
+  const { data } = await axiosInstance.get(`/account/${userId}`);
+  return data;
+};
+
+export const updateUserProfile = async (formData) => {
+  const { data } = await axiosInstance.patch("/account", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
+export const changePassword = async (passwordData) => {
+  const { data } = await axiosInstance.post(
+    "/account/change-password",
+    passwordData
+  );
   return data;
 };

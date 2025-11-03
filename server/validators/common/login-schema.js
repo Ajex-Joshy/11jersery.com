@@ -5,6 +5,7 @@ export const loginSchema = Joi.object({
     "any.required": "email is required",
     "alternatives.match": "email must be a valid email",
   }),
+  imageId: Joi.string().optional(),
 
   password: Joi.string().min(8).required().messages({
     "any.required": "Password is required",

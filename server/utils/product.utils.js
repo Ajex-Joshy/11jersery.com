@@ -4,7 +4,7 @@ import { createSlug } from "./helpers.js";
 import Faq from "../models/faq.model.js";
 import Category from "../models/category.model.js";
 
-export const validateObjectId = (id, entity = "Category") => {
+export const validateObjectId = (id, entity = "") => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError(400, "INVALID_ID", `Provided ${entity} ID is invalid`);
   }
@@ -84,7 +84,7 @@ export const saveFaqs = async (faqs, productId, replaceExisting = false) => {
 };
 
 export const buildProductQuery = async ({ search, category, status }) => {
-  const query = { isDeleted: false, isListed: true };
+  const query = { isDeleted: false };
 
   if (search) {
     query.title = { $regex: search, $options: "i" };

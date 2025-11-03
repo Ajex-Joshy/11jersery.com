@@ -2,8 +2,8 @@ import axios from "axios";
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000", // your backend URL
-  timeout: 10000, // optional: request timeout
+  baseURL: import.meta.env.VITE_BASE_URL,
+  timeout: import.meta.env.VITE_AXIOS_TIMEOUT,
 });
 
 axiosInstance.interceptors.request.use(
@@ -20,16 +20,16 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor (optional: handle global errors)
+// Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      if (error.response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-      }
-    }
+    // if (error.response) {
+    //   if (error.response.status === 401) {
+    //     localStorage.removeItem("token");
+    //     window.location.href = "/login";
+    //   }
+    // }
     return Promise.reject(error);
   }
 );

@@ -23,7 +23,7 @@ const ProductImageDropzone = ({
     originalFile: null,
     editIndex: null,
   });
-  // --- Compute Combined Display Items (no useEffect, no state) ---
+  // --- Compute Combined Display Items ---
   const displayItems = [
     ...initialImageUrls.map((url) => ({
       type: "initial",
@@ -216,7 +216,7 @@ const ProductImageDropzone = ({
               {/* --- Overlay & Actions --- */}
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200 p-1">
                 {/* Set Cover Button */}
-                <button
+                {/* <button
                   type="button"
                   onClick={(e) => setCoverImage(index, e)}
                   className={`flex items-center justify-center w-8 h-8 rounded-full shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500
@@ -241,7 +241,7 @@ const ProductImageDropzone = ({
                     fill={valueCoverIndex === index ? "currentColor" : "none"}
                     strokeWidth={1.5}
                   />
-                </button>
+                </button> */}
 
                 {/* Re-crop Button */}
                 <button

@@ -51,10 +51,14 @@ export const signupUser = async (userData) => {
     phone,
   });
 
+  await newUser.save();
   const userObj = newUser.toObject();
   delete userObj.password;
 
   const token = generateToken({ id: newUser._id });
+  const findUser = await User.findOne({ _id: newUser._id });
+
+  console.log("findUser", findUser);
 
   return { user: userObj, token };
 };

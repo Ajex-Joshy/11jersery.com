@@ -4,7 +4,7 @@ import {
   getProductDetailsService,
   getProductFaqs,
   getProducts,
-} from "../../services/user/product-service.js";
+} from "../../services/user/product.services.js";
 
 export const getProductDetailsController = asyncHandler(async (req, res) => {
   const { slug } = req.params;

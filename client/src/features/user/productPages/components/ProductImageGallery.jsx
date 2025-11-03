@@ -7,6 +7,7 @@ const ProductImageGallery = ({ imageIds = [], title }) => {
   );
 
   useEffect(() => {
+    console.log(imageIds);
     // Set the first image as the main image when the component loads
     if (imageIds.length > 0) {
       setMainImage(`${S3_URL}/images/${imageIds[0]}`);

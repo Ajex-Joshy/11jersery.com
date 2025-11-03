@@ -10,7 +10,7 @@ const connectDB = async () => {
       tls: true,
       tlsAllowInvalidCertificates: false,
     });
-    logger.info("MongoDB connected successfully");
+    logger.info("connected to monogoDB successfully");
   } catch (err) {
     logger.error(`ERROR: ${err.message}`);
   }

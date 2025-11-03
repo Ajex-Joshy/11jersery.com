@@ -7,11 +7,9 @@ import { useDispatch } from "react-redux";
 import { loginSchema } from "./authSchemas";
 import { useLogin } from "../authHooks"; // Adjust path
 import { setAuthModalView } from "../authSlice"; // Adjust path
-import FormInput from "../../../../components/common/FormInput";
+import FormInput from "../../../../components/common/FormComponents";
 const LoginForm = () => {
-  // Get the mutation hook
   const { mutate: loginMutate, isLoading } = useLogin();
-  // Get the Redux dispatch function
   const dispatch = useDispatch();
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,7 +26,6 @@ const LoginForm = () => {
     },
   });
   console.log(errors);
-  // Call the mutation on submit
   const onSubmit = (data) => {
     loginMutate(data, {
       onError: (error) => {

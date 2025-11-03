@@ -5,8 +5,8 @@ import {
   getProducts,
   updateProduct,
   updateProductBySlug,
-} from "../../services/admin/product-services.js";
-import { getProductFaqs } from "../../services/user/product-service.js";
+} from "../../services/admin/product.services.js";
+import { getProductFaqs } from "../../services/user/product.services.js";
 
 export const createProductController = asyncHandler(async (req, res) => {
   // 1. Get validated data from middleware
@@ -120,6 +120,6 @@ export const getProductsController = asyncHandler(async (req, res) => {
 
 export const getProductDetailsController = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const result = await getProductFaqs(slug);
+  const result = await getProductDetails(slug);
   sendResponse(res, result);
 });

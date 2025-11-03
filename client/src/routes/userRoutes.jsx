@@ -16,6 +16,7 @@ import TermsAndConditionsPage from "../features/user/company/TermsAndConditionsP
 import PrivacyPolicyPage from "../features/user/company/PrivacyPolicyPage.jsx";
 import NotFoundPage from "../features/user/company/NotFoundPage.jsx";
 import ErrorPage from "../features/user/company/ErrorPage.jsx";
+import AccountSettingsPage from "../features/user/account/AccountSettings.jsx";
 
 const UserRoutes = () => {
   return (
@@ -39,6 +40,7 @@ const UserRoutes = () => {
         <Route path="/account" element={<AccountLayout />}>
           {/* 'index' is the default page for "/account" */}
           <Route index element={<AccountOverview />} />
+          <Route path="/account/settings" element={<AccountSettingsPage />} />
           {/* <Route path="orders" element={<OrderHistory />} />
             <Route path="wishlist" element={<Wishlist />} />
            <Route path="addresses" element={<Addresses />} />
