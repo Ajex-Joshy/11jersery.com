@@ -14,11 +14,14 @@ import {
 } from "../../validators/admin/category-validator.js";
 import { parseAndValidateCategoryData } from "./controller-helpers.js/parseAndValidateCategoryData.js";
 import logger from "../../config/logger.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const createCategoryController = asyncHandler(async (req, res) => {
   const file = req.file;
   if (!file) {
-    return res.status(400).json({ message: "Image is required" });
+    return res
+      .status(STATUS_CODES.BAD_REQUEST)
+      .json({ message: "Image is required" });
   }
   let validatedData;
   try {
@@ -38,8 +41,6 @@ export const createCategoryController = asyncHandler(async (req, res) => {
 
 export const updateCategoryController = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
-  const updateData = req.body || {};
-  const file = req.file;
   let validatedData;
   try {
     validatedData = parseAndValidateCategoryData(
@@ -49,6 +50,8 @@ export const updateCategoryController = asyncHandler(async (req, res) => {
   } catch (error) {
     throw error;
   }
+  const updateData = validatedData || {};
+  const file = req.file;
 
   let newImageId = null;
   if (file) {
@@ -57,7 +60,7 @@ export const updateCategoryController = asyncHandler(async (req, res) => {
       updateData.imageId = newImageId;
     } catch (s3Error) {
       logger.error("S3 Upload Error:", s3Error);
-      res.status(500);
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR);
       throw new Error("Failed to upload new category image.");
     }
   }

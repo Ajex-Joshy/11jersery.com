@@ -1,6 +1,6 @@
 import User from "../../models/user.model.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../../utils/jwt.js";
+import { generateTokens, verifyToken } from "../../utils/jwt.js";
 import { AppError } from "../../utils/helpers.js";
 import crypto from "crypto";
 import logger from "../../config/logger.js";
@@ -8,6 +8,7 @@ import { sendEmail } from "../../utils/email-service.js";
 import { config } from "dotenv";
 config();
 import admin from "../../config/firebaseAdmin.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const signupUser = async (userData) => {
   const { firstName, lastName, email, phone, password, firebaseToken } =
@@ -17,7 +18,7 @@ export const signupUser = async (userData) => {
   });
   if (existingUser) {
     throw new AppError(
-      409,
+      STATUS_CODES.CONFLICT,
       "EMAIL_ALREADY_EXISTS",
       "A user with this email or phone address already exists."
     );
@@ -27,15 +28,16 @@ export const signupUser = async (userData) => {
   try {
     decodedToken = await admin.auth().verifyIdToken(firebaseToken);
   } catch (error) {
+    logger.error(error);
     throw new AppError(
-      401,
+      STATUS_CODES.BAD_REQUEST,
       "INVALID_TOKEN",
       "Invalid or expired Firebase token. Please try again."
     );
   }
   if (decodedToken.phone_number !== phone) {
     throw new AppError(
-      400,
+      STATUS_CODES.BAD_REQUEST,
       "VALIDATION_ERROR",
       "Phone number does not match the verification token."
     );
@@ -52,24 +54,29 @@ export const signupUser = async (userData) => {
   });
 
   await newUser.save();
-  const userObj = newUser.toObject();
-  delete userObj.password;
+  const user = await User.findById(newUser._id)
+    .select("_id firstName lastName email phone imageId")
+    .lean();
+  const { refreshToken, accessToken } = generateTokens({ user });
 
-  const token = generateToken({ id: newUser._id });
-  const findUser = await User.findOne({ _id: newUser._id });
+  newUser.refreshToken = refreshToken;
+  await newUser.save();
 
-  console.log("findUser", findUser);
+  delete user.password;
+  delete user.refreshToken;
+  delete user.lastLogin;
+  delete user.updatedAt;
 
-  return { user: userObj, token };
+  return { user, accessToken, refreshToken };
 };
 
 export const loginUser = async ({ identifier, password }) => {
   const user = await User.findOne({
     $or: [{ email: identifier }, { phone: identifier }],
-  });
+  }).select(" _id firstName lastName email imageId password");
   if (!user) {
     throw new AppError(
-      401,
+      STATUS_CODES.UNAUTHORIZED,
       "INVALID_CREDENTIALS",
       "Invalid email/phone or password"
     );
@@ -78,17 +85,44 @@ export const loginUser = async ({ identifier, password }) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     throw new AppError(
-      401,
+      STATUS_CODES.UNAUTHORIZED,
       "INVALID_CREDENTIALS",
       "Invalid email/phone or password"
     );
   }
-  const token = generateToken({ id: user._id });
+
+  const { accessToken, refreshToken } = generateTokens({ user });
+  user.refreshToken = refreshToken;
   user.lastLogin = new Date();
   await user.save();
+
   const userObj = user.toObject();
   delete userObj.password;
-  return { user: userObj, token };
+  delete userObj.refreshToken;
+  delete userObj.lastLogin;
+  delete userObj.updatedAt;
+  return { user: userObj, accessToken, refreshToken };
+};
+
+export const refreshAcessToken = async (token) => {
+  if (!token)
+    return res
+      .status(STATUS_CODES.UNAUTHORIZED)
+      .json({ message: "Unauthorized" });
+
+  try {
+    const decoded = verifyToken(token);
+    const user = await User.findById(decoded.id).lean();
+    const { accessToken, refreshToken } = generateTokens({ user });
+    return { accessToken, refreshToken };
+  } catch (err) {
+    logger.error(err);
+    throw new AppError(
+      STATUS_CODES.FORBIDDEN,
+      "INVALID_REFRESH_TOKEN",
+      "Invalid refresh token"
+    );
+  }
 };
 
 export const forgotPassword = async (email) => {
@@ -137,7 +171,7 @@ export const forgotPassword = async (email) => {
     user.resetPasswordExpires = undefined;
     await user.save();
     throw new AppError(
-      500,
+      STATUS_CODES.INTERNAL_SERVER_ERROR,
       "INTERNAL_SERVER_ERROR",
       "Failed to send password reset email. Please try again later."
     );
@@ -176,7 +210,6 @@ export const forgotPassword = async (email) => {
 // };
 
 export const resetPassword = async (token, newPassword) => {
-  console.log(token, newPassword);
   const user = await User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
@@ -184,7 +217,7 @@ export const resetPassword = async (token, newPassword) => {
 
   if (!user) {
     throw new AppError(
-      401,
+      STATUS_CODES.UNAUTHORIZED,
       "UNAUTHORIZED",
       "Password reset token is invalid or has expired."
     );

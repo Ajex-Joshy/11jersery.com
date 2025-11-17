@@ -4,6 +4,7 @@ import { Camera, User, Trash2 } from "lucide-react";
 import { S3_URL } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { useCallback } from "react";
+import PropTypes from "prop-types";
 
 const AvatarUploader = ({ value, onChange, initialImageUrl }) => {
   const [preview, setPreview] = useState(null);
@@ -99,5 +100,9 @@ const AvatarUploader = ({ value, onChange, initialImageUrl }) => {
     </div>
   );
 };
-
+AvatarUploader.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.instanceOf(File), PropTypes.string]),
+  onChange: PropTypes.func.isRequired,
+  initialImageUrl: PropTypes.string,
+};
 export default AvatarUploader;

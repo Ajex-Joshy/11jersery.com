@@ -1,5 +1,6 @@
 import React from "react";
 import { Loader2, AlertTriangle } from "lucide-react";
+import PropTypes from "prop-types";
 
 /**
  * A reusable loading spinner component.
@@ -28,4 +29,18 @@ export const ErrorDisplay = ({ error }) => {
       <p className="text-sm text-red-600">{errorMessage}</p>
     </div>
   );
+};
+
+ErrorDisplay.propTypes = {
+  error: PropTypes.oneOfType([
+    PropTypes.shape({
+      response: PropTypes.shape({
+        data: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+      }),
+      message: PropTypes.string,
+    }),
+    PropTypes.string,
+  ]),
 };

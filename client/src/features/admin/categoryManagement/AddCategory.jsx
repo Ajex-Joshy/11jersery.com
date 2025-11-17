@@ -1,30 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
-
 import { categorySchema } from "./categorySchema"; // Adjust path if needed
-import ImageDropzone from "../../../components/admin/ImageDropzone.jsx"; // Adjust path if needed
 import { useAddCategory } from "./categoryHooks"; // Adjust path if needed
-
-// --- Reusable FormInput Component ---
-const FormInput = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      className={`border p-2 rounded-md ${
-        error
-          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-          : "border-gray-300 focus:border-green-500 focus:ring-green-500"
-      } focus:outline-none focus:ring-1`} // Added focus styles
-      {...props}
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
+import ImageDropzone from "../../../components/admin/ImageDropZone";
+import { FormInput } from "../../../components/common/FormComponents";
 
 // --- Main AddCategory Component ---
 const AddCategory = () => {

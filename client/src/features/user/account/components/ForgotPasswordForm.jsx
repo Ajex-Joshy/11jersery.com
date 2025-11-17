@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForgotPassword } from "../authHooks";
 import { setAuthModalView } from "../authSlice";
-import FormInput from "../../../../components/common/FormComponents";
+import { FormInput } from "../../../../components/common/FormComponents";
 import { Loader2 } from "lucide-react";
 
 const forgotSchema = z.object({

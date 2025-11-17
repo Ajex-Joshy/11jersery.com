@@ -1,5 +1,6 @@
 import React from "react";
 import { Star, StarHalf } from "lucide-react";
+import PropTypes from "prop-types";
 
 const StarRating = ({ rating, size = 16 }) => {
   const fullStars = Math.floor(rating);
@@ -25,5 +26,8 @@ const StarRating = ({ rating, size = 16 }) => {
     </div>
   );
 };
-
+StarRating.propTypes = {
+  rating: PropTypes.number.isRequired,
+  size: PropTypes.number,
+};
 export default StarRating;

@@ -1,4 +1,5 @@
 import Category from "../../models/category.model.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 import {
   AppError,
   buildCategoryQuery,
@@ -7,6 +8,7 @@ import {
 } from "../../utils/helpers.js";
 import {
   checkSlugUniqueness,
+  enrichCategoryWithSignedUrl,
   validateObjectId,
 } from "../../utils/product.utils.js";
 import { buildCategoryStockPipeline } from "./service-helpers/query-helpers.js";
@@ -68,16 +70,19 @@ export const updateCategory = async (categoryId, updateData) => {
       runValidators: true, // run schema validators on update
     }
   );
+  const categoryWithSignedUrls = await enrichCategoryWithSignedUrl(
+    updatedCategory
+  );
 
   if (!updatedCategory) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "CATEGORY_NOT_FOUND",
       "Category not found with this ID"
     );
   }
 
-  return updatedCategory;
+  return categoryWithSignedUrls;
 };
 
 export const softDeleteCategory = async (categoryId) => {
@@ -92,7 +97,7 @@ export const softDeleteCategory = async (categoryId) => {
 
   if (!deletedCategory) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "CATEGORY_NOT_FOUND",
       "Category not found with this ID"
     );
@@ -104,7 +109,11 @@ export const softDeleteCategory = async (categoryId) => {
 export const updateCategoryStatus = async (categoryId, status) => {
   validateObjectId(categoryId);
   if (typeof status !== "boolean") {
-    throw new AppError(400, "INVALID_STATUS", "Status must be a boolean value");
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "INVALID_STATUS",
+      "Status must be a boolean value"
+    );
   }
 
   const updateCategory = await Category.findByIdAndUpdate(
@@ -112,10 +121,9 @@ export const updateCategoryStatus = async (categoryId, status) => {
     { isListed: status },
     { new: true, runValidators: true }
   );
-
   if (!updateCategory) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "CATEGORY_NOT_FOUND",
       "Category not found with this ID"
     );
@@ -143,9 +151,12 @@ export const getCategories = async (queryParams) => {
     Category.aggregate(pipeline),
     Category.countDocuments(query),
   ]);
+  const categoriesWithSignedUrls = await Promise.all(
+    categories.map((cat) => enrichCategoryWithSignedUrl(cat))
+  );
 
   return {
-    categories,
+    categories: categoriesWithSignedUrls,
     pagination: {
       totalCategories,
       currentPage: pageNumber,
@@ -158,21 +169,22 @@ export const getCategories = async (queryParams) => {
 export const getCategoryDetails = async (slug) => {
   if (!slug || typeof slug !== "string") {
     throw new AppError(
-      400,
+      STATUS_CODES.BAD_REQUEST,
       "INVALID_SLUG",
       "A valid category slug is required"
     );
   }
 
   const category = await Category.findOne({ slug, isDeleted: false });
+  const categoryWithSignedUrl = enrichCategoryWithSignedUrl(category);
 
   if (!category) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "CATEGORY_NOT_FOUND",
       "Category not found with this slug"
     );
   }
 
-  return category;
+  return categoryWithSignedUrl;
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTableParams } from "../../../hooks/useTableParams.jsx";
 import {
@@ -14,12 +14,11 @@ import {
 } from "../../../components/admin/UiElements.jsx";
 import ConfirmationModal from "../../../components/common/ConfirmationModal.jsx";
 import StockVariantsDisplay from "../../../components/admin/StockVariantsDisplay.jsx";
-import { S3_URL } from "../../../utils/constants.js";
-import { ChevronDown, Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
-const ProductImage = ({ imageId, title }) => (
+const ProductImage = ({ imageUrl, title }) => (
   <img
-    src={`${S3_URL}/images/${imageId}`}
+    src={imageUrl}
     alt={title}
     className="w-12 h-12 object-cover rounded-md border border-gray-200"
     onError={(e) => {
@@ -51,6 +50,7 @@ const ProductList = () => {
     isError: isErrorProducts,
     error: errorProducts,
   } = useProducts(queryParams);
+  console.log(productData);
 
   // Fetch categories for the filter dropdown
   const { data: categoriesData } = useAllCategories();
@@ -73,8 +73,10 @@ const ProductList = () => {
   if (isErrorProducts) {
     return (
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-        <p className="text-red-500 mt-4">Error loading data: {error.message}</p>
+        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+        <p className="text-red-500 mt-4">
+          Error loading data: {errorProducts.message}
+        </p>
       </div>
     );
   }
@@ -104,7 +106,7 @@ const ProductList = () => {
       key: "image",
       sortable: false,
       render: (item) => (
-        <ProductImage imageId={item.imageIds?.[0]} title={item.title} />
+        <ProductImage imageUrl={item.imageUrls?.[0]} title={item.title} />
       ),
     },
     {
@@ -179,9 +181,9 @@ const ProductList = () => {
   const products = productData?.data?.products || [];
   const pagination = productData?.data?.pagination;
 
-  const isSortActive = (field, direction) =>
-    uiState.sortConfig.field === field &&
-    uiState.sortConfig.direction === direction;
+  // const isSortActive = (field, direction) =>
+  //   uiState.sortConfig.field === field &&
+  //   uiState.sortConfig.direction === direction;
 
   // --- RENDER ---
   return (

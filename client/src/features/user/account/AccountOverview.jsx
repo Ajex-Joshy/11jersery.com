@@ -30,6 +30,7 @@ const getJoinDateFromObjectId = (objectId) => {
 /**
  * A reusable row for displaying profile information.
  */
+// eslint-disable-next-line no-unused-vars
 const InfoRow = ({ icon: Icon, label, value }) => (
   <div>
     <label className="flex items-center text-xs font-semibold text-gray-500 uppercase mb-1">

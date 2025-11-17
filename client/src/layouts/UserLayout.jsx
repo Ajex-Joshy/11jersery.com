@@ -16,8 +16,6 @@ import {
 import AuthModal from "../features/user/account/components/AuthModal";
 import {
   selectIsAuthenticated,
-  selectCurrentUser,
-  logOut,
   openAuthModal,
 } from "../features/user/account/authSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,7 +25,6 @@ import { Toaster } from "react-hot-toast";
 const Header = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const user = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
 
   const [searchTerm, setSearchTerm] = useState("");

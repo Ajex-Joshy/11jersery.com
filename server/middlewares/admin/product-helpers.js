@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
 import createError from "http-errors";
 import { validationOptions } from "../../validators/admin/product-validators.js";
+import { STATUS_CODES } from "../../utils/constants.js";
+import logger from "../../config/logger.js";
 
 /**
  * Parses and validates stringified product data from req.body.
@@ -19,7 +21,10 @@ export const parseAndValidateProductData = (schema, type = "product") =>
         parsedData = JSON.parse(dataString);
       } catch (parseError) {
         if (parseError instanceof SyntaxError) {
-          throw createError(400, `Invalid JSON format for ${dataKey}.`);
+          throw createError(
+            STATUS_CODES.BAD_REQUEST,
+            `Invalid JSON format for ${dataKey}.`
+          );
         }
         throw parseError;
       }
@@ -32,7 +37,7 @@ export const parseAndValidateProductData = (schema, type = "product") =>
       if (error) {
         const messages = error.details.map((el) => el.message).join(". ");
         throw createError(
-          400,
+          STATUS_CODES.BAD_REQUEST,
           `${
             type.charAt(0).toUpperCase() + type.slice(1)
           } data validation failed: ${messages}`
@@ -44,7 +49,7 @@ export const parseAndValidateProductData = (schema, type = "product") =>
       req.validatedBody[dataKey] = validatedData;
     } else if (type === "product" && req.method === "POST") {
       // productData is required for create
-      throw createError(400, "Missing product data.");
+      throw createError(STATUS_CODES.BAD_REQUEST, "Missing product data.");
     } else if (type === "product") {
       // For PATCH, if productData is not sent, initialize as empty object
       if (!req.validatedBody) req.validatedBody = {};
@@ -71,14 +76,18 @@ export const parseImagesToDelete = asyncHandler(async (req, res, next) => {
       const imagesToDelete = JSON.parse(req.body.imagesToDeleteString);
       if (!Array.isArray(imagesToDelete)) {
         throw createError(
-          400,
+          STATUS_CODES.BAD_REQUEST,
           "'imagesToDelete' must be an array of image identifiers."
         );
       }
       if (!req.validatedBody) req.validatedBody = {};
       req.validatedBody.imagesToDelete = imagesToDelete;
     } catch (parseError) {
-      throw createError(400, "Invalid JSON format for imagesToDelete.");
+      logger.error(parseError);
+      throw createError(
+        STATUS_CODES.BAD_REQUEST,
+        "Invalid JSON format for imagesToDelete."
+      );
     }
   } else {
     if (!req.validatedBody) req.validatedBody = {};

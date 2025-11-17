@@ -4,6 +4,7 @@ import axios from "axios";
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   timeout: import.meta.env.VITE_AXIOS_TIMEOUT,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -24,12 +25,34 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // if (error.response) {
-    //   if (error.response.status === 401) {
-    //     localStorage.removeItem("token");
-    //     window.location.href = "/login";
-    //   }
-    // }
+    const originalRequest = error.config;
+
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      return axiosInstance
+        .post("/auth/refresh-token")
+        .then((res) => {
+          const newAccessToken = res.token;
+          if (newAccessToken) {
+            localStorage.setItem("token", newAccessToken);
+            axiosInstance.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+          }
+          return axiosInstance(originalRequest);
+        })
+        .catch((refreshError) => {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+          return Promise.reject(refreshError);
+        });
+    }
+
     return Promise.reject(error);
   }
 );

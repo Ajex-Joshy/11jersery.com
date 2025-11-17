@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, X, Image as ImageIcon } from "lucide-react";
 import ImageCropperModal from "./ImageCropperModal";
+import PropTypes from "prop-types";
 
 const ImageDropzone = ({
   onChange,
@@ -108,6 +109,16 @@ const ImageDropzone = ({
       )}
     </>
   );
+};
+
+ImageDropzone.propTypes = {
+  onChange: PropTypes.func.isRequired,
+
+  value: PropTypes.instanceOf(File),
+
+  aspect: PropTypes.number,
+
+  initialImageUrl: PropTypes.string,
 };
 
 export default ImageDropzone;

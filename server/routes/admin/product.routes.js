@@ -37,7 +37,7 @@ router.post(
 );
 
 router.patch(
-  "/:slug",
+  "/:id",
   verifyAdminToken,
   upload.array("images", 4),
   parseAndValidateProductData(parsedProductDataSchema, "product"), // Use 'update' schema if different

@@ -51,14 +51,53 @@ export const useToggleProductList = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: toggleProductList,
-    onSuccess: async (data) => {
-      toast.success(data.message || "Product status updated!");
-      await queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
+
+    onMutate: async ({ productId }) => {
+      await queryClient.cancelQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
+
+      const allQueries = queryClient.getQueriesData({
+        queryKey: [PRODUCTS_QUERY_KEY],
+      });
+
+      const previousProducts = allQueries;
+
+      allQueries.forEach(([key, oldData]) => {
+        console.log("oldData", oldData);
+        if (!oldData || !oldData.data || !oldData.data.products) return;
+
+        queryClient.setQueryData(key, {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            products: oldData.data.products.map((product) =>
+              product._id === productId
+                ? { ...product, isListed: !product.isListed }
+                : product
+            ),
+          },
+        });
+      });
+
+      return { previousProducts };
     },
-    onError: (error) => {
+
+    // If mutation fails, rollback
+    onError: (error, variables, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(
+          [PRODUCTS_QUERY_KEY],
+          context.previousProducts
+        );
+      }
+
       toast.error(
         error.response?.data?.message || "Failed to update product status."
       );
+    },
+
+    // On success, show toast
+    onSuccess: (data) => {
+      toast.success(data.message || "Product status updated!");
     },
   });
 };

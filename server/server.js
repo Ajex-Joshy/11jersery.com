@@ -14,16 +14,21 @@ import {
   httpRequestCounter,
   httpRequestDurationMicroseconds,
 } from "./config/metrics.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "https://years-applicants-first-guns.trycloudflare.com",
+      "http://localhost:5173",
+    ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
 );
+app.use(cookieParser());
 const httpLogger = pinoHttp({
   logger,
 });
@@ -54,8 +59,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/admin", adminRoutes);
-app.use("/", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/", userRoutes);
 app.use(errorHandler);
 app.get("/metrics", async (req, res) => {
   try {

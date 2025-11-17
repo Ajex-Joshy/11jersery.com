@@ -30,11 +30,46 @@ export const useToggleUserBlock = () => {
   return useMutation({
     mutationFn: toggleUserBlock,
 
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: [CUSTOMERS_QUERY_KEY] }),
-        queryClient.invalidateQueries({ queryKey: [CUSTOMER_STATS_QUERY_KEY] }),
-      ]);
+    onMutate: async ({ userId, isBlocked }) => {
+      await queryClient.cancelQueries({ queryKey: [CUSTOMERS_QUERY_KEY] });
+
+      const previousCustomers = queryClient.getQueryData([CUSTOMERS_QUERY_KEY]);
+
+      queryClient.setQueriesData({ queryKey: [CUSTOMERS_QUERY_KEY] }, (old) => {
+        if (!old || !old.data || !old.data.users) return old;
+
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            users: old.data.users.map((user) =>
+              user._id === userId
+                ? {
+                    ...user,
+                    isBlocked,
+                    status: isBlocked ? "blocked" : "active",
+                  }
+                : user
+            ),
+          },
+        };
+      });
+
+      return { previousCustomers };
     },
+
+    onError: (error, variables, context) => {
+      if (context?.previousCustomers) {
+        queryClient.setQueryData(
+          [CUSTOMERS_QUERY_KEY],
+          context.previousCustomers
+        );
+      }
+    },
+
+    // onSettled: () => {
+    //   queryClient.invalidateQueries({ queryKey: [CUSTOMERS_QUERY_KEY] });
+    //   queryClient.invalidateQueries({ queryKey: [CUSTOMER_STATS_QUERY_KEY] });
+    // },
   });
 };

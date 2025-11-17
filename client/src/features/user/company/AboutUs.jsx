@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ShieldCheck, Package, Star, Users } from "lucide-react";
 
 // Reusable component for "Our Promise" section
+// eslint-disable-next-line no-unused-vars
 const PromiseCard = ({ icon: Icon, title, children }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
     <Icon className="w-10 h-10 text-blue-600 mb-3" strokeWidth={1.5} />

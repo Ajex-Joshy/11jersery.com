@@ -3,6 +3,7 @@ import { AppError } from "./helpers.js";
 import { createSlug } from "./helpers.js";
 import Faq from "../models/faq.model.js";
 import Category from "../models/category.model.js";
+import { getSignedUrlForKey } from "../services/admin/service-helpers/s3.service.js";
 
 export const validateObjectId = (id, entity = "") => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -116,4 +117,34 @@ export const buildProductQuery = async ({ search, category, status }) => {
   }
 
   return query;
+};
+
+export const enrichProductWithSignedUrls = async (product) => {
+  const productObj = product.toObject ? product.toObject() : product;
+
+  if (productObj.imageIds && productObj.imageIds.length > 0) {
+    const signedUrls = await Promise.all(
+      productObj.imageIds.map((key) => getSignedUrlForKey(key))
+    );
+    productObj.imageUrls = signedUrls.filter(Boolean);
+
+    productObj.coverImageUrl = productObj.imageUrls[0] || null;
+  } else {
+    productObj.imageUrls = [];
+    productObj.coverImageUrl = null;
+  }
+  return productObj;
+};
+
+export const enrichCategoryWithSignedUrl = async (category) => {
+  const categoryObj = category.toObject ? category.toObject() : category;
+
+  if (categoryObj.imageId) {
+    const signedUrl = await getSignedUrlForKey(categoryObj.imageId);
+    categoryObj.imageUrl = signedUrl || null;
+  } else {
+    categoryObj.imageUrl = null;
+  }
+
+  return categoryObj;
 };

@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { Pencil, AlertTriangle, Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useUserProfile } from "./userHooks"; // Assumes userHooks.js is in the same folder
 import { PersonalDetailsModal } from "./components/PersonalDetailsModal";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
-import {
-  LoadingSpinner,
-  ErrorDisplay,
-} from "../../../components/common/StateDisplays";
+import { ErrorDisplay } from "../../../components/common/StateDisplays";
 import { selectCurrentUser } from "./authSlice";
+import toast from "react-hot-toast";
 
 const SettingsCard = ({ title, children, onEdit }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -42,7 +39,6 @@ const AccountSettingsPage = () => {
   //   const { data: profilePayload, isLoading, isError, error } = useUserProfile();
 
   // Get data from Redux as a fallback/initial state
-  const userFromStore = useSelector(selectCurrentUser);
 
   // Prioritize fresh data from the query, but use store data as a fallback
   //   const user = profilePayload?.data || userFromStore;

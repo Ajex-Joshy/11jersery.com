@@ -1,4 +1,3 @@
-import { sl } from "zod/v4/locales";
 import axiosInstance from "../../../api/axiosInstance";
 
 export const getCategories = async ({ queryKey }) => {

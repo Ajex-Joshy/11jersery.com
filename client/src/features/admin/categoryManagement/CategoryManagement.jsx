@@ -20,7 +20,7 @@ const DiscoverCard = ({ data }) => (
     <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
       {data?.imageId ? (
         <img
-          src={`${S3_URL}/images/${data.imageId}`}
+          src={data.imageUrl}
           alt={data.title}
           className="w-16 h-16 object-cover rounded-md"
         />
@@ -51,6 +51,7 @@ const CategoryManagement = () => {
     isError: isErrorCategories,
     error: errorCategories,
   } = useCategories(queryParams);
+  console.log(categoryData);
 
   const { mutate: toggleList, isLoading: isTogglingList } =
     useToggleCategoryList();

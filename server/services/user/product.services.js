@@ -1,11 +1,12 @@
-import logger from "../../config/logger.js";
-import redisClient from "../../config/redis-client.js";
 import Category from "../../models/category.model.js";
 import Faq from "../../models/faq.model.js";
 import Product from "../../models/product.model.js";
 import Review from "../../models/review.model.js";
 import { AppError, getPagination, getSortOption } from "../../utils/helpers.js";
-import { buildProductQuery } from "../../utils/product.utils.js";
+import {
+  buildProductQuery,
+  enrichProductWithSignedUrls,
+} from "../../utils/product.utils.js";
 
 export const getProductDetailsService = async (productSlug) => {
   const product = await Product.findOne({
@@ -21,6 +22,7 @@ export const getProductDetailsService = async (productSlug) => {
       `Product with slug "${productSlug}" not found`
     );
   }
+  const productsWithSignedUrls = await enrichProductWithSignedUrls(product);
 
   const reviews = await Review.find({ productId: product._id })
     .select("_id rating userName place comment createdAt productId")
@@ -38,7 +40,7 @@ export const getProductDetailsService = async (productSlug) => {
     .lean();
 
   return {
-    product,
+    product: productsWithSignedUrls,
     reviews,
     otherProducts,
   };
@@ -125,19 +127,6 @@ const getFilterMetadata = async (baseQuery) => {
  * Fetches products AND the metadata (filters, sorting) for the product listing page.
  */
 export const getProducts = async (queryParams) => {
-  const cacheKey = `products:listing:${JSON.stringify(queryParams)}`;
-
-  try {
-    const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
-      logger.info(`Fetched from cache: ${cacheKey}`);
-      return JSON.parse(cachedData);
-    }
-  } catch (err) {
-    logger.error(`Redis GET error: ${cacheKey}, fetching from DB`);
-  }
-
-  logger.info(`Cache key missed: ${cacheKey}`);
   const {
     page = 1,
     limit = 10,
@@ -182,6 +171,9 @@ export const getProducts = async (queryParams) => {
 
     getFilterMetadata(baseQuery),
   ]);
+  const productsWithSignedUrls = await Promise.all(
+    products.map((product) => enrichProductWithSignedUrls(product))
+  );
 
   const response = {
     metadata: {
@@ -208,15 +200,9 @@ export const getProducts = async (queryParams) => {
     },
     data: {
       categoryTitle: categoryTitle,
-      products: products,
+      products: productsWithSignedUrls,
     },
   };
 
-  try {
-    await redisClient.set(cacheKey, JSON.stringify(response), "EX", 3600);
-    logger.info(`Cache key set: ${cacheKey}`);
-  } catch (err) {
-    logger.error(`Redis SET error: ${err}`);
-  }
   return response;
 };

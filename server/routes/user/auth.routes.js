@@ -1,13 +1,13 @@
 import express from "express";
 import {
   forgotPasswordController,
+  refreshAcessTokenController,
   resetPasswordController,
   userLoginController,
   userSignupController,
   verifyOtpController,
 } from "../../controllers/user/auth.controller.js";
 import { otpLimiter } from "../../utils/otp.utils.js";
-import { authenticateUser } from "../../middlewares/user/authenticate-user.js";
 
 import { validate } from "../../middlewares/common/validate.js";
 import {
@@ -23,6 +23,8 @@ const router = express.Router();
 router.post("/signup", validate(signupSchema), userSignupController);
 
 router.post("/login", validate(loginSchema), userLoginController);
+
+router.post("/refresh-token", refreshAcessTokenController);
 
 router.post(
   "/forgot-password",

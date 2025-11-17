@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { UploadCloud, X, Star, Crop } from "lucide-react";
 import ImageCropperModal from "./ImageCropperModal"; // Assuming path is correct
 import toast from "react-hot-toast"; // Import toast for re-crop warning
+import PropTypes from "prop-types";
 
 const ProductImageDropzone = ({
   onChangeFiles,
@@ -16,6 +17,7 @@ const ProductImageDropzone = ({
   error,
   aspect = 1 / 1,
 }) => {
+  console.log(initialImageUrls);
   // Combined state for display: { type: 'initial'|'new', source: string|File, previewUrl: string }
   const [cropModalState, setCropModalState] = useState({
     isOpen: false,
@@ -129,10 +131,10 @@ const ProductImageDropzone = ({
   };
 
   // Set Cover Image (index is based on combined displayItems)
-  const setCoverImage = (index, e) => {
-    e.stopPropagation();
-    onChangeCoverIndex(index);
-  };
+  // const setCoverImage = (index, e) => {
+  //   e.stopPropagation();
+  //   onChangeCoverIndex(index);
+  // };
 
   // Open Cropper for re-cropping 'new' files
   const openRecropModal = (index, e) => {
@@ -306,6 +308,26 @@ const ProductImageDropzone = ({
       )}
     </div>
   );
+};
+
+ProductImageDropzone.propTypes = {
+  onChangeFiles: PropTypes.func.isRequired,
+
+  valueFiles: PropTypes.arrayOf(PropTypes.instanceOf(File)).isRequired,
+
+  onChangeCoverIndex: PropTypes.func.isRequired,
+
+  valueCoverIndex: PropTypes.number.isRequired,
+
+  initialImageUrls: PropTypes.arrayOf(PropTypes.string),
+
+  onRemoveInitialImage: PropTypes.func.isRequired,
+
+  label: PropTypes.string,
+
+  error: PropTypes.string,
+
+  aspect: PropTypes.number,
 };
 
 export default ProductImageDropzone; // Changed name back for consistency if needed

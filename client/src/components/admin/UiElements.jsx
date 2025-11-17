@@ -1,5 +1,6 @@
 import React from "react";
 import { Edit2, Trash2 } from "lucide-react";
+import PropTypes from "prop-types";
 
 /**
  * Badge for customer status (Active / Blocked)
@@ -34,6 +35,11 @@ export const StatusBadge = ({ status, isBlocked }) => {
   );
 };
 
+StatusBadge.propTypes = {
+  status: PropTypes.string.isRequired,
+  isBlocked: PropTypes.bool.isRequired,
+};
+
 /**
  * Badge/Button for category status (List / Unlist)
  * We can make this a button to handle your toggle logic.
@@ -54,6 +60,11 @@ export const ListToggleButton = ({ isListed, onClick, isLoading }) => {
       {isLoading ? "SAVING..." : text}
     </button>
   );
+};
+ListToggleButton.propTypes = {
+  isListed: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
 };
 
 /**
@@ -90,3 +101,9 @@ export const ActionIconButtons = ({ onEdit, onDelete }) => (
     </button>
   </div>
 );
+
+ActionToggleButton.propTypes = {
+  isBlocked: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+};

@@ -1,8 +1,9 @@
 import logger from "../../config/logger.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const errorHandler = (err, req, res, _next) => {
-  logger.error(err.message);
-  const statusCode = err.status || 500;
+  logger.error(err);
+  const statusCode = err.status || STATUS_CODES.INTERNAL_SERVER_ERROR;
   const code = err.code || "INTERNAL_SERVER_ERROR";
   const message =
     err.message ||

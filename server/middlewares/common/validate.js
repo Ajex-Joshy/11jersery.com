@@ -1,3 +1,4 @@
+import { STATUS_CODES } from "../../utils/constants.js";
 import { AppError } from "../../utils/helpers.js";
 
 export const validate = (schema) => {
@@ -13,7 +14,9 @@ export const validate = (schema) => {
     if (error) {
       const errorMessage = error.details[0].message;
 
-      return next(new AppError(400, "VALIDATION_ERROR", errorMessage));
+      return next(
+        new AppError(STATUS_CODES.BAD_REQUEST, "VALIDATION_ERROR", errorMessage)
+      );
     }
 
     req.body = value;

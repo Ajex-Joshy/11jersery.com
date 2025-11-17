@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useNavigate, data } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import toast from "react-hot-toast";
@@ -15,7 +15,7 @@ import {
 
 import ProductImageDropzone from "../../../components/admin/ProductImageDropZone.jsx";
 import { S3_URL } from "../../../utils/constants";
-import FormInput from "../../../components/common/FormComponents.jsx";
+import { FormInput } from "../../../components/common/FormComponents.jsx";
 import { FormTextarea } from "../../../components/common/FormComponents.jsx";
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -30,7 +30,6 @@ const EditProduct = () => {
     isError,
     error: fetchError,
   } = useProductDetails(slug);
-  console.log(productDetailsPayload);
   const { data: categoriesData } = useAllCategories();
 
   // --- Mutation ---
@@ -52,10 +51,7 @@ const EditProduct = () => {
     handleSubmit,
     control,
     reset,
-    setError,
-    watch, // Watch is needed for comparison if not using dirtyFields exclusively
-    // --- FIX: Use correct schema ---
-    formState: { errors, isDirty, dirtyFields }, // isDirty tracks if any field changed from defaultValues
+    formState: { errors, dirtyFields }, // isDirty tracks if any field changed from defaultValues
   } = useForm({
     resolver: zodResolver(productSchema), // Use the EDIT schema
     defaultValues: {},
@@ -137,16 +133,12 @@ const EditProduct = () => {
     }
   }, [originalData, originalFaqs, categoriesData, reset, replaceFaqs]);
 
-  const existingImageIds = originalData?.imageIds || [];
-  const existingImageUrls = existingImageIds.map(
-    (id) => `${S3_URL}/images/${id}`
-  );
   const handleRemoveInitialImage = (urlToRemove) => {
     const imageIdToRemove = urlToRemove.replace(`${S3_URL}/`, "");
     setImagesToDelete((prev) => [...prev, imageIdToRemove]);
   };
 
-  const filteredInitialUrls = existingImageUrls.filter(
+  const filteredInitialUrls = categoriesData.imageUrls.filter(
     (url) => !imagesToDelete.includes(url.replace(`${S3_URL}/`, ""))
   );
 
@@ -226,8 +218,6 @@ const EditProduct = () => {
         // Ignore 'images' and 'faqs' - handled separately below
       }
     });
-    console.log(data);
-    console.log(productChanges);
 
     // --- Append Changes to FormData ---
     let formDataHasData = false; // Flag to check if anything is appended
@@ -248,7 +238,9 @@ const EditProduct = () => {
       newImages.forEach((file) => formData.append(`images`, file));
       formDataHasData = true;
       // If new images are added, ensure cover index is sent (even if 0)
-      if (!productChanges.hasOwnProperty("coverImageIndex")) {
+      if (
+        !Object.prototype.hasOwnProperty.call(productChanges, "coverImageIndex")
+      ) {
         formData.append("coverImageIndex", data.coverImageIndex.toString());
       }
     }
@@ -267,8 +259,9 @@ const EditProduct = () => {
     }
 
     // --- Call Mutation ---
+    let id = productDetailsPayload.data.product._id;
     updateMutate(
-      { slug, formData },
+      { id, formData },
       {
         onError: (err) => {
           console.error("Error updating product:", err);

@@ -1,10 +1,7 @@
 import asyncHandler from "express-async-handler";
 import createError from "http-errors";
-import {
-  parsedProductDataSchema,
-  parsedFaqsDataSchema,
-  validationOptions,
-} from "../../validators/admin/productValidators.js"; // Adjust path
+import { validationOptions } from "../../validators/admin/productValidators.js"; // Adjust path
+import logger from "../../../config/logger.js";
 
 /**
  * Parses and validates stringified product data from req.body.
@@ -82,6 +79,7 @@ export const parseImagesToDelete = asyncHandler(async (req, res, next) => {
       if (!req.validatedBody) req.validatedBody = {};
       req.validatedBody.imagesToDelete = imagesToDelete;
     } catch (parseError) {
+      logger.error(parseError);
       throw createError(400, "Invalid JSON format for imagesToDelete.");
     }
   } else {

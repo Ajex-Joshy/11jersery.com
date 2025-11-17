@@ -5,9 +5,10 @@ import { X, Loader2 } from "lucide-react";
 import { personalDetailsSchema } from "../profileSchema.js";
 import { useUpdateProfile } from "../userHooks";
 import AvatarUploader from "../../../../components/common/AvatarUploader.jsx";
-import FormInput from "../../../../components/common/FormComponents.jsx";
+import { FormInput } from "../../../../components/common/FormComponents.jsx";
+import toast from "react-hot-toast";
 // Helper component for Date of Birth
-const DateOfBirthFields = ({ control, errors }) => {
+const DateOfBirthFields = ({ control }) => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => currentYear - 18 - i);
   const months = [
@@ -94,7 +95,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
     control,
     formState: { errors },
     reset,
-    watch,
   } = useForm({
     resolver: zodResolver(personalDetailsSchema),
   });

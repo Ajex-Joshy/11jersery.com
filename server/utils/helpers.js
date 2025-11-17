@@ -1,8 +1,9 @@
 import slugify from "slugify";
+import { STATUS_CODES } from "./constants.js";
 
 export class AppError extends Error {
   constructor(
-    status = 500,
+    status = STATUS_CODES.INTERNAL_SERVER_ERROR,
     code = "INTERNAL_SERVER_ERROR",
     message = "An unexpected error occurred. We are investigating the issue."
   ) {
@@ -13,7 +14,7 @@ export class AppError extends Error {
   }
 }
 
-export const sendResponse = (res, data, statusCode = 200) => {
+export const sendResponse = (res, data, statusCode = STATUS_CODES.OK) => {
   res.status(statusCode).json({
     data,
   });

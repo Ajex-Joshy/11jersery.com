@@ -1,4 +1,6 @@
+import logger from "../../../config/logger.js";
 import Faq from "../../../models/faq.model.js";
+import { STATUS_CODES } from "../../../utils/constants.js";
 
 export const buildCategoryStockPipeline = (query, sort, skip, pageSize) => [
   { $match: query },
@@ -35,12 +37,15 @@ export const buildCategoryStockPipeline = (query, sort, skip, pageSize) => [
       productCount: { $ifNull: [{ $first: "$meta.productCount" }, 0] },
     },
   },
-  { $project: { meta: 0 } },
+  { $project: { meta: 0, updatedAt: 0, _v: 0, __v: 0 } },
 ];
 
 export const updateFaqs = async (newFaqsData = [], productId) => {
   if (!productId) {
-    throw createError(400, "Product ID is required to update FAQs.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "Product ID is required to update FAQs."
+    );
   }
 
   // 1. Get all existing FAQs for this product
@@ -91,12 +96,12 @@ export const updateFaqs = async (newFaqsData = [], productId) => {
       }
     } else {
       // --- Create New ---
-      // Ensure productId is set correctly, remove potential incoming _id if it was null/undefined
-      const { _id, ...faqToCreate } = incomingFaq;
+      const faqToCreate = { ...incomingFaq };
+      delete faqToCreate._id;
       operations.push(
         Faq.create({
           ...faqToCreate,
-          productId: productId, // Ensure association
+          productId: productId,
         })
       );
     }
@@ -106,9 +111,11 @@ export const updateFaqs = async (newFaqsData = [], productId) => {
   try {
     await Promise.all(operations);
   } catch (error) {
-    console.error("Error during FAQ update operations:", error);
-    // Rethrow a more specific error or handle cleanup if needed
-    throw createError(500, "Failed to update product FAQs.");
+    logger.error(error);
+    throw createError(
+      STATUS_CODES.INTERNAL_SERVER_ERROR,
+      "Failed to update product FAQs."
+    );
   }
 
   // 5. Return the final list of FAQs for the product
@@ -120,7 +127,10 @@ export const updateFaqs = async (newFaqsData = [], productId) => {
 // This assumes you *don't* pass IDs during creation
 export const saveFaqs = async (faqsData = [], productId) => {
   if (!productId) {
-    throw createError(400, "Product ID is required to save FAQs.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "Product ID is required to save FAQs."
+    );
   }
   if (faqsData.length === 0) {
     return [];
@@ -135,7 +145,10 @@ export const saveFaqs = async (faqsData = [], productId) => {
     const savedFaqs = await Faq.insertMany(faqsToCreate);
     return savedFaqs;
   } catch (error) {
-    console.error("Error saving new FAQs:", error);
-    throw createError(500, "Failed to save product FAQs.");
+    logger.error(error);
+    throw createError(
+      STATUS_CODES.INTERNAL_SERVER_ERROR,
+      "Failed to save product FAQs."
+    );
   }
 };

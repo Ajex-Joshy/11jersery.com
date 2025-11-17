@@ -2,15 +2,14 @@ import Admin from "../../models/admin.model.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/jwt.js";
 import { AppError } from "../../utils/helpers.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const loginAdmin = async (identifier, password) => {
-  console.log(identifier, password);
   try {
     const admin = await Admin.findOne({ email: identifier });
-    console.log(admin);
     if (!admin)
       throw new AppError(
-        400,
+        STATUS_CODES.BAD_REQUEST,
         "INVALID_CREDENTIALS",
         "Invalid email or password."
       );
@@ -18,7 +17,7 @@ export const loginAdmin = async (identifier, password) => {
     const isPasswordCorrect = await bcrypt.compare(password, admin.password);
     if (!isPasswordCorrect)
       throw new AppError(
-        400,
+        STATUS_CODES.BAD_REQUEST,
         "INVALID_CREDENTIALS",
         "Invalid email or password."
       );

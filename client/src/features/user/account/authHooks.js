@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { getAccountDetails, loginUser, signupUser } from "./authApis";
-import { setAuthModalView, setUser } from "./authSlice";
+import { loginUser, signupUser } from "./authApis";
+import { openAuthModal, setUser } from "./authSlice";
 import { requestPasswordReset, resetPassword } from "./authApis";
 import { useNavigate } from "react-router-dom";
 

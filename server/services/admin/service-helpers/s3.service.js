@@ -1,5 +1,11 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 import crypto from "crypto";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import logger from "../../../config/logger.js";
 
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
 const region = process.env.AWS_S3_REGION;
@@ -35,5 +41,22 @@ export const uploadFileToS3 = async (file) => {
     return imageName;
   } catch (error) {
     throw error;
+  }
+};
+
+export const getSignedUrlForKey = async (key) => {
+  if (!key) return null;
+  const k = `images/${key}`;
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: k,
+  });
+
+  try {
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    return url;
+  } catch (error) {
+    logger.error(`Error generating signed URL for key ${key}:`, error);
+    return null;
   }
 };

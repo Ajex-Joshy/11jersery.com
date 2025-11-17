@@ -16,6 +16,7 @@ import {
   getVisitors,
 } from "./service-helpers/user-metrics.js";
 import { validateObjectId } from "../../utils/product.utils.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const getUsers = async (queryParams) => {
   const {
@@ -33,7 +34,11 @@ export const getUsers = async (queryParams) => {
   const { pageNumber, pageSize, skip } = getPagination(page, limit);
 
   const [result, totalUsers] = await Promise.all([
-    User.find(query).sort(sort).skip(skip).limit(pageSize).select("-password"),
+    User.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(pageSize)
+      .select("_id firstName lastName email phone isBlocked status"),
     User.countDocuments(query),
   ]);
 
@@ -105,7 +110,11 @@ export const getUsersStats = async () => {
 
 export const updateUserStatus = async (userId, isBlocked) => {
   if (typeof isBlocked !== "boolean") {
-    throw new AppError(400, "INVALID_STATUS", "Status should be boolean");
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "INVALID_STATUS",
+      "Status should be boolean"
+    );
   }
 
   validateObjectId(userId);
@@ -119,7 +128,7 @@ export const updateUserStatus = async (userId, isBlocked) => {
 
   if (!user) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "USER_NOT_FOUND",
       "The user with the specified ID could not be found."
     );

@@ -112,7 +112,7 @@ const ProductDetailsPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           <ProductImageGallery
-            imageIds={product.imageIds}
+            imageUrls={product.imageUrls}
             title={product.title}
           />
           <ProductPurchaseForm

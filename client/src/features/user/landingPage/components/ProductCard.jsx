@@ -4,12 +4,6 @@ import { S3_URL } from "../../../../utils/constants";
 import StarRating from "../../../../components/common/StarRating";
 
 const ProductCard = ({ product }) => {
-  // --- 1. Use correct image ID field and path ---
-  const imageId = product.imageIds?.[0];
-  const imageUrl = imageId
-    ? `${S3_URL}/images/${imageId}`
-    : "https://acube.delighterp.com/uploaded/acube_delighterp_com/product/default_product_image.jpg"; // Fallback image
-
   // --- 2. Calculate discount ---
   const listPrice = product.price.list;
   const salePrice = product.price.sale;
@@ -31,7 +25,7 @@ const ProductCard = ({ product }) => {
       <div className="aspect-[1/1] overflow-hidden bg-gray-100 rounded-t-xl">
         {" "}
         <img
-          src={imageUrl}
+          src={product?.imageUrls[0]}
           alt={product.title}
           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 mix-blend-multiply" // Use object-contain and mix-blend
           onError={(e) => {

@@ -24,11 +24,19 @@ export const parseAndValidateCategoryData = (dataFromRequest, schema) => {
         ? undefined
         : Number(data.maxRedeemable);
 
-  if (!data.discount || data.discount === 0) {
-    data.discount = 0;
+  /**
+   * Only reset discount fields when offer is disabled.
+   * If offerEnabled is true, never auto-clear discountType.
+   */
+  if (data.offerEnabled === "false" || data.offerEnabled === false) {
+    data.discount = data.discount ? Number(data.discount) : 0;
     data.discountType = undefined;
-    data.minPurchaseAmount = 0;
-    data.maxRedeemable = 0;
+    data.minPurchaseAmount = data.minPurchaseAmount
+      ? Number(data.minPurchaseAmount)
+      : 0;
+    data.maxRedeemable = data.maxRedeemable
+      ? Number(data.maxRedeemable)
+      : 0;
   }
   if (data.discountType === "") data.discountType = undefined;
 

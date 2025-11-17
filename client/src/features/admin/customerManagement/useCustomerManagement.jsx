@@ -46,14 +46,16 @@ export const useCustomerManagement = () => {
   const { mutate: toggleBlock, isLoading: isTogglingBlock } =
     useToggleUserBlock();
 
-  // --- MODAL HANDLERS (Page-specific logic) ---
   const handleConfirmToggle = () => {
     const item = modalState.item;
-    if (!item) return;
-    toggleBlock(
-      { userId: item._id, isBlocked: !item.isBlocked },
-      { onSettled: () => setModalState({ isOpen: false, item: null }) }
-    );
+    if (!item || isTogglingBlock) return;
+
+    setModalState({ isOpen: false, item: null });
+
+    toggleBlock({
+      userId: item._id,
+      isBlocked: !item.isBlocked,
+    });
   };
 
   const openConfirmationModal = (item) => {
@@ -128,7 +130,8 @@ export const useCustomerManagement = () => {
         return (
           <ActionToggleButton
             isBlocked={item.isBlocked}
-            isLoading={false}
+            isLoading={isTogglingBlock}
+            disabled={isTogglingBlock}
             onClick={() => openConfirmationModal(item)}
           />
         );

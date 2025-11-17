@@ -1,4 +1,5 @@
 import User from "../../models/user.model.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 import { AppError } from "../../utils/helpers.js";
 
 export const getAccountDetails = async (userId) => {
@@ -7,6 +8,11 @@ export const getAccountDetails = async (userId) => {
     isBlocked: false,
     isDeleted: false,
   }).select(" _id firstName lastName email phone imageId");
-  if (!user) throw new AppError(404, "USER_NOT_FOUND", "could not found user");
+  if (!user)
+    throw new AppError(
+      STATUS_CODES.NOT_FOUND,
+      "USER_NOT_FOUND",
+      "could not found user"
+    );
   return user;
 };

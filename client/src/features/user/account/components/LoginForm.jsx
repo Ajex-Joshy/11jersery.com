@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { loginSchema } from "./authSchemas";
 import { useLogin } from "../authHooks"; // Adjust path
 import { setAuthModalView } from "../authSlice"; // Adjust path
-import FormInput from "../../../../components/common/FormComponents";
+import { FormInput } from "../../../../components/common/FormComponents";
 const LoginForm = () => {
   const { mutate: loginMutate, isLoading } = useLogin();
   const dispatch = useDispatch();

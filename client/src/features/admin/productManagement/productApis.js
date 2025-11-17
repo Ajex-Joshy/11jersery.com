@@ -1,4 +1,3 @@
-import { da } from "zod/v4/locales";
 import axiosInstance from "../../../api/axiosInstance";
 /**
  * Fetches products with pagination, sorting, filtering.
@@ -59,9 +58,9 @@ export const addProduct = async (formData) => {
   return data;
 };
 
-export const updateProduct = async ({ slug, formData }) => {
+export const updateProduct = async ({ id, formData }) => {
   const { data } = await axiosInstance.patch(
-    `/admin/products/${slug}`,
+    `/admin/products/${id}`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },

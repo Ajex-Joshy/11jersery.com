@@ -1,5 +1,6 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PropTypes from "prop-types";
 
 const Pagination = ({ pagination, onPageChange }) => {
   const { currentPage, totalPages, totalUsers, limit } = pagination;
@@ -48,5 +49,13 @@ const Pagination = ({ pagination, onPageChange }) => {
     </div>
   );
 };
-
+Pagination.propTypes = {
+  pagination: PropTypes.shape({
+    currentPage: PropTypes.number.isRequired,
+    totalPages: PropTypes.number.isRequired,
+    totalUsers: PropTypes.number.isRequired,
+    limit: PropTypes.number.isRequired,
+  }).isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};
 export default Pagination;

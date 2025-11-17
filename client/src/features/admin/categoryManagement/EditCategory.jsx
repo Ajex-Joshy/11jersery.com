@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useNavigate } from "react-router-dom";
@@ -10,26 +10,7 @@ import { useCategoryDetails, useUpdateCategory } from "./categoryHooks";
 // Removed unused import: import { sl } from "zod/v4/locales";
 import { S3_URL } from "../../../utils/constants"; // Ensure path is correct
 import ImageDropzone from "../../../components/admin/ImageDropZone";
-
-// --- Reusable FormInput ---
-const FormInput = ({ label, id, error, ...props }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      className={`border p-2 rounded-md ${
-        error
-          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-          : "border-gray-300 focus:border-green-500 focus:ring-green-500"
-      } focus:outline-none focus:ring-1`}
-      {...props}
-    />
-    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
-  </div>
-);
-// ---
+import { FormInput } from "../../../components/common/FormComponents";
 
 const EditCategory = () => {
   const { slug } = useParams();
@@ -40,7 +21,6 @@ const EditCategory = () => {
     data: categoryDetailsData,
     isLoading: isLoadingDetails,
     isError,
-    error: fetchError,
   } = useCategoryDetails(slug);
 
   // Update mutation hook
@@ -52,7 +32,7 @@ const EditCategory = () => {
     control,
     reset,
     setError,
-    watch, // Watch offerEnabled and discountType
+    watch,
     setValue,
     unregister,
     formState: { errors },
@@ -79,11 +59,10 @@ const EditCategory = () => {
 
   // --- Populate form when data loads ---
   // --- Populate form when data loads ---
+  console.log("categoryDetailsData", categoryDetailsData);
   useEffect(() => {
     if (categoryDetailsData?.data) {
-      // Assuming data is in payload.category
       const category = categoryDetailsData.data;
-      // --- Determine if an offer exists ---
       const hasOffer =
         category.discount > 0 && category.discountType ? true : false;
 
@@ -111,9 +90,10 @@ const EditCategory = () => {
         inCollections: category.inCollections,
         image: null,
       });
-      console.log(category.isListed);
+      setValue("offerEnabled", hasOffer);
+      setValue("discountType", category.discountType || "");
     }
-  }, [categoryDetailsData, reset]);
+  }, [categoryDetailsData, reset, setValue]);
   // --- Effect to manage field registration (same as AddCategory) ---
   useEffect(() => {
     if (!offerEnabled) {
@@ -155,9 +135,7 @@ const EditCategory = () => {
   }, [offerEnabled, discountType, register, unregister, setValue]);
 
   // Construct existing image URL safely
-  const existingImageUrl = categoryDetailsData?.data?.imageId
-    ? `${S3_URL}/images/${categoryDetailsData.data.imageId}` // Assuming imageUrl is just the key/path
-    : null;
+
   console.log(errors);
   // --- Handle Form Submission ---
   const onSubmit = (data) => {
@@ -241,7 +219,7 @@ const EditCategory = () => {
     }
 
     // Status & Display Toggles
-    const isListedBool = data.isListed === "true"; // Convert form string to boolean
+    const isListedBool = data.isListed === true;
     if (isListedBool !== originalData.isListed) {
       formData.append("isListed", isListedBool);
       hasChanges = true;
@@ -260,7 +238,6 @@ const EditCategory = () => {
       formData.append("image", data.image);
       hasChanges = true;
     }
-    console.log(data.image);
 
     // --- Check if any changes were made ---
     if (!hasChanges) {
@@ -268,7 +245,12 @@ const EditCategory = () => {
       navigate("/admin/categories"); // Navigate back if no changes
       return;
     }
-    for (let [key, value] in formData.entries()) console.log(key, value);
+    console.log(originalData);
+    console.log("original", originalData);
+    console.log("data", data);
+    for (const [key, value] of formData.entries()) {
+      console.log("formData", key, value);
+    }
     // --- Call Mutation ---
     const id = originalData._id;
     updateMutate(
@@ -314,7 +296,7 @@ const EditCategory = () => {
               <ImageDropzone
                 onChange={field.onChange}
                 value={field.value} // New File object
-                initialImageUrl={existingImageUrl} // Existing URL for preview
+                initialImageUrl={categoryDetailsData?.data?.imageUrl} // Existing URL for preview
                 aspect={16 / 9}
               />
             )}

@@ -1,6 +1,6 @@
 import Product from "../../../models/product.model.js";
 import Category from "../../../models/category.model.js";
-import logger from "../../../config/logger.js";
+import { enrichProductWithSignedUrls } from "../../../utils/product.utils.js";
 
 export const getLandingCategoriesWithProducts = async (
   page = 1,
@@ -28,6 +28,9 @@ export const getLandingCategoriesWithProducts = async (
         .skip(skip)
         .limit(limit)
         .lean();
+      const productsWithSignedUrls = await Promise.all(
+        products.map((product) => enrichProductWithSignedUrls(product))
+      );
 
       const totalProducts = await Product.countDocuments({
         categoryIds: { $in: [cat._id] },
@@ -36,7 +39,7 @@ export const getLandingCategoriesWithProducts = async (
       });
       return {
         title: cat.title,
-        products,
+        products: productsWithSignedUrls,
         pagination: {
           totalProducts,
           limit,

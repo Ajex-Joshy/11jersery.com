@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useSignup } from "../authHooks";
 import { setAuthModalView } from "../authSlice";
 import { signupSchema } from "./authSchemas";
-import FormInput from "../../../../components/common/FormComponents";
+import { FormInput } from "../../../../components/common/FormComponents";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
@@ -48,7 +48,7 @@ const SignupForm = () => {
         "recaptcha-container",
         {
           size: "invisible",
-          callback: (response) => {
+          callback: () => {
             console.log("reCAPTCHA solved");
           },
           "expired-callback": () => {
@@ -125,13 +125,16 @@ const SignupForm = () => {
       const firebaseToken = await user.getIdToken();
       toast.dismiss();
 
-      const { confirmPassword, otp, ...signupData } = data;
-      console.log(signupData);
+      const {
+        confirmPassword: _confirmPassword,
+        otp: _otp,
+        ...signupData
+      } = data;
       signupMutate({
         ...signupData,
         firebaseToken,
       });
-    } catch (error) {
+    } catch {
       toast.dismiss();
       setError("otp", { type: "manual", message: "Invalid or expired OTP." });
     }

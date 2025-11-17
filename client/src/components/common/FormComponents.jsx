@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export const FormInput = ({ id, label, error, ...props }) => (
   <div className="flex flex-col">
@@ -18,6 +19,12 @@ export const FormInput = ({ id, label, error, ...props }) => (
   </div>
 );
 
+FormInput.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  error: PropTypes.string,
+};
+
 export const FormTextarea = ({ label, id, error, ...props }) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="mb-1 text-sm font-medium text-gray-700">
@@ -33,5 +40,8 @@ export const FormTextarea = ({ label, id, error, ...props }) => (
     {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
   </div>
 );
-
-export default FormInput;
+FormTextarea.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  error: PropTypes.string,
+};

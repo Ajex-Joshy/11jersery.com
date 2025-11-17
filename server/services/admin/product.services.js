@@ -1,30 +1,17 @@
 import logger from "../../config/logger.js";
-import redisClient from "../../config/redis-client.js";
 import Faq from "../../models/faq.model.js";
 import Product from "../../models/product.model.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 import { AppError, getPagination, getSortOption } from "../../utils/helpers.js";
 import {
   buildProductQuery,
   checkSlugUniqueness,
+  enrichProductWithSignedUrls,
   saveFaqs,
   validateObjectId,
 } from "../../utils/product.utils.js";
 import { updateFaqs } from "./service-helpers/query-helpers.js";
 import { uploadFileToS3 } from "./service-helpers/s3.service.js";
-
-const clearProductListingCache = async () => {
-  try {
-    const keys = await redisClient.keys("products:listing:*");
-    if (keys.length > 0) {
-      await redisClient.del(keys);
-      logger.info(
-        `Cache Inavalidated: cleared ${keys.length} productlisting caches`
-      );
-    }
-  } catch (err) {
-    logger.error(`Redis cache invalidation error`, err);
-  }
-};
 
 export async function addProduct(productDataString, faqsDataString, files) {
   const productInfo = productDataString;
@@ -72,19 +59,23 @@ export async function addProduct(productDataString, faqsDataString, files) {
   return { product: savedProduct, faqs: savedFaqs };
 }
 
-export const updateProductBySlug = async (
-  slug,
+export const updateProductById = async (
+  id,
   productUpdateData,
   faqsUpdateData,
   files
 ) => {
   // 1. Find the existing product by slug
   const existingProduct = await Product.findOne({
-    slug: slug,
+    _id: id,
     isDeleted: false,
   });
   if (!existingProduct) {
-    throw createError(404, "Product not found with the given slug");
+    throw new AppError(
+      STATUS_CODES.NOT_FOUND,
+      "NOT_FOUND",
+      "Product not found with the given id"
+    );
   }
 
   // 2. Handle Image Uploads (if new files provided)
@@ -100,14 +91,14 @@ export const updateProductBySlug = async (
         const coverUrl = newImageUrls.splice(coverIndex, 1)[0];
         newImageUrls.unshift(coverUrl);
       } else if (newImageUrls.length > 0 && coverIndex >= newImageUrls.length) {
-        console.warn(
+        logger.warn(
           `Invalid coverImageIndex (${coverIndex}) received during update. Defaulting to first image.`
         );
       }
       // Add the final ordered URLs to the update payload
       productUpdateData.imageIds = newImageUrls;
     } catch (s3Error) {
-      console.error("S3 Upload Error during product update:", s3Error);
+      logger.error("S3 Upload Error during product update:", s3Error);
       throw createError(500, "Failed to upload new product images.");
     }
   }
@@ -151,7 +142,10 @@ export const updateProductBySlug = async (
 
   if (!updatedProduct) {
     // This check might be redundant if findOne succeeded, but good practice
-    throw createError(500, "Failed to update product after finding it.");
+    throw createError(
+      STATUS_CODES.INTERNAL_SERVER_ERROR,
+      "Failed to update product after finding it."
+    );
   }
 
   // 6. Update FAQs
@@ -161,7 +155,6 @@ export const updateProductBySlug = async (
     faqsUpdateData || [],
     updatedProduct._id
   );
-  await clearProductListingCache();
   return { product: updatedProduct, faqs: updatedFaqs };
 };
 
@@ -181,13 +174,19 @@ export const getProducts = async (queryParams) => {
   const sort = getSortOption(sortBy, sortOrder);
 
   const [result, totalProducts] = await Promise.all([
-    Product.find(query).sort(sort).skip(skip).limit(pageSize),
+    Product.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(pageSize)
+      .select("-_v -__v"),
     Product.countDocuments(query),
   ]);
-  console.log(result);
+  const productsWithSignedUrls = await Promise.all(
+    result.map((product) => enrichProductWithSignedUrls(product))
+  );
 
   return {
-    products: result,
+    products: productsWithSignedUrls,
     pagination: {
       totalProducts,
       currentpage: pageNumber,
@@ -201,10 +200,15 @@ export const getProductDetails = async (slug) => {
   const product = await Product.findOne({ slug });
 
   if (!product)
-    throw new AppError(404, "PRODUCT_NOT_FOUND", "Product not found");
+    throw new AppError(
+      STATUS_CODES.NOT_FOUND,
+      "PRODUCT_NOT_FOUND",
+      "Product not found"
+    );
+  const enrichedProduct = await enrichProductWithSignedUrls(product);
   const faqs = await Faq.find({ productId: product._id });
 
-  return { product, faqs };
+  return { product: enrichedProduct, faqs };
 };
 
 export async function updateProduct(productId, updateData) {
@@ -228,14 +232,13 @@ export async function updateProduct(productId, updateData) {
 
   if (!updatedProduct) {
     throw new AppError(
-      404,
+      STATUS_CODES.NOT_FOUND,
       "PRODUCT_NOT_FOUND",
       "Product not found with the given ID"
     );
   }
 
   const updatedFaqs = await saveFaqs(faqs, updatedProduct._id, true);
-  await clearProductListingCache();
 
   return { product: updatedProduct, faqs: updatedFaqs };
 }

@@ -1,13 +1,12 @@
 import React from "react";
 import { Search, Download, ArrowUp, ArrowDown } from "lucide-react";
 import Pagination from "../common/Pagination";
+import PropTypes from "prop-types";
 
 const DynamicTable = ({
   title,
   columns,
   data,
-  isLoading,
-  error,
   searchValue,
   onSearchChange,
   status,
@@ -131,5 +130,50 @@ const DynamicTable = ({
     </div>
   );
 };
+
+
+DynamicTable.propTypes = {
+  title: PropTypes.string.isRequired,
+
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      header: PropTypes.node.isRequired,
+      sortable: PropTypes.bool,
+      render: PropTypes.func.isRequired,
+    })
+  ).isRequired,
+
+  data: PropTypes.array.isRequired,
+
+  searchValue: PropTypes.string.isRequired,
+
+  onSearchChange: PropTypes.func.isRequired,
+
+  status: PropTypes.string.isRequired,
+
+  onStatusChange: PropTypes.func.isRequired,
+
+  limit: PropTypes.number.isRequired,
+
+  onLimitChange: PropTypes.func.isRequired,
+
+  sortConfig: PropTypes.shape({
+    field: PropTypes.string,
+    direction: PropTypes.oneOf(["asc", "desc"]),
+  }).isRequired,
+
+  onSort: PropTypes.func.isRequired,
+
+  pagination: PropTypes.shape({
+    currentPage: PropTypes.number,
+    totalPages: PropTypes.number,
+    totalProducts: PropTypes.number,
+    limit: PropTypes.number,
+  }),
+
+  onPageChange: PropTypes.func.isRequired,
+};
+
 
 export default DynamicTable;

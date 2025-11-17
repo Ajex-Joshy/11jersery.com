@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { X } from "lucide-react";
+import PropTypes from "prop-types";
 
 // --- Utility function to get the cropped file ---
 function getCroppedFile(image, crop, fileName) {
@@ -142,5 +143,13 @@ const ImageCropperModal = ({
     </div>
   );
 };
+ImageCropperModal.propTypes = {
+  imageSrc: PropTypes.string.isRequired,
 
+  onClose: PropTypes.func.isRequired,
+
+  onCropComplete: PropTypes.func.isRequired,
+
+  aspect: PropTypes.number,
+};
 export default ImageCropperModal;

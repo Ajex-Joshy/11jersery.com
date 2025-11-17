@@ -10,6 +10,7 @@ import {
   mergeCart,
   clearCart,
 } from "../../services/user/cart.services.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const getCartController = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -24,7 +25,10 @@ export const addItemToCartController = asyncHandler(async (req, res) => {
   const { productId, size, quantity } = req.body;
 
   if (!productId || !size || !quantity) {
-    throw createError(400, "productId, size, and quantity are required.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "productId, size, and quantity are required."
+    );
   }
 
   const updatedCart = await addItem(userId, { productId, size, quantity });
@@ -38,10 +42,16 @@ export const updateItemQuantityController = asyncHandler(async (req, res) => {
   const { quantity } = req.body;
 
   if (!itemId) {
-    throw createError(400, "Item ID is required in URL parameters.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "Item ID is required in URL parameters."
+    );
   }
   if (!quantity || quantity <= 0) {
-    throw createError(400, "A valid quantity (greater than 0) is required.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "A valid quantity (greater than 0) is required."
+    );
   }
 
   const updatedCart = await updateItemQuantity(userId, itemId, quantity);
@@ -54,7 +64,10 @@ export const removeItemFromCartController = asyncHandler(async (req, res) => {
   const { itemId } = req.params;
 
   if (!itemId) {
-    throw createError(400, "Item ID is required in URL parameters.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "Item ID is required in URL parameters."
+    );
   }
 
   const updatedCart = await removeItem(userId, itemId);
@@ -67,7 +80,10 @@ export const mergeCartController = asyncHandler(async (req, res) => {
   const { items } = req.body;
 
   if (!items || !Array.isArray(items)) {
-    throw createError(400, "An 'items' array is required.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "An 'items' array is required."
+    );
   }
 
   const mergedCart = await mergeCart(userId, items);

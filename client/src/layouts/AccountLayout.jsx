@@ -23,6 +23,7 @@ const navLinks = [
   { name: "Account Settings", href: "settings", icon: Settings },
 ];
 
+// eslint-disable-next-line no-unused-vars
 const AccountNavLink = ({ href, icon: Icon, children, end = false }) => {
   const activeClass = "bg-black text-white font-semibold";
   const inactiveClass =

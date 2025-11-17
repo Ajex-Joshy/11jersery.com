@@ -4,9 +4,9 @@ import {
   getProductDetails,
   getProducts,
   updateProduct,
-  updateProductBySlug,
+  updateProductById,
 } from "../../services/admin/product.services.js";
-import { getProductFaqs } from "../../services/user/product.services.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const createProductController = asyncHandler(async (req, res) => {
   // 1. Get validated data from middleware
@@ -14,7 +14,10 @@ export const createProductController = asyncHandler(async (req, res) => {
   const files = req.files;
 
   if (!files || files.length === 0) {
-    throw createError(400, "At least one product image is required.");
+    throw createError(
+      STATUS_CODES.BAD_REQUEST,
+      "At least one product image is required."
+    );
   }
 
   if (
@@ -34,15 +37,11 @@ export const createProductController = asyncHandler(async (req, res) => {
     files
   );
 
-  sendResponse(res, {
-    statusCode: 201,
-    message: "Product added successfully",
-    payload: { product: createdProduct, faqs: savedFaqs },
-  });
+  sendResponse(res, { product: createdProduct, faqs: savedFaqs });
 });
 
 export const updateProductController = asyncHandler(async (req, res) => {
-  const { slug } = req.params;
+  const { id } = req.params;
   const { productData, faqsData, imagesToDelete } = req.validatedBody;
   const files = req.files; // New images
 
@@ -64,19 +63,9 @@ export const updateProductController = asyncHandler(async (req, res) => {
     delete productData.coverImageIndex; // Index is irrelevant if no new files
   }
   const { product: updatedProduct, faqs: updatedFaqs } =
-    await updateProductBySlug(
-      slug,
-      productData,
-      faqsData,
-      files,
-      imagesToDelete
-    );
+    await updateProductById(id, productData, faqsData, files, imagesToDelete);
 
-  sendResponse(res, {
-    statusCode: 200,
-    message: "Product updated successfully",
-    payload: { product: updatedProduct, faqs: updatedFaqs },
-  });
+  sendResponse(res, { product: updatedProduct, faqs: updatedFaqs });
 });
 
 export const deleteProductController = asyncHandler(async (req, res) => {
@@ -98,7 +87,7 @@ export const updateProductStatus = asyncHandler(async (req, res) => {
 
   if (typeof isListed !== "boolean") {
     throw new AppError(
-      400,
+      STATUS_CODES.BAD_REQUEST,
       "VALIDATION_ERROR",
       "isListed must be a boolean value"
     );

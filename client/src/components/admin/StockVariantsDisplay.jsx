@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const sizeColorMap = {
   XS: "bg-yellow-400 text-yellow-900",
@@ -33,6 +34,17 @@ const StockVariantsDisplay = ({ variants }) => {
       ))}
     </div>
   );
+};
+
+StockVariantsDisplay.propTypes = {
+  variants: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string,
+      sku: PropTypes.string,
+      size: PropTypes.string.isRequired,
+      stock: PropTypes.number.isRequired,
+    })
+  ).isRequired,
 };
 
 export default StockVariantsDisplay;

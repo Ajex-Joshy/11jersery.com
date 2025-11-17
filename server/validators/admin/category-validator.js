@@ -1,11 +1,10 @@
 import Joi from "joi";
 
-// Reusable ObjectId validator (no change)
-const mongoIdSchema = Joi.string().hex().length(24).messages({
-  "string.base": "{#label} must be a string",
-  "string.hex": "{#label} must be a valid ObjectId",
-  "string.length": "{#label} must be 24 characters long",
-});
+// const mongoIdSchema = Joi.string().hex().length(24).messages({
+//   "string.base": "{#label} must be a string",
+//   "string.hex": "{#label} must be a valid ObjectId",
+//   "string.length": "{#label} must be 24 characters long",
+// });
 
 // --- Base Schema ---
 // Make offer fields optional and allow null/empty by default

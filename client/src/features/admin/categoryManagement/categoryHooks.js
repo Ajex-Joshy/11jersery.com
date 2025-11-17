@@ -45,16 +45,49 @@ export const useAddCategory = () => {
 
 export const useToggleCategoryList = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: toggleCategoryList,
-    onSuccess: async (data) => {
-      toast.success(data.message || "Category status updated!");
-      await queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
+
+    // ---- OPTIMISTIC UPDATE ----
+    onMutate: async ({ categoryId }) => {
+      await queryClient.cancelQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
+
+      const previousData = queryClient.getQueriesData({
+        queryKey: [CATEGORIES_QUERY_KEY],
+      });
+
+      previousData.forEach(([key, old]) => {
+        if (!old || !old.data?.categories) return;
+
+        queryClient.setQueryData(key, {
+          ...old,
+          data: {
+            ...old.data,
+            categories: old.data.categories.map((cat) =>
+              cat._id === categoryId ? { ...cat, isListed: !cat.isListed } : cat
+            ),
+          },
+        });
+      });
+
+      return { previousData };
     },
-    onError: (error) => {
+
+    onError: (error, variables, context) => {
+      if (context?.previousData) {
+        context.previousData.forEach(([key, old]) => {
+          queryClient.setQueryData(key, old);
+        });
+      }
       toast.error(
-        error.response?.data?.message || "Failed to update category status."
+        error.response?.data?.message ||
+          "Failed to update category status. Rolled back."
       );
+    },
+
+    onSuccess: (data) => {
+      toast.success(data.message || "Category status updated!");
     },
   });
 };
