@@ -2,10 +2,10 @@ import express from "express";
 import {
   getCartController,
   addItemToCartController,
-  updateItemQuantityController,
   removeItemFromCartController,
-  mergeCartController,
   clearCartController,
+  decrementItem,
+  incrementItem,
 } from "../../controllers/user/cart.controller.js";
 import { authenticateUser } from "../../middlewares/user/authenticate-user.js";
 
@@ -15,14 +15,14 @@ router.use(authenticateUser);
 
 router.get("/", getCartController);
 
-router.post("/add", addItemToCartController);
+router.post("/item", addItemToCartController);
 
-router.post("/merge", mergeCartController);
+router.patch("/increment/:itemId", incrementItem);
 
-router.delete("/clear", clearCartController);
-
-router.patch("/update/:itemId", updateItemQuantityController);
+router.patch("/decrement/:itemId", decrementItem);
 
 router.delete("/remove/:itemId", removeItemFromCartController);
+
+router.delete("/clear", clearCartController);
 
 export default router;

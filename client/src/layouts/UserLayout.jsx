@@ -20,6 +20,7 @@ import {
 } from "../features/user/account/authSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { Toaster } from "react-hot-toast";
+import CartPage from "../features/user/cart/CartPage";
 
 // --- Header Component ---
 const Header = () => {
@@ -38,7 +39,18 @@ const Header = () => {
   };
 
   const handleOpenLogin = () => {
-    dispatch(openAuthModal("login")); // Dispatch open modal action
+    dispatch(openAuthModal("login"));
+  };
+
+  const renderProtectedIcon = (icon, path) => {
+    if (isAuthenticated) {
+      return <Link to={path}>{icon}</Link>;
+    }
+    return (
+      <button onClick={handleOpenLogin} className="...">
+        {icon}
+      </button>
+    );
   };
 
   return (
@@ -124,24 +136,10 @@ const Header = () => {
           <Link to="/wishlist" className="text-gray-600 hover:text-black">
             <Heart size={22} />
           </Link>
-          <Link to="/cart" className="text-gray-600 hover:text-black relative">
-            <ShoppingCart size={22} />
-            {/* Add badge if cart has items */}
-            {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">3</span> */}
-          </Link>
-          {isAuthenticated ? (
-            <div className="relative group">
-              <Link to="/account" className="...">
-                {" "}
-                <User />{" "}
-              </Link>
-            </div>
-          ) : (
-            <button onClick={handleOpenLogin} className="...">
-              {" "}
-              <User />{" "}
-            </button>
-          )}
+
+          {renderProtectedIcon(<ShoppingCart />, "/cart")}
+          {renderProtectedIcon(<User />, "/account")}
+
           {/* Mobile Menu Button - Placeholder */}
           <button className="md:hidden text-gray-600 hover:text-black">
             {/* Add Menu icon here */}

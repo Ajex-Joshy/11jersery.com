@@ -21,9 +21,10 @@ export const generateTokens = (userObject) => {
 export const setRefreshToken = (res, token) => {
   res.cookie("refreshToken", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
-    maxAge: process.env.REFRESH_TOKEN_MAX_AGE,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+    maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
+    path: "/",
   });
 };
 

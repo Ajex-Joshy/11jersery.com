@@ -17,7 +17,7 @@ const navLinks = [
   { name: "Account Overview", href: "/account", icon: User, end: true },
   { name: "My orders", href: "orders", icon: Package },
   { name: "Wishlist", href: "wishlist", icon: Heart },
-  { name: "Addresses", href: "addresses", icon: MapPin },
+  { name: "Addresses", href: "/account/addresses", icon: MapPin },
   { name: "Wallet", href: "wallet", icon: Wallet },
   { name: "My Coupons", href: "coupons", icon: Ticket },
   { name: "Account Settings", href: "settings", icon: Settings },

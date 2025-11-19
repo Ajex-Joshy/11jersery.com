@@ -7,7 +7,7 @@ const cartItemSchema = new Schema(
   {
     productId: {
       type: Types.ObjectId,
-      ref: "Product", // References your 'Product' model
+      ref: "Product",
       required: [true, "Product ID is required."],
     },
     size: {
@@ -24,7 +24,7 @@ const cartItemSchema = new Schema(
     },
     price: {
       type: Number,
-      required: [true, "Price at time of add is required."], // Price snapshot
+      required: [true, "Price at time of add is required."],
       min: [0, "Price cannot be negative."],
     },
   },
@@ -37,9 +37,9 @@ const cartSchema = new Schema(
   {
     userId: {
       type: Types.ObjectId,
-      ref: "User", // References your 'User' model
+      ref: "User",
       required: [true, "User ID is required."],
-      unique: true, // Ensures one cart per user
+      unique: true,
       index: true,
     },
     items: {
@@ -49,8 +49,6 @@ const cartSchema = new Schema(
   },
   {
     timestamps: true, // Tracks 'createdAt' and 'updatedAt' for the cart itself
-    toJSON: { virtuals: true }, // Ensure virtuals are included when cart is sent as JSON
-    toObject: { virtuals: true },
   }
 );
 

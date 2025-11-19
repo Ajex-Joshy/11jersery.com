@@ -55,7 +55,6 @@ export async function addProduct(productDataString, faqsDataString, files) {
   if (faqs && faqs.length > 0) {
     savedFaqs = await saveFaqs(faqs, savedProduct._id);
   }
-  await clearProductListingCache();
   return { product: savedProduct, faqs: savedFaqs };
 }
 

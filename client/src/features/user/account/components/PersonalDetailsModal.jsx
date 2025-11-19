@@ -3,11 +3,10 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Loader2 } from "lucide-react";
 import { personalDetailsSchema } from "../profileSchema.js";
-import { useUpdateProfile } from "../userHooks";
-import AvatarUploader from "../../../../components/common/AvatarUploader.jsx";
+import { useUpdatePersonalDetails, useRequestEmailOtp } from "../userHooks";
 import { FormInput } from "../../../../components/common/FormComponents.jsx";
 import toast from "react-hot-toast";
-// Helper component for Date of Birth
+
 const DateOfBirthFields = ({ control }) => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => currentYear - 18 - i);
@@ -87,7 +86,8 @@ const DateOfBirthFields = ({ control }) => {
 };
 
 export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
-  const { mutate, isLoading } = useUpdateProfile();
+  const { mutate, isLoading } = useUpdatePersonalDetails();
+  const requestEmailOtpMutation = useRequestEmailOtp();
 
   const {
     register,
@@ -95,6 +95,7 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
     control,
     formState: { errors },
     reset,
+    getValues,
   } = useForm({
     resolver: zodResolver(personalDetailsSchema),
   });
@@ -105,40 +106,45 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
       reset({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        phone: user.phone || "", // Add phone
-        // DOB and Gender would be populated here if they exist on `user`
-        // dob_day: user.dob ? user.dob.split('-')[2] : "",
-        // dob_month: user.dob ? user.dob.split('-')[1] : "",
-        // dob_year: user.dob ? user.dob.split('-')[0] : "",
-        // gender: user.gender || "",
-        image: null, // Always start with no *new* file
+        phone: user.phone || "",
+        dob_day: user.dob ? user.dob.split("-")[2] : "",
+        dob_month: user.dob ? user.dob.split("-")[1] : "",
+        dob_year: user.dob ? user.dob.split("-")[0] : "",
+        gender: user.gender || "",
       });
     }
   }, [user, isOpen, reset]);
 
   const onSubmit = (data) => {
     const formData = new FormData();
-    const changedFields = {}; // Only send changed fields
+    const changedFields = {};
 
     // Compare with original data
     if (data.firstName !== user.firstName)
       changedFields.firstName = data.firstName;
     if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
     if (data.phone !== user.phone) changedFields.phone = data.phone;
-    // Add DOB/Gender logic here
 
-    // Append changed text fields
+    const newDob =
+      data.dob_year && data.dob_month && data.dob_day
+        ? `${data.dob_year}-${data.dob_month}-${data.dob_day}`
+        : "";
+
+    if (newDob !== (user.dob || "")) {
+      changedFields.dob = newDob;
+    }
+
+    if (data.gender !== user.gender) {
+      changedFields.gender = data.gender;
+    }
+
     Object.keys(changedFields).forEach((key) => {
       formData.append(key, changedFields[key]);
     });
 
-    // Append new image file if selected
-    if (data.image instanceof File) {
-      formData.append("image", data.image);
-    }
-
     // Only submit if something actually changed
-    if (Object.keys(changedFields).length > 0 || data.image instanceof File) {
+    console.log(changedFields);
+    if (Object.keys(changedFields).length > 0) {
       mutate(formData, {
         onSuccess: () => onClose(), // Close modal on success
       });
@@ -173,18 +179,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
             </button>
           </div>
 
-          <Controller
-            name="image"
-            control={control}
-            render={({ field }) => (
-              <AvatarUploader
-                onChange={field.onChange}
-                value={field.value}
-                initialImageUrl={user?.imageId}
-              />
-            )}
-          />
-
           <FormInput
             id="firstName"
             label="First Name"
@@ -198,13 +192,35 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
             error={errors.lastName?.message}
           />
 
-          {/* Add Phone Number from your Figma */}
+          <FormInput
+            id="email"
+            label="Email"
+            type="email"
+            {...register("email")}
+            error={errors.email?.message}
+          />
+          {/* OTP Request Button */}
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (!getValues("email")) {
+                  toast.error("Enter a valid email first");
+                  return;
+                }
+                requestEmailOtpMutation.mutate(getValues("email"));
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+            >
+              Send OTP
+            </button>
+          </div>
           <FormInput
             id="phone"
-            label="Phone Number"
+            label="OTP"
             type="tel"
-            {...register("phone")}
-            error={errors.phone?.message}
+            {...register("otp")}
+            error={errors.otp?.message}
           />
 
           {/* Gender Radios from Figma */}

@@ -4,6 +4,7 @@ import { createSlug } from "./helpers.js";
 import Faq from "../models/faq.model.js";
 import Category from "../models/category.model.js";
 import { getSignedUrlForKey } from "../services/admin/service-helpers/s3.service.js";
+import Product from "../models/product.model.js";
 
 export const validateObjectId = (id, entity = "") => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -134,6 +135,33 @@ export const enrichProductWithSignedUrls = async (product) => {
     productObj.coverImageUrl = null;
   }
   return productObj;
+};
+
+export const getSignedUrlsForProduct = async (productId) => {
+  validateObjectId(productId, "Product");
+
+  const product = await Product.findById(productId).select("imageIds");
+
+  if (!product) {
+    throw new AppError(
+      404,
+      "PRODUCT_NOT_FOUND",
+      "No product found with this ID"
+    );
+  }
+
+  const imageIds = product.imageIds || [];
+
+  // Generate signed URLs
+  const signedUrls = await Promise.all(
+    imageIds.map((id) => getSignedUrlForKey(id))
+  );
+
+  return {
+    productId,
+    imageUrls: signedUrls.filter(Boolean),
+    coverImageUrl: signedUrls[0] || null,
+  };
 };
 
 export const enrichCategoryWithSignedUrl = async (category) => {

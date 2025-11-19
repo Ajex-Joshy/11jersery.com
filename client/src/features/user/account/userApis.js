@@ -1,31 +1,28 @@
 import axiosInstance from "../../../api/axiosInstance";
-/**
- * Fetches the current user's profile data.
- */
+
 export const getUserProfile = async () => {
   const { data } = await axiosInstance.get("/user/profile");
-  return data; // Expects { data: { _id, firstName, lastName, ... } }
+  return data;
 };
 
-/**
- * Updates the user's profile (name, phone, avatar).
- * @param {FormData} formData - FormData containing changed fields and optionally a new image.
- */
-export const updateUserProfile = async (formData) => {
-  const { data } = await axiosInstance.patch("/user/profile", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+export const updatePersonalDetails = async (payload) => {
+  const { data } = await axiosInstance.put("/user/update-details", payload);
+  return data;
+};
+
+export const updatePassword = async (payload) => {
+  const { data } = await axiosInstance.put("/user/update-password", payload);
+  return data;
+};
+
+export const requestEmailOtp = async (newEmail) => {
+  const { data } = await axiosInstance.post("/user/request-email-otp", {
+    newEmail,
   });
-  return data; // Expects { data: { user }, token: "..." }
+  return data;
 };
 
-/**
- * Changes the user's password.
- * @param {object} passwordData - { currentPassword, newPassword }
- */
-export const changePassword = async (passwordData) => {
-  const { data } = await axiosInstance.post(
-    "/user/change-password",
-    passwordData
-  );
-  return data; // Expects { message: "Password updated" }
+export const verifyEmailOtp = async (otp) => {
+  const { data } = await axiosInstance.post("/user/verify-email-otp", { otp });
+  return data;
 };

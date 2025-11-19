@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { Minus, Plus, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import StarRating from "../../../../components/common/StarRating";
+import { useAddItemToCart } from "../../cart/cartHooks";
+import { useIncrementItem } from "../../cart/cartHooks";
+import { useDecrementItem } from "../../cart/cartHooks";
+import { useCart } from "../../cart/cartHooks";
+import { useEffect } from "react";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
@@ -9,6 +14,23 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   // State for user selections
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const { mutate: addItemToCart, isPending } = useAddItemToCart();
+  const { mutate: incrementItem } = useIncrementItem();
+  const { mutate: decrementItem } = useDecrementItem();
+  const { data: cart } = useCart();
+
+  useEffect(() => {
+    if (!selectedSize || !cart?.data?.items) return;
+
+    const existingItem =
+      cart.data.items.find(
+        (item) => item.productId === product._id && item.size === selectedSize
+      ) || null;
+
+    if (existingItem) {
+      setQuantity(existingItem.quantity);
+    }
+  }, [cart, selectedSize, product._id]);
 
   // Create a map for quick stock lookup
   const stockMap = new Map((variants || []).map((v) => [v.size, v.stock]));
@@ -21,11 +43,81 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
-    setQuantity(1); // Reset quantity
+
+    const existingItem =
+      cart?.data?.items?.find(
+        (item) => item.productId === product._id && item.size === size
+      ) || null;
+
+    if (existingItem) {
+      setQuantity(existingItem.quantity);
+    } else {
+      setQuantity(1);
+    }
   };
 
   const handleQuantityChange = (amount) => {
-    setQuantity((prev) => Math.max(1, prev + amount)); // Min quantity 1
+    if (!selectedSize) {
+      toast.error("Please select a size.");
+      return;
+    }
+
+    // Find the item in the cart that matches product + size
+    const existingItem =
+      cart?.data?.items?.find(
+        (item) => item.productId === product._id && item.size === selectedSize
+      ) || null;
+    if (!existingItem) {
+      const payload = {
+        productId: product._id,
+        size: selectedSize,
+        quantity: 1,
+      };
+
+      addItemToCart(payload, {
+        onSuccess: () => {
+          setQuantity(1);
+          toast.success("Item added to cart");
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message || "Failed to add item");
+        },
+      });
+
+      return;
+    }
+
+    const itemId = existingItem._id;
+
+    if (amount === 1) {
+      incrementItem(
+        { itemId },
+        {
+          onSuccess: () => {
+            setQuantity(existingItem.quantity + 1);
+            toast.success(`Quantity increased to ${existingItem.quantity + 1}`);
+          },
+          onError: (error) =>
+            toast.error(
+              error?.response?.data?.message || "Failed to update quantity"
+            ),
+        }
+      );
+    } else if (amount === -1) {
+      decrementItem(
+        { itemId },
+        {
+          onSuccess: () => {
+            setQuantity(existingItem.quantity - 1);
+            toast.success(`Quantity decreased to ${existingItem.quantity - 1}`);
+          },
+          onError: (error) =>
+            toast.error(
+              error?.response?.data?.message || "Failed to update quantity"
+            ),
+        }
+      );
+    }
   };
 
   const handleAddToCart = () => {
@@ -33,9 +125,21 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
       toast.error("Please select a size.");
       return;
     }
-    // Add to cart logic would go here
-    console.log(`Adding ${quantity} of size ${selectedSize} to cart.`);
-    toast.success("Added to cart!");
+
+    const payload = {
+      productId: product._id,
+      size: selectedSize,
+      quantity,
+    };
+
+    addItemToCart(payload, {
+      onSuccess: () => {
+        toast.success("Added to cart!");
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to add to cart");
+      },
+    });
   };
 
   const selectedStock = stockMap.get(selectedSize) || 0;

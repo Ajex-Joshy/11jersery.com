@@ -64,8 +64,8 @@ const ProductList = () => {
   if (isLoadingProducts) {
     return (
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-        <p className="text-gray-500 mt-4">Loading customer data...</p>
+        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+        <p className="text-gray-500 mt-4">Loading product data...</p>
       </div>
     );
   }

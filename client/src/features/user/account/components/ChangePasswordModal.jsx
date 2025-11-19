@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Loader2 } from "lucide-react";
 import { changePasswordSchema } from "../profileSchema.js";
-import { useChangePassword } from "../userHooks.js";
+import { useUpdatePassword } from "../userHooks.js";
 import { FormInput } from "../../../../components/common/FormComponents.jsx";
 export const ChangePasswordModal = ({ isOpen, onClose, userEmail }) => {
-  const { mutate, isLoading } = useChangePassword();
+  const { mutate, isLoading } = useUpdatePassword();
 
   const {
     register,

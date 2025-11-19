@@ -23,7 +23,7 @@ export const loginAdmin = async (identifier, password) => {
       );
     const adminWithoutPassword = admin.toObject();
     delete adminWithoutPassword.password;
-    const token = generateToken({ id: admin._id });
+    const token = generateToken({ id: admin._id }, "2d");
     return { data: { admin: adminWithoutPassword, token } };
   } catch (error) {
     throw error;

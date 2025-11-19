@@ -1,13 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserProfile, updateUserProfile, changePassword } from "./userApis";
+import {
+  getUserProfile,
+  updatePersonalDetails,
+  updatePassword,
+  requestEmailOtp,
+  verifyEmailOtp,
+} from "./userApis";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setUser } from "./authSlice";
 export const USER_PROFILE_KEY = ["userProfile"];
 
-/**
- * Hook to fetch the user's profile data.
- */
 export const useUserProfile = () => {
   return useQuery({
     queryKey: USER_PROFILE_KEY,
@@ -16,46 +19,58 @@ export const useUserProfile = () => {
   });
 };
 
-/**
- * Hook to update the user's profile (name, phone, image).
- */
-export const useUpdateProfile = () => {
+export const useUpdatePersonalDetails = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
 
   return useMutation({
-    mutationFn: updateUserProfile,
+    mutationFn: updatePersonalDetails,
     onSuccess: (data) => {
-      toast.success(data.message || "Profile updated successfully!");
-
-      // 1. Invalidate the user profile query to refetch fresh data
-      queryClient.invalidateQueries({ queryKey: USER_PROFILE_KEY });
-
-      // 2. Update the user info in the auth slice (updates name in header)
-      if (data.token) {
-        dispatch(setUser({ token: data.token }));
-      }
+      toast.success("Personal details updated successfully");
+      queryClient.invalidateQueries(USER_PROFILE_KEY);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update profile.");
+      toast.error(error?.response?.data?.message || "Failed to update details");
     },
   });
 };
 
-/**
- * Hook to change the user's password.
- */
-export const useChangePassword = () => {
+export const useUpdatePassword = () => {
   return useMutation({
-    mutationFn: changePassword,
-    onSuccess: (data) => {
-      toast.success(data.message || "Password changed successfully!");
+    mutationFn: updatePassword,
+    onSuccess: () => {
+      toast.success("Password updated successfully");
     },
     onError: (error) => {
-      // Don't close modal, let user see error
       toast.error(
-        error.response?.data?.message || "Failed to change password."
+        error?.response?.data?.message || "Failed to update password"
       );
+    },
+  });
+};
+
+export const useRequestEmailOtp = () => {
+  return useMutation({
+    mutationFn: requestEmailOtp,
+    onSuccess: () => {
+      toast.success("OTP sent to your new email");
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to send OTP");
+    },
+  });
+};
+
+export const useVerifyEmailOtp = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: verifyEmailOtp,
+    onSuccess: () => {
+      toast.success("Email updated successfully");
+      queryClient.invalidateQueries(USER_PROFILE_KEY);
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Invalid OTP");
     },
   });
 };

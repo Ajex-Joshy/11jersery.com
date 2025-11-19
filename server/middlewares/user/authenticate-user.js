@@ -8,6 +8,7 @@ export const authenticateUser = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("authHeader", req.headers);
       throw new AppError(
         STATUS_CODES.UNAUTHORIZED,
         "UNAUTHORIZED",
@@ -27,14 +28,13 @@ export const authenticateUser = async (req, res, next) => {
         "Token invalid or expired"
       );
     }
-    if (!decoded.id)
+    if (!decoded?.user?._id)
       throw new AppError(
         STATUS_CODES.UNAUTHORIZED,
         "INVALID_TOKEN",
         "Token invalid or expired"
       );
-
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded?.user?._id);
     if (!user)
       throw new AppError(
         STATUS_CODES.NOT_FOUND,

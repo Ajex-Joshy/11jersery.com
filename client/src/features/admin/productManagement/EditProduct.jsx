@@ -137,9 +137,16 @@ const EditProduct = () => {
     const imageIdToRemove = urlToRemove.replace(`${S3_URL}/`, "");
     setImagesToDelete((prev) => [...prev, imageIdToRemove]);
   };
-
-  const filteredInitialUrls = categoriesData.imageUrls.filter(
-    (url) => !imagesToDelete.includes(url.replace(`${S3_URL}/`, ""))
+  const filteredInitialUrls =
+    productDetailsPayload?.data?.product?.imageUrls.filter(
+      // (url) => !imagesToDelete.includes(url.replace(`${S3_URL}/`, ""))
+      (url) => url
+    ) || [];
+  console.log(
+    "filteredInitialUrls",
+    filteredInitialUrls,
+    "urls",
+    productDetailsPayload?.data?.product?.imageUrls
   );
 
   const onSubmit = (data) => {

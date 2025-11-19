@@ -59,6 +59,7 @@ export const addProduct = async (formData) => {
 };
 
 export const updateProduct = async ({ id, formData }) => {
+  console.log(id);
   const { data } = await axiosInstance.patch(
     `/admin/products/${id}`,
     formData,
@@ -66,5 +67,6 @@ export const updateProduct = async ({ id, formData }) => {
       headers: { "Content-Type": "multipart/form-data" },
     }
   );
+  console.log(data);
   return data;
 };

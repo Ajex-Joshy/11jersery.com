@@ -17,6 +17,11 @@ import PrivacyPolicyPage from "../features/user/company/PrivacyPolicyPage.jsx";
 import NotFoundPage from "../features/user/company/NotFoundPage.jsx";
 import ErrorPage from "../features/user/company/ErrorPage.jsx";
 import AccountSettingsPage from "../features/user/account/AccountSettings.jsx";
+import CartPage from "../features/user/cart/CartPage.jsx";
+import AddressesPage from "../features/user/address/AddressPage.jsx";
+import AddAddressPage from "../features/user/address/AddAddressPage.jsx";
+import CheckoutPage from "../features/user/checkout/CheckoutPage.jsx";
+import PaymentPage from "../features/user/checkout/PaymentPage.jsx";
 
 const UserRoutes = () => {
   return (
@@ -37,10 +42,18 @@ const UserRoutes = () => {
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       <Route element={<ProtectedRoutes />}>
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/account" element={<AccountLayout />}>
-          {/* 'index' is the default page for "/account" */}
           <Route index element={<AccountOverview />} />
           <Route path="/account/settings" element={<AccountSettingsPage />} />
+          <Route path="/account/addresses" element={<AddressesPage />} />
+          <Route path="/account/addresses/new" element={<AddAddressPage />} />
+          <Route
+            path="/account/addresses/edit/:addressId"
+            element={<AddAddressPage />}
+          />
           {/* <Route path="orders" element={<OrderHistory />} />
             <Route path="wishlist" element={<Wishlist />} />
            <Route path="addresses" element={<Addresses />} />
