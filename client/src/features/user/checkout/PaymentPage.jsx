@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   ChevronRight,
   CreditCard,
@@ -12,7 +12,8 @@ import toast from "react-hot-toast";
 
 // Hooks
 import { useCart } from "../cart/cartHooks";
-
+import { usePlaceOrder } from "../order/orderHooks";
+import { useGetAddressById } from "../address/addressHooks";
 // Components
 import { OrderSummary } from "../../../components/user/OrderSummary";
 import {
@@ -64,17 +65,31 @@ const PaymentMethodOption = ({
 
 const PaymentPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedAddressId = location.state?.selectedAddressId;
+
   const { data: cartPayload, isLoading, isError, error } = useCart();
+  const {
+    data: addressPayload,
+    isLoading: isAddressLoading,
+    isError: isAddressError,
+    error: addressError,
+  } = useGetAddressById(selectedAddressId);
 
   const [selectedMethod, setSelectedMethod] = useState("cod"); // Default to COD
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const placeOrderMutation = usePlaceOrder();
+
   // Loading/Error States
-  if (isLoading) return <LoadingSpinner text="Loading payment options..." />;
+  if (isLoading || isAddressLoading)
+    return <LoadingSpinner text="Loading payment options..." />;
   if (isError) return <ErrorDisplay error={error} />;
+  if (isAddressError) return <ErrorDisplay error={addressError} />;
 
   const cart = cartPayload?.data || {};
   const items = cart.items || [];
+  const selectedAddress = addressPayload?.data?.address;
 
   if (items.length === 0) {
     navigate("/cart"); // Redirect if empty
@@ -88,30 +103,47 @@ const PaymentPage = () => {
     }
 
     setIsProcessing(true);
+    console.log(cart, "cart");
+    console.log(selectedAddress);
 
-    // Simulate API call based on method
-    if (selectedMethod === "cod") {
-      // --- COD Flow ---
-      setTimeout(() => {
+    const ItemsRequiredFields = items.map(({ productId, size, quantity }) => ({
+      productId,
+      size,
+      quantity,
+    }));
+
+    const filteredAddress = {
+      firstName: selectedAddress.firstName,
+      lastName: selectedAddress.lastName,
+      phone: selectedAddress.phoneNumber,
+      pinCode: selectedAddress.pinCode,
+      state: selectedAddress.state,
+      city: selectedAddress.city,
+      country: selectedAddress.country,
+      email: selectedAddress.email,
+      addressLine1: selectedAddress.addressLine1,
+      addressLine2: selectedAddress.addressLine2,
+    };
+    const orderData = {
+      items: ItemsRequiredFields,
+      shippingAddress: filteredAddress,
+    };
+
+    placeOrderMutation.mutate(orderData, {
+      onSuccess: (data) => {
         setIsProcessing(false);
-        toast.success("Order placed successfully! (Cash on Delivery)");
-        navigate("/account/orders");
-      }, 1500);
-    } else {
-      // --- Razorpay Flow (Card or UPI) ---
-      // Ideally, you would call your backend here to create a Razorpay order
-      // and then open the Razorpay checkout modal.
-      setTimeout(() => {
+        toast.success("Order placed successfully!");
+        const orderId = data?.data?._id;
+        navigate(`/order-confirmation/${orderId}`);
+      },
+      onError: (err) => {
+        console.log(err);
         setIsProcessing(false);
-        toast.success(
-          `Opening Razorpay for ${
-            selectedMethod === "card" ? "Card" : "UPI"
-          } payment...`
+        toast.error(
+          err?.response?.data?.error?.message || "Failed to place order"
         );
-        // Trigger Razorpay logic here
-        // Example: openRazorpay(orderData);
-      }, 1000);
-    }
+      },
+    });
   };
 
   // Determine button text based on selected method
@@ -190,7 +222,7 @@ const PaymentPage = () => {
                   subtotal={cart.subtotal}
                   total={cart.total}
                   discount={cart.discount}
-                  deliveryFee="Free"
+                  deliveryFee={cart.deliveryFee}
                   isCheckoutPage={true} // Hide promo input
                   onCheckout={handlePlaceOrder} // This button now places the order
                   isProcessing={isProcessing}

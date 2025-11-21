@@ -74,21 +74,21 @@ const AccountSettingsPage = () => {
         >
           <InfoRow label="First Name" value={user.firstName || "..."} />
           <InfoRow label="Last Name" value={user.lastName || "..."} />
-          <InfoRow label="Phone" value={user.phone || "Not provided"} />
+          <InfoRow label="Email" value={user.email || "..."} />
           {/* Add other fields as needed, e.g., Gender, DOB */}
         </SettingsCard>
 
         {/* --- Email & Password Card --- */}
         <SettingsCard
-          title="Email & Password"
+          title="Phone & Password"
           onEdit={() => setModalView("password")}
         >
-          <InfoRow label="Email" value={user.email} />
+          <InfoRow label="Phone" value={user.phone} />
           <InfoRow label="Password" value="••••••••" />
         </SettingsCard>
 
         {/* --- Delete Account Section --- */}
-        <div className="bg-red-50 p-6 rounded-lg border border-red-200">
+        {/* <div className="bg-red-50 p-6 rounded-lg border border-red-200">
           <h2 className="text-xl font-semibold text-red-700 flex items-center gap-2 mb-3">
             <AlertTriangle size={20} />
             Delete Account
@@ -105,7 +105,7 @@ const AccountSettingsPage = () => {
           >
             Delete my account
           </button>
-        </div>
+        </div> */}
       </div>
 
       <PersonalDetailsModal

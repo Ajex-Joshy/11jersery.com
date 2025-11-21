@@ -7,15 +7,16 @@ import { getProductsController } from "../../controllers/user/product.controller
 import cartRoutes from "./cart.routes.js";
 import accountRouter from "./account.routes.js";
 import addressRouter from "./address.routes.js";
+import orderRouter from "./order.routes.js";
 
 const userRouter = express.Router();
-userRouter.get("/orders", checkUserStatus);
 userRouter.get("/landing-page", getLandingPageController);
 userRouter.use("/auth", authRoutes);
 userRouter.use("/product", productRoutes);
 userRouter.use("/cart", cartRoutes);
 userRouter.use("/account", accountRouter);
 userRouter.use("/address", addressRouter);
+userRouter.use("/orders", orderRouter);
 
 userRouter.get("/products", getProductsController);
 export default userRouter;

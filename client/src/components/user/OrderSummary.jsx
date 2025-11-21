@@ -29,6 +29,7 @@ export const OrderSummary = ({
       setPromoCode("");
     }, 1000);
   };
+  console.log(deliveryFee);
 
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 sticky top-24">

@@ -163,7 +163,7 @@ const CartPage = () => {
               subtotal={cart.subtotal}
               total={cart.total}
               discount={cart.discount}
-              deliveryFee="Free" // From Figma
+              deliveryFee={cart.deliveryFee}
               onCheckout={handleCheckout}
               onApplyPromo={(promoCode) => {
                 // Placeholder for promo code logic

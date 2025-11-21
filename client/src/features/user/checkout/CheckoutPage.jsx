@@ -68,7 +68,7 @@ const CheckoutPage = () => {
 
     // Save selected address ID to local state/redux context if needed
     // For now, we just navigate to the next step
-    navigate("/payment");
+    navigate("/payment", { state: { selectedAddressId } });
   };
 
   return (
@@ -119,7 +119,7 @@ const CheckoutPage = () => {
                   subtotal={cart.subtotal}
                   total={cart.total}
                   discount={cart.discount}
-                  deliveryFee="Free"
+                  deliveryFee={cart.deliveryFee}
                   isCheckoutPage={true} // Hides standard checkout button/promo input from reusable component
                 />
 

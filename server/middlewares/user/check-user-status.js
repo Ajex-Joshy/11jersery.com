@@ -5,7 +5,7 @@ import { STATUS_CODES } from "../../utils/constants.js";
 const checkUserStatus = async (req, res, next) => {
   try {
     // 'req.auth.userId' is added by Clerk's middleware
-    const authId = req.auth.userId;
+    const authId = req.user._id;
 
     if (!authId) {
       return res

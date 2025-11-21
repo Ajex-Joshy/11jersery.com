@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { geocodeAddress } from "../../utils/googleGeocode.js";
 
 const addressSchema = Joi.object({
   firstName: Joi.string().min(2).max(50).required(),
@@ -60,4 +61,77 @@ export const validateEditAddress = (req, res, next) => {
     });
   }
   next();
+};
+
+export const validateAddressWithGoogle = async (req, res, next) => {
+  try {
+    const {
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      pinCode,
+      country = "India",
+    } = req.body;
+
+    // Build full address string
+    const fullAddress = `${addressLine1}, ${
+      addressLine2 || ""
+    }, ${city}, ${state}, ${pinCode}, ${country}`;
+
+    // Call Google
+    const result = await geocodeAddress(fullAddress);
+    console.log(fullAddress);
+    console.log(result);
+
+    const components = result.address_components;
+
+    // Extract validated Google components
+    const googleCity =
+      components.find((c) => c.types.includes("locality"))?.long_name || null;
+
+    const googleState =
+      components.find((c) => c.types.includes("administrative_area_level_1"))
+        ?.long_name || null;
+
+    const googlePincode =
+      components.find((c) => c.types.includes("postal_code"))?.long_name ||
+      null;
+
+    // Compare Google values with user values
+    if (googlePincode && googlePincode !== pinCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid pincode. Google Maps couldn't verify it.",
+      });
+    }
+
+    if (googleCity && googleCity.toLowerCase() !== city.toLowerCase()) {
+      return res.status(400).json({
+        success: false,
+        message: "City does not match Google Maps records",
+      });
+    }
+
+    if (googleState && googleState.toLowerCase() !== state.toLowerCase()) {
+      return res.status(400).json({
+        success: false,
+        message: "State does not match Google Maps records",
+      });
+    }
+
+    // Add lat/lng to req for later saving
+    req.body.location = {
+      lat: result.geometry.location.lat,
+      lng: result.geometry.location.lng,
+    };
+
+    // Proceed
+    next();
+  } catch (err) {
+    return res.status(400).json({
+      success: false,
+      message: err.message || "Address validation failed with Google Maps API.",
+    });
+  }
 };

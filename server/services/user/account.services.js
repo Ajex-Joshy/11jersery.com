@@ -10,7 +10,7 @@ export const getAccountDetails = async (userId) => {
     _id: userId,
     isBlocked: false,
     isDeleted: false,
-  }).select(" _id firstName lastName email phone imageId");
+  }).select(" _id firstName lastName email phone ");
   if (!user)
     throw new AppError(
       STATUS_CODES.NOT_FOUND,
@@ -21,7 +21,7 @@ export const getAccountDetails = async (userId) => {
 };
 
 export const updatePersonalDetails = async (userId, updates) => {
-  const allowedFields = ["firstName", "lastName", "gender", "dob", "email"];
+  const allowedFields = ["firstName", "lastName", "email"];
 
   const filteredUpdates = Object.fromEntries(
     Object.entries(updates).filter(([key]) => allowedFields.includes(key))
@@ -31,7 +31,7 @@ export const updatePersonalDetails = async (userId, updates) => {
     { _id: userId, isBlocked: false, isDeleted: false },
     { $set: filteredUpdates },
     { new: true }
-  ).select("_id firstName lastName email phone gender dob imageId");
+  ).select("_id firstName lastName email phone ");
 
   if (!updatedUser)
     throw new AppError(
@@ -60,7 +60,8 @@ export const requestEmailChange = async (userId, newEmail) => {
   await redisClient.set(
     `emailChange:${userId}`,
     JSON.stringify({ otp, newEmail }),
-    { EX: 10 * 60 } // 10 minutes expiry
+    "EX",
+    600 // 10 minutes expiry
   );
 
   await user.save();
@@ -74,8 +75,8 @@ export const requestEmailChange = async (userId, newEmail) => {
   return { message: "OTP sent to new email" };
 };
 
-export const confirmEmailChange = async (userId, providedOtp) => {
-  const data = await redis.get(`emailChange:${userId}`);
+export const confirmEmailChange = async (userId, details) => {
+  const data = await redisClient.get(`emailChange:${userId}`);
 
   if (!data) {
     throw new AppError(
@@ -87,7 +88,7 @@ export const confirmEmailChange = async (userId, providedOtp) => {
 
   const { otp, newEmail } = JSON.parse(data);
 
-  if (otp !== providedOtp) {
+  if (otp !== details.otp) {
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,
       "OTP_INVALID",
@@ -109,7 +110,7 @@ export const confirmEmailChange = async (userId, providedOtp) => {
     );
   }
 
-  await redis.del(`emailChange:${userId}`);
+  await redisClient.del(`emailChange:${userId}`);
 
   return {
     message: "Email updated successfully",
@@ -117,13 +118,14 @@ export const confirmEmailChange = async (userId, providedOtp) => {
   };
 };
 
-export const updatePassword = async (userId, oldPassword, newPassword) => {
+export const updatePassword = async (userId, currentPassword, newPassword) => {
   // Fetch user with password
   const user = await User.findOne({
     _id: userId,
     isBlocked: false,
     isDeleted: false,
   }).select("+password");
+  console.log("user", user);
 
   if (!user)
     throw new AppError(
@@ -132,17 +134,18 @@ export const updatePassword = async (userId, oldPassword, newPassword) => {
       "User not found"
     );
 
-  // Compare old password
-  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  // Compare old
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch)
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,
       "INCORRECT_PASSWORD",
-      "Old password is incorrect"
+      "Current password is incorrect"
     );
 
   // Check if new password is the same as old password
   const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  console.log("isSamePassword", isSamePassword);
   if (isSamePassword)
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,

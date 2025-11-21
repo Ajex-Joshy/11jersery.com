@@ -14,9 +14,9 @@ router.use(authenticateUser);
 
 router.get("/:userId", getUserAccountController);
 
-router.put("/update-details", updatePersonalDetailsController);
+router.patch("/update-details", updatePersonalDetailsController);
 
-router.put("/update-password", updatePasswordController);
+router.patch("/update-password", updatePasswordController);
 
 router.post("/request-email-otp", requestEmailOtpController);
 

@@ -35,25 +35,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: 6,
     },
-    imageId: {
-      type: String,
-      default: "default-profile",
-    },
-    gender: {
-      type: String,
-      enum: ["male", "female", "other"],
-    },
     status: {
       type: String,
       enum: ["active", "inactive", "blocked"],
       default: "active",
-    },
-    dob: {
-      type: Date,
-    },
-    photoUrl: {
-      type: String,
-      trim: true,
     },
     isBlocked: {
       type: Boolean,

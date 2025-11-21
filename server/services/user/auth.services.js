@@ -73,7 +73,7 @@ export const signupUser = async (userData) => {
 export const loginUser = async ({ identifier, password }) => {
   const user = await User.findOne({
     $or: [{ email: identifier }, { phone: identifier }],
-  }).select(" _id firstName lastName email imageId password");
+  }).select(" _id firstName lastName email imageId password phone");
   if (!user) {
     throw new AppError(
       STATUS_CODES.UNAUTHORIZED,

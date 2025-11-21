@@ -33,9 +33,9 @@ export const updatePersonalDetailsController = async (req, res, next) => {
 export const updatePasswordController = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const { oldPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body;
 
-    const result = await updatePassword(userId, oldPassword, newPassword);
+    const result = await updatePassword(userId, currentPassword, newPassword);
 
     sendResponse(res, {
       message: "Password updated successfully",

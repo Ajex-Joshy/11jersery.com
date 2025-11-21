@@ -22,7 +22,7 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       identifier: "ajex.brototype@gmail.com",
-      password: "Ajex@12345",
+      password: "Ajex@123",
     },
   });
   console.log(errors);

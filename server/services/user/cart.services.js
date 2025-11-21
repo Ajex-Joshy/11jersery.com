@@ -53,13 +53,17 @@ const _findUserCart = async (userId) => {
     discountAmount += perItemDiscount * item.quantity;
   });
 
-  const total = subtotal - discountAmount;
+  let total = subtotal - discountAmount;
+
+  const deliveryFee = total > 500 ? 0 : 80;
+  total = total + deliveryFee;
 
   return {
     ...cart,
     subtotal,
     discount: discountAmount,
     total,
+    deliveryFee,
   };
 };
 

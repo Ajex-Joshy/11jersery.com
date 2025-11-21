@@ -1,0 +1,62 @@
+import React from "react";
+import { FileText, Loader2 } from "lucide-react";
+import { useDownloadInvoice } from "../../features/user/order/orderHooks";
+
+const InvoiceDownloadButton = ({
+  orderId,
+  className = "",
+  variant = "default",
+}) => {
+  // Use the hook to get the mutate function and loading state
+  const { mutate: download, isLoading } = useDownloadInvoice();
+
+  const handleDownload = (e) => {
+    e.preventDefault(); // Prevent navigation if inside a link
+    e.stopPropagation(); // Stop event bubbling
+    if (!isLoading) {
+      download(orderId);
+    }
+  };
+
+  // Variant: Icon Only (e.g., for a table row action)
+  if (variant === "icon") {
+    return (
+      <button
+        onClick={handleDownload}
+        disabled={isLoading}
+        className={`text-gray-500 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100 ${className}`}
+        title="Download Invoice"
+        aria-label="Download Invoice"
+      >
+        {isLoading ? (
+          <Loader2 size={18} className="animate-spin" />
+        ) : (
+          <FileText size={18} />
+        )}
+      </button>
+    );
+  }
+
+  // Variant: Default (Button with Text)
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={isLoading}
+      className={`
+        flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 
+        text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors
+        focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-200
+        disabled:opacity-50 disabled:cursor-not-allowed ${className}
+      `}
+    >
+      {isLoading ? (
+        <Loader2 size={16} className="animate-spin" />
+      ) : (
+        <FileText size={16} />
+      )}
+      {isLoading ? "Downloading..." : "Download Invoice"}
+    </button>
+  );
+};
+
+export default InvoiceDownloadButton;

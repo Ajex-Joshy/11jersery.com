@@ -58,7 +58,7 @@ axiosInstance.interceptors.response.use(
       } catch (err) {
         console.log(err.message);
         localStorage.removeItem("token");
-        // window.location.href = "/login";
+        window.location.href = "/";
         return Promise.reject(err);
       }
     }

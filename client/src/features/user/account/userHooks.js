@@ -29,7 +29,9 @@ export const useUpdatePersonalDetails = () => {
       queryClient.invalidateQueries(USER_PROFILE_KEY);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to update details");
+      toast.error(
+        error?.response?.data?.error?.message || "Failed to update details"
+      );
     },
   });
 };
@@ -42,7 +44,7 @@ export const useUpdatePassword = () => {
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to update password"
+        error?.response?.data?.error?.message || "Failed to update password"
       );
     },
   });
@@ -55,7 +57,9 @@ export const useRequestEmailOtp = () => {
       toast.success("OTP sent to your new email");
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to send OTP");
+      toast.error(
+        error?.response?.data?.error?.message || "Failed to send OTP"
+      );
     },
   });
 };
@@ -70,7 +74,35 @@ export const useVerifyEmailOtp = () => {
       queryClient.invalidateQueries(USER_PROFILE_KEY);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Invalid OTP");
+      console.log(error);
+      toast.error(error?.response?.data?.error?.message || "Invalid OTP");
+    },
+  });
+};
+
+export const useRequestEmailChange = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: verifyEmailOtp,
+    onSuccess: () => {
+      toast.success("Email updated successfully");
+      queryClient.invalidateQueries(USER_PROFILE_KEY);
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.error?.message || "Invalid OTP");
+    },
+  });
+};
+export const useConfirmEmailChange = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: verifyEmailOtp,
+    onSuccess: () => {
+      toast.success("Email updated successfully");
+      queryClient.invalidateQueries(USER_PROFILE_KEY);
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.error?.message || "Invalid OTP");
     },
   });
 };

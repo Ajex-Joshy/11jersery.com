@@ -1,104 +1,38 @@
-import React, { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Loader2 } from "lucide-react";
 import { personalDetailsSchema } from "../profileSchema.js";
-import { useUpdatePersonalDetails, useRequestEmailOtp } from "../userHooks";
+import { useUpdatePersonalDetails } from "../userHooks";
 import { FormInput } from "../../../../components/common/FormComponents.jsx";
 import toast from "react-hot-toast";
-
-const DateOfBirthFields = ({ control }) => {
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 100 }, (_, i) => currentYear - 18 - i);
-  const months = [
-    { value: "01", label: "Jan" },
-    { value: "02", label: "Feb" },
-    { value: "03", label: "Mar" },
-    { value: "04", label: "Apr" },
-    { value: "05", label: "May" },
-    { value: "06", label: "Jun" },
-    { value: "07", label: "Jul" },
-    { value: "08", label: "Aug" },
-    { value: "09", label: "Sep" },
-    { value: "10", label: "Oct" },
-    { value: "11", label: "Nov" },
-    { value: "12", label: "Dec" },
-  ];
-  const days = Array.from({ length: 31 }, (_, i) =>
-    (i + 1).toString().padStart(2, "0")
-  );
-
-  return (
-    <div className="grid grid-cols-3 gap-3">
-      <Controller
-        name="dob_year"
-        control={control}
-        render={({ field }) => (
-          <select
-            {...field}
-            className="border border-gray-300 p-2 rounded-md text-sm"
-          >
-            <option value="">Year</option>
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        )}
-      />
-      <Controller
-        name="dob_month"
-        control={control}
-        render={({ field }) => (
-          <select
-            {...field}
-            className="border border-gray-300 p-2 rounded-md text-sm"
-          >
-            <option value="">Month</option>
-            {months.map((month) => (
-              <option key={month.value} value={month.value}>
-                {month.label}
-              </option>
-            ))}
-          </select>
-        )}
-      />
-      <Controller
-        name="dob_day"
-        control={control}
-        render={({ field }) => (
-          <select
-            {...field}
-            className="border border-gray-300 p-2 rounded-md text-sm"
-          >
-            <option value="">Day</option>
-            {days.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-        )}
-      />
-    </div>
-  );
-};
+import { useRequestEmailOtp, useConfirmEmailChange } from "../userHooks";
 
 export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
   const { mutate, isLoading } = useUpdatePersonalDetails();
-  const requestEmailOtpMutation = useRequestEmailOtp();
+  const { mutate: sendOtpMutate, isLoading: isSendingOtp } =
+    useRequestEmailOtp();
+  const { mutate: verifyOtpMutate, isLoading: isVerifyingOtp } =
+    useConfirmEmailChange();
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     reset,
-    getValues,
+    watch,
+    setError,
+    clearErrors,
   } = useForm({
     resolver: zodResolver(personalDetailsSchema),
   });
+
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+
+  const watchedEmail = watch("email", "");
+  const watchedOtp = watch("otp", "");
 
   // Populate form with user data when modal opens or user data changes
   useEffect(() => {
@@ -106,47 +40,97 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
       reset({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        phone: user.phone || "",
-        dob_day: user.dob ? user.dob.split("-")[2] : "",
-        dob_month: user.dob ? user.dob.split("-")[1] : "",
-        dob_year: user.dob ? user.dob.split("-")[0] : "",
-        gender: user.gender || "",
+        email: user.email || "",
+        otp: "",
       });
+      setEmailChanged(false);
+      setOtpSent(false);
+      setOtpVerified(false);
+      clearErrors("otp");
     }
-  }, [user, isOpen, reset]);
+  }, [user, isOpen, reset, clearErrors]);
+
+  useEffect(() => {
+    console.log(watchedEmail, user.email);
+    if (user) {
+      setEmailChanged(watchedEmail !== user.email);
+      if (watchedEmail === user.email) {
+        setOtpSent(false);
+        setOtpVerified(false);
+        clearErrors("otp");
+      }
+    }
+  }, [watchedEmail, user, clearErrors]);
+
+  const onSendOtp = () => {
+    if (!watchedEmail || watchedEmail === user.email) {
+      toast.error("Please enter a new email to send OTP.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(watchedEmail)) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+    sendOtpMutate(
+      { newEmail: watchedEmail },
+      {
+        onSuccess: () => {
+          toast.success("OTP sent to new email.");
+          setOtpSent(true);
+          setOtpVerified(false);
+          clearErrors("otp");
+        },
+        onError: (error) => {
+          console.log(error);
+          toast.error(
+            error?.response?.data?.error?.message || "Failed to send OTP."
+          );
+        },
+      }
+    );
+  };
+
+  const onVerifyOtp = () => {
+    if (!watchedOtp) {
+      setError("otp", { type: "manual", message: "Please enter the OTP." });
+      return;
+    }
+    verifyOtpMutate(
+      { newEmail: watchedEmail, otp: watchedOtp },
+      {
+        onSuccess: () => {
+          toast.success("Email verified.");
+          setOtpVerified(true);
+          clearErrors("otp");
+        },
+        onError: (error) => {
+          setError("otp", {
+            type: "manual",
+            message: error?.message || "Invalid OTP.",
+          });
+        },
+      }
+    );
+  };
 
   const onSubmit = (data) => {
-    const formData = new FormData();
     const changedFields = {};
 
-    // Compare with original data
     if (data.firstName !== user.firstName)
       changedFields.firstName = data.firstName;
     if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
-    if (data.phone !== user.phone) changedFields.phone = data.phone;
+    // if (data.email !== user.email) {
+    //   if (!otpVerified) {
+    //     toast.error("Please verify your new email before saving.");
+    //     return;
+    //   }
+    //   changedFields.email = data.email;
+    // }
 
-    const newDob =
-      data.dob_year && data.dob_month && data.dob_day
-        ? `${data.dob_year}-${data.dob_month}-${data.dob_day}`
-        : "";
-
-    if (newDob !== (user.dob || "")) {
-      changedFields.dob = newDob;
-    }
-
-    if (data.gender !== user.gender) {
-      changedFields.gender = data.gender;
-    }
-
-    Object.keys(changedFields).forEach((key) => {
-      formData.append(key, changedFields[key]);
-    });
-
-    // Only submit if something actually changed
-    console.log(changedFields);
     if (Object.keys(changedFields).length > 0) {
-      mutate(formData, {
-        onSuccess: () => onClose(), // Close modal on success
+      mutate(changedFields, {
+        onSuccess: () => onClose(),
       });
     } else {
       toast("No changes detected.");
@@ -191,7 +175,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
             {...register("lastName")}
             error={errors.lastName?.message}
           />
-
           <FormInput
             id="email"
             label="Email"
@@ -199,73 +182,53 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
             {...register("email")}
             error={errors.email?.message}
           />
-          {/* OTP Request Button */}
-          <div className="flex items-center gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (!getValues("email")) {
-                  toast.error("Enter a valid email first");
-                  return;
-                }
-                requestEmailOtpMutation.mutate(getValues("email"));
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-            >
-              Send OTP
-            </button>
-          </div>
-          <FormInput
-            id="phone"
-            label="OTP"
-            type="tel"
-            {...register("otp")}
-            error={errors.otp?.message}
-          />
 
-          {/* Gender Radios from Figma */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Gender
-            </label>
-            <div className="flex gap-6">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  {...register("gender")}
-                  value="male"
-                  className="form-radio"
-                />{" "}
-                Male
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  {...register("gender")}
-                  value="female"
-                  className="form-radio"
-                />{" "}
-                Female
-              </label>
+          {emailChanged && (
+            <div className="space-y-2">
+              {!otpSent && (
+                <button
+                  type="button"
+                  onClick={onSendOtp}
+                  disabled={isSendingOtp}
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                >
+                  {isSendingOtp ? (
+                    <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                  ) : (
+                    "Send OTP"
+                  )}
+                </button>
+              )}
+              {otpSent && (
+                <>
+                  <FormInput
+                    id="otp"
+                    label="Enter OTP"
+                    {...register("otp")}
+                    error={errors.otp?.message}
+                  />
+                  <button
+                    type="button"
+                    onClick={onVerifyOtp}
+                    disabled={isVerifyingOtp || otpVerified}
+                    className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                  >
+                    {isVerifyingOtp ? (
+                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                    ) : otpVerified ? (
+                      "OTP Verified"
+                    ) : (
+                      "Verify OTP"
+                    )}
+                  </button>
+                </>
+              )}
             </div>
-            {errors.gender && (
-              <span className="text-red-600 text-xs mt-1">
-                {errors.gender.message}
-              </span>
-            )}
-          </div>
-
-          {/* DOB Dropdowns from Figma */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Date of Birth
-            </label>
-            <DateOfBirthFields control={control} errors={errors} />
-          </div>
+          )}
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (emailChanged && !otpVerified)}
             className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50"
           >
             {isLoading ? (

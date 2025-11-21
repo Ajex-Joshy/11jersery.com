@@ -22,6 +22,9 @@ import AddressesPage from "../features/user/address/AddressPage.jsx";
 import AddAddressPage from "../features/user/address/AddAddressPage.jsx";
 import CheckoutPage from "../features/user/checkout/CheckoutPage.jsx";
 import PaymentPage from "../features/user/checkout/PaymentPage.jsx";
+import OrderConfirmationPage from "../features/user/order/OrderConfirmationPage.jsx";
+import OrderHistoryPage from "../features/user/order/OrderHistoryPage.jsx";
+import OrderDetailsPage from "../features/user/order/OrderDetailsPage.jsx";
 
 const UserRoutes = () => {
   return (
@@ -45,11 +48,20 @@ const UserRoutes = () => {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={<OrderConfirmationPage />}
+        />
         <Route path="/account" element={<AccountLayout />}>
           <Route index element={<AccountOverview />} />
           <Route path="/account/settings" element={<AccountSettingsPage />} />
           <Route path="/account/addresses" element={<AddressesPage />} />
           <Route path="/account/addresses/new" element={<AddAddressPage />} />
+          <Route path="/account/orders" element={<OrderHistoryPage />} />
+          <Route
+            path="/account/orders/:orderId"
+            element={<OrderDetailsPage />}
+          />
           <Route
             path="/account/addresses/edit/:addressId"
             element={<AddAddressPage />}
