@@ -10,24 +10,16 @@ import {
   Printer,
 } from "lucide-react";
 import { useOrderDetails } from "./orderHooks";
-import axiosInstance from "../../../api/axiosInstance";
 import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
 import Confetti from "react-confetti";
-import { useDownloadInvoice } from "./orderHooks";
+import InvoiceDownloadButton from "../../../components/user/Buttons";
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
-  const {
-    data: orderPayload,
-    isLoading,
-    isError,
-    error,
-  } = useOrderDetails(orderId);
-
-  const { mutate: downloadInvoice } = useDownloadInvoice();
+  const { order, isLoading, isError, error } = useOrderDetails(orderId);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -36,8 +28,6 @@ const OrderConfirmationPage = () => {
 
   if (isLoading) return <LoadingSpinner text="Loading order details..." />;
   if (isError) return <ErrorDisplay error={error} />;
-
-  const order = orderPayload?.data;
 
   if (!order) return <div className="p-8 text-center">Order not found.</div>;
 
@@ -57,7 +47,7 @@ const OrderConfirmationPage = () => {
           <p className="text-lg text-gray-600 max-w-lg mx-auto">
             Your order{" "}
             <span className="font-mono font-bold text-black">
-              #{order._id.slice(-6).toUpperCase()}
+              #{order.orderId}
             </span>{" "}
             has been placed successfully. We've sent a confirmation email to{" "}
             <span className="font-medium text-black">
@@ -99,12 +89,7 @@ const OrderConfirmationPage = () => {
                   </p>
                 </div>
                 <div>
-                  <button
-                    onClick={() => downloadInvoice(orderId)}
-                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                  >
-                    <Printer size={16} /> Download Invoice
-                  </button>
+                  <InvoiceDownloadButton order={order} />
                 </div>
               </div>
             </div>
@@ -135,7 +120,12 @@ const OrderConfirmationPage = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-gray-900 mb-1">
-                        {item.title}
+                        <Link
+                          to={`/product/${item.slug}`}
+                          className="hover:underline"
+                        >
+                          {item.title}
+                        </Link>
                       </h3>
                       <p className="text-sm text-gray-500 mb-2">
                         Size: {item.size} | Qty: {item.quantity}
@@ -175,7 +165,7 @@ const OrderConfirmationPage = () => {
                   <span>
                     {order?.price?.deliveryFee === 0
                       ? "Free"
-                      : `₹${order.deliveryFee}`}
+                      : `₹${order?.price?.deliveryFee}`}
                   </span>
                 </div>
                 <div className="border-t border-gray-300 my-4 pt-4 flex justify-between text-lg font-bold text-gray-900">

@@ -139,7 +139,7 @@ const CheckoutPage = () => {
                     <>Processing...</>
                   ) : (
                     <>
-                      Place Order <Lock size={18} />
+                      Go to payment <Lock size={18} />
                     </>
                   )}
                 </button>

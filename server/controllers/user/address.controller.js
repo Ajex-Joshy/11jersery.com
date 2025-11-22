@@ -13,7 +13,7 @@ import { asyncHandler } from "../../utils/helpers.js";
 /**
  * Add New Address Controller
  */
-export const addAddressController = asyncHandler(async (req, res, next) => {
+export const addAddressController = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const addressData = req.body;
 
@@ -29,7 +29,7 @@ export const addAddressController = asyncHandler(async (req, res, next) => {
 /**
  * Get All Addresses Controller
  */
-export const getAllAddressController = asyncHandler(async (req, res, next) => {
+export const getAllAddressController = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   let addresses = await getAllAddresses(userId);
@@ -40,7 +40,7 @@ export const getAllAddressController = asyncHandler(async (req, res, next) => {
 /**
  * Edit Address Controller
  */
-export const editAddressController = asyncHandler(async (req, res, next) => {
+export const editAddressController = asyncHandler(async (req, res) => {
   const addressId = req.params.id;
   validateObjectId(addressId);
 
@@ -63,7 +63,7 @@ export const editAddressController = asyncHandler(async (req, res, next) => {
 /**
  * Delete Address Controller
  */
-export const deleteAddressController = asyncHandler(async (req, res, next) => {
+export const deleteAddressController = asyncHandler(async (req, res) => {
   const addressId = req.params.id;
   validateObjectId(addressId);
 
@@ -80,7 +80,7 @@ export const deleteAddressController = asyncHandler(async (req, res, next) => {
   return sendResponse(res, { message: "Address deleted successfully" });
 });
 
-export const getAddressByIdController = asyncHandler(async (req, res, next) => {
+export const getAddressByIdController = asyncHandler(async (req, res) => {
   const addressId = req.params.id;
   validateObjectId(addressId);
 

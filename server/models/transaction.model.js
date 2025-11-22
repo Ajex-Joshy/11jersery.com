@@ -4,8 +4,6 @@ const PAYMENT_METHOD_ENUM = ["RAZORPAY", "WALLET", "COD", "NONE"];
 
 const transactionSchema = new Schema(
   {
-    transactionCode: { type: String, unique: true },
-
     userId: {
       type: Types.ObjectId,
       ref: "User",
@@ -16,18 +14,32 @@ const transactionSchema = new Schema(
     orderId: {
       type: Types.ObjectId,
       ref: "Order",
-      required: false,
+      required: true,
       index: true,
     },
 
     amount: {
-      type: Number,
-      required: true,
-      min: [0, "Amount cannot be negative"],
+      subtotal: {
+        type: Number,
+        required: true,
+        min: [0, "Subtotal cannot be negative"],
+      },
+      discountedPrice: {
+        type: Number,
+        required: true,
+        min: [0, "Discounted price cannot be negative"],
+      },
+      deliveryFee: {
+        type: Number,
+        required: true,
+        min: [0, "Delivery fee cannot be negative"],
+      },
+      total: {
+        type: Number,
+        required: true,
+        min: [0, "Total cannot be negative"],
+      },
     },
-
-    balanceBefore: { type: Number },
-    balanceAfter: { type: Number },
 
     type: {
       type: String,
@@ -43,13 +55,16 @@ const transactionSchema = new Schema(
         "WALLET_TOPUP",
         "WALLET_PAYMENT",
         "REFERRAL_BONUS",
+        "ORDER_CANCELLED",
+        "ORDER_ITEM_CANCELLED",
+        "RECALCULATED_ORDER_PAYMENT",
       ],
       required: true,
     },
 
     status: {
       type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED", "REFUNDED"],
+      enum: ["PENDING", "SUCCESS", "FAILED", "REFUNDED", "UNPAID", "CANCELLED"],
       default: "PENDING",
       index: true,
     },
@@ -60,32 +75,8 @@ const transactionSchema = new Schema(
       required: true,
       index: true,
     },
-
-    gateway: {
-      paymentId: { type: String },
-      orderId: { type: String },
-      signature: { type: String },
-      walletRef: { type: String },
-    },
-
-    metadata: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );
-
-transactionSchema.pre("save", async function (next) {
-  if (this.transactionCode) return next();
-  const last = await this.constructor.findOne(
-    {},
-    {},
-    { sort: { createdAt: -1 } }
-  );
-  const lastNum = last?.transactionCode
-    ? parseInt(last.transactionCode.replace("TXN-", ""))
-    : 0;
-  const newNum = (lastNum + 1).toString().padStart(6, "0");
-  this.transactionCode = `TXN-${newNum}`;
-  next();
-});
 
 export default mongoose.model("Transaction", transactionSchema);

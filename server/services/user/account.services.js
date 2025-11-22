@@ -125,7 +125,6 @@ export const updatePassword = async (userId, currentPassword, newPassword) => {
     isBlocked: false,
     isDeleted: false,
   }).select("+password");
-  console.log("user", user);
 
   if (!user)
     throw new AppError(
@@ -145,7 +144,6 @@ export const updatePassword = async (userId, currentPassword, newPassword) => {
 
   // Check if new password is the same as old password
   const isSamePassword = await bcrypt.compare(newPassword, user.password);
-  console.log("isSamePassword", isSamePassword);
   if (isSamePassword)
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,

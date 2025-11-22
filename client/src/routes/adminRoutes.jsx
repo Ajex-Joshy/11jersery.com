@@ -14,6 +14,8 @@ import Profile from "../features/admin/account/Profile";
 import Admin404 from "../components/admin/404";
 import EditProduct from "../features/admin/productManagement/EditProduct";
 import ErrorPage from "../features/user/company/ErrorPage";
+import OrderManagement from "../features/admin/order/OrderManagement";
+import AdminOrderDetails from "../features/admin/order/AdminOrderDetails";
 
 const AdminRoutes = () => {
   return (
@@ -34,6 +36,8 @@ const AdminRoutes = () => {
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/edit-product/:slug" element={<EditProduct />} />
+          <Route path="/orders" element={<OrderManagement />} />
+          <Route path="/orders/:orderId" element={<AdminOrderDetails />} />
           {/* 
           <Route path="/orders" element={<OrderMangement />} />
           <Route path="/categories" element={<CategoryManagement />} />

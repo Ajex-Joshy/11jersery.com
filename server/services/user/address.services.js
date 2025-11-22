@@ -22,7 +22,6 @@ export const getAllAddresses = async (userId) => {
 };
 
 export const editAddress = async (addressId, updateData) => {
-  console.log(addressId, updateData);
   if (updateData.isDefault) {
     const address = await Address.findById(addressId);
     if (address) {

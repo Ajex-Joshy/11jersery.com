@@ -16,10 +16,7 @@ export const OrderItem = ({ item, onCancelItem }) => {
       {/* Image */}
       <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
         <img
-          src={
-            item.imageUrl ||
-            (item.imageIds?.[0] ? `${S3_URL}/${item.imageIds[0]}` : null)
-          }
+          src={item.imageUrl}
           alt={item.title}
           className={`w-full h-full object-cover ${
             isCancelled ? "grayscale opacity-70" : ""

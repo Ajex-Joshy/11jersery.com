@@ -11,6 +11,7 @@ const DynamicTable = ({
   onSearchChange,
   status,
   onStatusChange,
+  statusOptions = [],
   limit,
   onLimitChange,
   sortConfig,
@@ -24,17 +25,23 @@ const DynamicTable = ({
       <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 gap-4">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <div>
-            <select
-              value={status}
-              onChange={(e) => onStatusChange(e.target.value)}
-              className="pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            >
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="blocked">Blocked</option>
-            </select>
-          </div>
+          {/* Dynamic Status Filter Dropdown */}
+          {statusOptions && statusOptions.length > 0 && (
+            <div>
+              <select
+                value={status}
+                onChange={(e) => onStatusChange(e.target.value)}
+                className="pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">All Statuses</option>
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Search Input */}
           <div className="relative flex-1 md:flex-auto">
@@ -106,10 +113,9 @@ const DynamicTable = ({
         </table>
       </div>
 
-      {/* --- Footer with Pagination & Limit --- */}
+      {/* Footer with Pagination & Limit */}
       {pagination && (
         <div className="flex flex-col md:flex-row justify-between items-center p-4 bg-white border-t border-gray-200">
-          {/* 3. Limit (Rows per page) Dropdown */}
           <div className="flex items-center gap-2 mb-2 md:mb-0">
             <span className="text-sm text-gray-700">Rows per page:</span>
             <select
@@ -123,7 +129,6 @@ const DynamicTable = ({
             </select>
           </div>
 
-          {/* Pagination Component */}
           <Pagination pagination={pagination} onPageChange={onPageChange} />
         </div>
       )}
@@ -131,10 +136,8 @@ const DynamicTable = ({
   );
 };
 
-
 DynamicTable.propTypes = {
   title: PropTypes.string.isRequired,
-
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -143,37 +146,34 @@ DynamicTable.propTypes = {
       render: PropTypes.func.isRequired,
     })
   ).isRequired,
-
   data: PropTypes.array.isRequired,
-
   searchValue: PropTypes.string.isRequired,
-
   onSearchChange: PropTypes.func.isRequired,
-
   status: PropTypes.string.isRequired,
-
   onStatusChange: PropTypes.func.isRequired,
 
+  // Updated PropType
+  statusOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })
+  ),
+
   limit: PropTypes.number.isRequired,
-
   onLimitChange: PropTypes.func.isRequired,
-
   sortConfig: PropTypes.shape({
     field: PropTypes.string,
     direction: PropTypes.oneOf(["asc", "desc"]),
   }).isRequired,
-
   onSort: PropTypes.func.isRequired,
-
   pagination: PropTypes.shape({
     currentPage: PropTypes.number,
     totalPages: PropTypes.number,
     totalProducts: PropTypes.number,
     limit: PropTypes.number,
   }),
-
   onPageChange: PropTypes.func.isRequired,
 };
-
 
 export default DynamicTable;

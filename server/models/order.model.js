@@ -29,6 +29,7 @@ const PAYMENT_STATUS_ENUM = [
   "Failed",
   "Refunded",
   "Cancelled",
+  "Unpaid",
 ];
 
 const orderItemSchema = new Schema({
@@ -83,6 +84,8 @@ const orderSchema = new Schema(
 
     items: [orderItemSchema],
 
+    transactionIds: [{ type: Types.ObjectId, ref: "Transaction" }],
+
     price: {
       subtotal: { type: Number, required: true },
       discountedPrice: { type: Number }, // Global discount
@@ -127,28 +130,6 @@ const orderSchema = new Schema(
   },
   { timestamps: true }
 );
-
-orderSchema.pre("save", function (next) {
-  if (this.isModified("items")) {
-    const itemStatuses = this.items.map((i) => i.status);
-
-    // Logic: If ALL items are cancelled, Order is Cancelled
-    if (itemStatuses.every((s) => s === "Cancelled")) {
-      this.orderStatus = "Cancelled";
-      if (!this.timeline.cancelledAt) this.timeline.cancelledAt = new Date();
-    }
-    // Logic: If ALL items are Delivered, Order is Delivered
-    else if (itemStatuses.every((s) => s === "Delivered")) {
-      this.orderStatus = "Delivered";
-      if (!this.timeline.deliveredAt) this.timeline.deliveredAt = new Date();
-    }
-    // Logic: If SOME are Delivered/Shipped and others Pending
-    else if (itemStatuses.some((s) => s === "Shipped" || s === "Delivered")) {
-      this.orderStatus = "Partially Shipped"; // or keep as Processing
-    }
-  }
-  next();
-});
 
 orderSchema.pre("save", async function (next) {
   if (this.orderId) return next(); // Skip if already assigned

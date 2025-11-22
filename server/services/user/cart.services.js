@@ -138,7 +138,6 @@ export const addItem = async (userId, { productId, size, quantity }) => {
 export const adjustItemQuantity = async (userId, itemId, action) => {
   const cart = await Cart.findOne({ userId });
   if (!cart) throw createError(404, "Cart not found.");
-  console.log(cart.items);
 
   const item = cart.items.find((i) => {
     return i._id.toString() == itemId;

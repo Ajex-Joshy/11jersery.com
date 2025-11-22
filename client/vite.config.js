@@ -6,6 +6,12 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    host: true,
+    strictPort: true,
+    cors: true,
     allowedHosts: ["years-applicants-first-guns.trycloudflare.com"],
+  },
+  define: {
+    "process.env": {},
   },
 });

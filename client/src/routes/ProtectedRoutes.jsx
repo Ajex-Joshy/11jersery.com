@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,21 +7,18 @@ import {
   selectCurrentUser,
 } from "../features/user/account/authSlice";
 
-export const ProtectedRoutes = (path, icon) => {
-  // const isAuthenticated = useSelector(selectCurrentUser);
-  // const dispatch = useDispatch();
-  // const handleOpenLogin = () => {
-  //   dispatch(openAuthModal("login"));
-  // };
+export const ProtectedRoutes = () => {
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
 
-  // if (isAuthenticated) {
-  //   return <Link to={path}>{icon}</Link>;
-  // }
-  // return (
-  //   <button onClick={handleOpenLogin} className="...">
-  //     {icon}
-  //   </button>
-  // );
+  if (!user) {
+    dispatch(openAuthModal("login"));
+    return <Navigate to="/" replace />;
+  }
 
-  return <UserLayout />;
+  return (
+    <UserLayout>
+      <Outlet />
+    </UserLayout>
+  );
 };

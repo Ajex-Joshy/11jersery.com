@@ -11,6 +11,7 @@ const ConfirmationModal = ({
   confirmButtonText = "Confirm",
   confirmButtonVariant = "primary",
   isLoading = false,
+  children,
 }) => {
   if (!isOpen) {
     return null;
@@ -51,6 +52,7 @@ const ConfirmationModal = ({
 
         <div className="mb-6">
           <p className="text-sm text-gray-600">{message}</p>
+          {children}
         </div>
 
         <div className="flex justify-end gap-3">

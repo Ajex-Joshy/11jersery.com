@@ -5,11 +5,11 @@ import { MainStatCard, OverviewStat } from "./components/StatComponents.jsx";
 import { CustomerLineChart } from "./components/CustomerLineChart.jsx";
 import DynamicTable from "../../../components/admin/DynamicTable.jsx";
 import ConfirmationModal from "../../../components/common/ConfirmationModal.jsx";
+import { userStatusOptions } from "../../../utils/constants.js";
 
 const CustomerManagement = () => {
   const { isLoading, isError, error, stats, table, filters, modal } =
     useCustomerManagement();
-
   // --- LOADING / ERROR STATES ---
   if (isLoading) {
     return (
@@ -76,6 +76,7 @@ const CustomerManagement = () => {
           pagination={table.pagination}
           isLoading={isLoading}
           error={error}
+          statusOptions={userStatusOptions}
           // Pass all filter state and handlers
           searchValue={filters.searchTerm}
           onSearchChange={filters.handleSearch}

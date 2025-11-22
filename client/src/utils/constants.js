@@ -38,3 +38,17 @@ export const indianStates = [
   "Lakshadweep",
   "Puducherry",
 ];
+
+export const userStatusOptions = [
+  { label: "Active", value: "active" },
+  { label: "Blocked", value: "blocked" },
+];
+
+export const orderStatusOptions = [
+  { label: "Pending", value: "Pending" },
+  { label: "Processing", value: "Processing" },
+  { label: "Shipped", value: "Shipped" },
+  { label: "Delivered", value: "Delivered" },
+  { label: "Cancelled", value: "Cancelled" },
+  { label: "Returned", value: "Returned" },
+];

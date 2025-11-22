@@ -81,8 +81,6 @@ export const validateAddressWithGoogle = async (req, res, next) => {
 
     // Call Google
     const result = await geocodeAddress(fullAddress);
-    console.log(fullAddress);
-    console.log(result);
 
     const components = result.address_components;
 

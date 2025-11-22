@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropTypes from "prop-types";
 
 const Pagination = ({ pagination, onPageChange }) => {
-  const { currentPage, totalPages, totalUsers, limit } = pagination;
+  const { currentPage, totalPages, totalUsers, totalOrders, limit } =
+    pagination;
 
   if (totalPages <= 1) {
     return null;
@@ -15,14 +16,16 @@ const Pagination = ({ pagination, onPageChange }) => {
   };
 
   const startItem = (currentPage - 1) * limit + 1;
-  const endItem = Math.min(currentPage * limit, totalUsers);
+  let totalItem = totalUsers || totalOrders;
+  const endItem = Math.min(currentPage * limit, totalItem);
+  console.log(pagination, totalPages);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center p-4 bg-white border-t border-gray-200">
       <div className="text-sm text-gray-700 mb-2 md:mb-0">
         Showing <span className="font-medium">{startItem}</span> to{" "}
         <span className="font-medium">{endItem}</span> of{" "}
-        <span className="font-medium">{totalUsers}</span> results
+        <span className="font-medium">{totalPages}</span> results
       </div>
       <div className="flex items-center space-x-1">
         <button

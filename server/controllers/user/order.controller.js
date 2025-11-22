@@ -45,7 +45,7 @@ export const getOrderDetailsController = asyncHandler(async (req, res) => {
 // // REQUEST ORDER CANCELLATION
 export const cancelOrderController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
-  const { reason } = req.body;
+  const { reason } = req.body || "";
   const userId = req.user._id;
 
   const updated = await cancelOrder(userId, orderId, reason);
@@ -56,7 +56,7 @@ export const cancelOrderController = asyncHandler(async (req, res) => {
 // CANCEL SINGLE ITEM
 export const cancelItemController = asyncHandler(async (req, res) => {
   const { orderId, itemId } = req.params; // itemId passed in params or body
-  const { reason } = req.body;
+  const { reason } = req.body || "";
   const userId = req.user._id;
 
   const updatedOrder = await cancelItem(userId, orderId, itemId, reason);

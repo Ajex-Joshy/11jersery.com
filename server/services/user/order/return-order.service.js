@@ -56,7 +56,6 @@ export const requestReturnItem = async (userId, orderId, itemId, reason) => {
         "items._id": itemId,
       }).session(session);
     }
-    console.log(orderId, order);
 
     ensureOrderExists(order);
 

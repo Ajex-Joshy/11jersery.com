@@ -32,7 +32,7 @@ router.get("/:id", getAddressByIdController);
 router.patch(
   "/:id",
   validateEditAddress,
-  validateAddressWithGoogle,
+  // validateAddressWithGoogle,
   editAddressController
 );
 

@@ -2,7 +2,6 @@ import express from "express";
 import authRoutes from "./auth.routes.js";
 import { getLandingPageController } from "../../controllers/user/landing-page.controller.js";
 import productRoutes from "./product.routes.js";
-import checkUserStatus from "../../middlewares/user/check-user-status.js";
 import { getProductsController } from "../../controllers/user/product.controller.js";
 import cartRoutes from "./cart.routes.js";
 import accountRouter from "./account.routes.js";

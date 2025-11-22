@@ -3,22 +3,20 @@ import { FileText, Loader2 } from "lucide-react";
 import { useDownloadInvoice } from "../../features/user/order/orderHooks";
 
 const InvoiceDownloadButton = ({
-  orderId,
+  order,
   className = "",
   variant = "default",
 }) => {
-  // Use the hook to get the mutate function and loading state
   const { mutate: download, isLoading } = useDownloadInvoice();
 
   const handleDownload = (e) => {
-    e.preventDefault(); // Prevent navigation if inside a link
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+    e.stopPropagation();
     if (!isLoading) {
-      download(orderId);
+      download(order);
     }
   };
 
-  // Variant: Icon Only (e.g., for a table row action)
   if (variant === "icon") {
     return (
       <button
@@ -37,7 +35,6 @@ const InvoiceDownloadButton = ({
     );
   }
 
-  // Variant: Default (Button with Text)
   return (
     <button
       onClick={handleDownload}

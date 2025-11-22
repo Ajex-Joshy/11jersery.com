@@ -2,6 +2,8 @@ import Order from "../../../models/order.model.js";
 import mongoose from "mongoose";
 import { reduceStock, validateStock } from "./stock.service.js";
 import Product from "../../../models/product.model.js";
+import Transaction from "../../../models/transaction.model.js";
+import { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
 const calculateOrderPrice = async (items) => {
   for (const item of items) {
@@ -50,6 +52,7 @@ export const generateOrderTimeline = () => {
 export const placeCodOrder = async (userId, items, shippingAddress) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+
   try {
     const {
       items: updatedItems,
@@ -86,8 +89,30 @@ export const placeCodOrder = async (userId, items, shippingAddress) => {
       ],
       { session }
     );
+    const transaction = await Transaction.create(
+      [
+        {
+          userId,
+          orderId: order[0]._id,
+          amount: {
+            subtotal,
+            discountedPrice,
+            deliveryFee,
+            total,
+          },
+          type: "CREDIT",
+          reason: "ORDER_PAYMENT",
+          status: "PENDING",
+          paymentMethod: "COD",
+        },
+      ],
+      { session }
+    );
 
+    order[0].transactionIds = [transaction[0]._id];
+    await order[0].save({ session });
     await session.commitTransaction();
+    sendOrderConfirmationEmail(order[0]);
     session.endSession();
     return order[0];
   } catch (err) {

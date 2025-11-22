@@ -8,7 +8,6 @@ export const authenticateUser = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      console.log("authHeader", req.headers);
       throw new AppError(
         STATUS_CODES.UNAUTHORIZED,
         "UNAUTHORIZED",
@@ -43,7 +42,6 @@ export const authenticateUser = async (req, res, next) => {
       );
 
     req.user = user;
-    console.log("user", user);
     next();
   } catch (err) {
     next(err);

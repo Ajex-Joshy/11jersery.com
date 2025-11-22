@@ -25,7 +25,6 @@ export const userSignupController = asyncHandler(async (req, res) => {
 
 export const refreshAcessTokenController = asyncHandler(async (req, res) => {
   const token = req.cookies.refreshToken;
-  console.log(token);
   if (!token)
     throw new AppError(
       STATUS_CODES.UNAUTHORIZED,

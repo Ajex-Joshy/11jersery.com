@@ -24,19 +24,24 @@ export const placeOrder = async (orderData) => {
   }
 };
 
-export const cancelOrder = async (orderId) => {
+export const cancelOrder = async ({ orderId, reason }) => {
+  console.log(orderId, reason);
   try {
-    const response = await axiosInstance.put(`/orders/${orderId}/cancel`);
+    const response = await axiosInstance.post(`/orders/${orderId}/cancel`, {
+      reason,
+    });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const cancelItem = async (orderId, itemId) => {
+export const cancelItem = async ({ orderId, itemId, reason }) => {
+  console.log(orderId, itemId);
   try {
-    const response = await axiosInstance.put(
-      `/orders//${orderId}/items/${itemId}/cancel`
+    const response = await axiosInstance.post(
+      `/orders/${orderId}/items/${itemId}/cancel`,
+      { reason }
     );
     return response.data;
   } catch (error) {
@@ -46,7 +51,7 @@ export const cancelItem = async (orderId, itemId) => {
 
 export const requestReturnItem = async (orderId, itemId, returnData) => {
   try {
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.post(
       `/orders/${orderId}/items/${itemId}/return`,
       returnData
     );

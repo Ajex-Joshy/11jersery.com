@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, MapPin, CheckCircle2, Loader2 } from "lucide-react";
+import { Plus, MapPin, CheckCircle2, Loader2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAddresses } from "../../address/addressHooks";
 
@@ -71,13 +71,16 @@ const AddressSelection = ({ selectedId, onSelect }) => {
                       </span>
                     )}
                   </div>
-                  {isSelected && (
-                    <CheckCircle2
-                      className="text-black"
-                      size={20}
-                      fill="white"
-                    />
-                  )}
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/account/addresses/edit/${addr._id}`);
+                    }}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                  >
+                    <Pencil size={18} />
+                  </button>
                 </div>
 
                 <div

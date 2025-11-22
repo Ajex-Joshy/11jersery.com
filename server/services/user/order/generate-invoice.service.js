@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import logger from "../../../config/logger.js";
 import orderModel from "../../../models/order.model.js";
 
 export const generateInvoice = async (userId, orderId, res) => {
@@ -15,12 +14,12 @@ export const generateInvoice = async (userId, orderId, res) => {
     const PDFDocument = (await import("pdfkit")).default;
     const doc = new PDFDocument({ margin: 50, size: "A4" });
 
-    // Set headers for download
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=invoice-${order.orderId}.pdf`
-    );
+    const filename = order.orderId
+      ? `invoice-${order.orderId}.pdf`
+      : `invoice-${order._id.toString().slice(-6)}.pdf`;
+
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
 
     doc.pipe(res);
 
@@ -124,7 +123,6 @@ export const generateInvoice = async (userId, orderId, res) => {
 
     // --- Table Rows ---
     let y = tableTop + 30;
-    let totalItemsPrice = 0;
 
     order.items.forEach((item) => {
       const itemTotal = item.salePrice * item.quantity;
@@ -234,7 +232,7 @@ export const generateInvoice = async (userId, orderId, res) => {
 
     doc.end();
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ message: "Error generating invoice" });
+    logger.error(error);
+    throw error;
   }
 };

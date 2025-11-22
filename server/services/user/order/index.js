@@ -1,6 +1,6 @@
 import Order from "../../../models/order.model.js";
-import Product from "../../../models/product.model.js";
-import { getPagination } from "../../../utils/helpers.js";
+import { STATUS_CODES } from "../../../utils/constants.js";
+import { AppError, getPagination } from "../../../utils/helpers.js";
 import { getSignedUrlForKey } from "../../admin/service-helpers/s3.service.js";
 
 export * from "./place-order.service.js";
@@ -55,14 +55,12 @@ export const listOrders = async (userId, queryParams) => {
       .skip(skip)
       .limit(pageSize)
       .select("orderId orderStatus payment price items timeline createdAt")
-      .lean(), // Performance boost
+      .lean(),
     Order.countDocuments(query),
   ]);
   for (let order of orders) {
     for (let item of order.items) {
-      console.log("item", item);
       let imageUrl = await getSignedUrlForKey(item.imageId);
-      console.log(imageUrl);
       item.imageUrl = imageUrl;
       delete item.imageId;
     }
@@ -84,15 +82,13 @@ export const listOrders = async (userId, queryParams) => {
 };
 export const getOrderDetails = async (userId, orderId) => {
   const order = await Order.findOne({ _id: orderId, userId }).select(
-    " -createdAt -updatedAt -__v"
+    "  -updatedAt -__v"
   );
 
   if (!order)
     throw new AppError(STATUS_CODES.NOT_FOUND, "NOT_FOUND", "Order not found");
-  console.log("order", order);
   // Convert order to object
   const orderObj = order.toObject();
-  console.log(orderObj);
 
   if (orderObj.items && Array.isArray(orderObj.items)) {
     for (let item of orderObj.items) {

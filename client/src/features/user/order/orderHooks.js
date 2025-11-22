@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   cancelItem,
   cancelOrder,
+  downloadInvoice,
   getOrderDetails,
   getOrders,
   placeOrder,
@@ -56,6 +57,11 @@ export const useOrderDetails = (orderId) => {
     queryKey: [ORDER_DETAILS_KEY, orderId],
     queryFn: () => getOrderDetails(orderId),
     enabled: !!orderId,
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.error?.message || "Failed to fetch order details"
+      );
+    },
   });
 
   // 2. Mutations
@@ -66,7 +72,9 @@ export const useOrderDetails = (orderId) => {
       queryClient.invalidateQueries([ORDER_DETAILS_KEY, orderId]);
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Failed to cancel order"),
+      toast.error(
+        err.response?.data?.error?.message || "Failed to cancel order"
+      ),
   });
 
   // Mutation for individual item cancellation (if supported by backend)
@@ -78,7 +86,9 @@ export const useOrderDetails = (orderId) => {
         queryClient.invalidateQueries([ORDER_DETAILS_KEY, orderId]);
       },
       onError: (err) =>
-        toast.error(err.response?.data?.message || "Failed to cancel item"),
+        toast.error(
+          err.response?.data?.error?.message || "Failed to cancel item"
+        ),
     }
   );
 
@@ -102,9 +112,9 @@ export const useOrderDetails = (orderId) => {
     isError,
     error,
     actions: {
-      cancelOrder: () => cancelOrderMutate(orderId),
-      cancelItem: (itemId) => cancelItemMutate({ orderId, itemId }),
-      // returnItem: ...
+      cancelOrder: (reason) => cancelOrderMutate({ orderId, reason }),
+      cancelItem: (itemId, reason) =>
+        cancelItemMutate({ orderId, itemId, reason }),
     },
     state: {
       isCancelling,
@@ -152,15 +162,15 @@ export const useOrderDetails = (orderId) => {
 
 export const useDownloadInvoice = () => {
   return useMutation({
-    mutationFn: async (orderId) => {
-      const data = await downloadInvoice(orderId);
+    mutationFn: async (order) => {
+      const data = await downloadInvoice(order._id);
 
       const blob = new Blob([data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `invoice-${orderId}.pdf`;
+      a.download = `invoice-${order.orderId}.pdf`;
       a.click();
 
       window.URL.revokeObjectURL(url);
