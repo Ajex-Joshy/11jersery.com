@@ -86,7 +86,7 @@ export const saveFaqs = async (faqs, productId, replaceExisting = false) => {
 };
 
 export const buildProductQuery = async ({ search, category, status }) => {
-  const query = { isDeleted: false };
+  const query = { isDeleted: false, isListed: true };
 
   if (search) {
     query.title = { $regex: search, $options: "i" };

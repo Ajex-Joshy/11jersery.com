@@ -7,6 +7,7 @@ import cartRoutes from "./cart.routes.js";
 import accountRouter from "./account.routes.js";
 import addressRouter from "./address.routes.js";
 import orderRouter from "./order.routes.js";
+import walletRoutes from "./wallet.routes.js";
 
 const userRouter = express.Router();
 userRouter.get("/landing-page", getLandingPageController);
@@ -16,6 +17,7 @@ userRouter.use("/cart", cartRoutes);
 userRouter.use("/account", accountRouter);
 userRouter.use("/address", addressRouter);
 userRouter.use("/orders", orderRouter);
+userRouter.use("/wallet", walletRoutes);
 
 userRouter.get("/products", getProductsController);
 export default userRouter;

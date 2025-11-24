@@ -6,8 +6,8 @@ import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays.jsx";
-import { S3_URL } from "../../../utils/constants";
 import { selectCurrentUser } from "./authSlice.js";
+import { useUserProfile } from "./userHooks.js";
 
 const getJoinDateFromObjectId = (objectId) => {
   if (!objectId || objectId.length < 8) {
@@ -42,17 +42,18 @@ const InfoRow = ({ icon: Icon, label, value }) => (
 );
 
 const AccountOverview = () => {
-  const user = useSelector(selectCurrentUser);
+  const { data: profilePayload, isLoading, isError, error } = useUserProfile();
+
+  const userFromStore = useSelector(selectCurrentUser);
+
+  // Get data from Redux as a fallback/initial state
+  const user = profilePayload?.data || userFromStore;
 
   if (!user) {
     return <ErrorDisplay error={{ message: "Could not load user data." }} />;
   }
 
   const joinDate = getJoinDateFromObjectId(user._id);
-  const imageUrl =
-    user.imageId && user.imageId !== "default-profile"
-      ? `${S3_URL}/images/${user.imageId}`
-      : null; // Will show fallback
 
   return (
     <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
@@ -70,19 +71,11 @@ const AccountOverview = () => {
       {/* --- Main Content --- */}
       <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col md:flex-row items-start gap-8">
         <div className="flex-shrink-0 w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt="Profile"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/128/eeeeee/aaaaaa?text=User";
-              }}
-            />
-          ) : (
-            <User className="w-20 h-20 text-gray-400" />
-          )}
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png"
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Profile Details */}

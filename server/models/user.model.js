@@ -55,6 +55,10 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    wallet: {
+      type: Number,
+      default: 0,
+    },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

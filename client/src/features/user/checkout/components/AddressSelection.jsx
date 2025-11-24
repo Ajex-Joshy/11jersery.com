@@ -71,7 +71,6 @@ const AddressSelection = ({ selectedId, onSelect }) => {
                       </span>
                     )}
                   </div>
-
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

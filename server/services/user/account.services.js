@@ -2,6 +2,7 @@ import redisClient from "../../config/redis-client.js";
 import User from "../../models/user.model.js";
 import { STATUS_CODES } from "../../utils/constants.js";
 import { sendEmail } from "../../utils/email-service.js";
+import { verifyEmailChangeTemplate } from "../../utils/email-templates/verify-email-change-otp.js";
 import { AppError } from "../../utils/helpers.js";
 import bcrypt from "bcrypt";
 
@@ -61,7 +62,7 @@ export const requestEmailChange = async (userId, newEmail) => {
     `emailChange:${userId}`,
     JSON.stringify({ otp, newEmail }),
     "EX",
-    600 // 10 minutes expiry
+    600
   );
 
   await user.save();
@@ -69,7 +70,7 @@ export const requestEmailChange = async (userId, newEmail) => {
   await sendEmail({
     to: newEmail,
     subject: "Verify Your New Email",
-    html: `Your OTP to verify your new email is: ${otp}`,
+    html: verifyEmailChangeTemplate(otp),
   });
 
   return { message: "OTP sent to new email" };

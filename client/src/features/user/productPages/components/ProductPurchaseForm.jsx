@@ -7,6 +7,7 @@ import { useIncrementItem } from "../../cart/cartHooks";
 import { useDecrementItem } from "../../cart/cartHooks";
 import { useCart } from "../../cart/cartHooks";
 import { useEffect } from "react";
+import PropTypes from "prop-types";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
@@ -79,9 +80,6 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
           setQuantity(1);
           toast.success("Item added to cart");
         },
-        onError: (error) => {
-          toast.error(error?.response?.data?.message || "Failed to add item");
-        },
       });
 
       return;
@@ -135,9 +133,6 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
     addItemToCart(payload, {
       onSuccess: () => {
         toast.success("Added to cart!");
-      },
-      onError: (error) => {
-        toast.error(error?.response?.data?.message || "Failed to add to cart");
       },
     });
   };
@@ -270,6 +265,29 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
       </div>
     </div>
   );
+};
+
+ProductPurchaseForm.propTypes = {
+  product: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    rating: PropTypes.shape({
+      average: PropTypes.number.isRequired,
+    }).isRequired,
+    shortDescription: PropTypes.string,
+    price: PropTypes.shape({
+      list: PropTypes.number.isRequired,
+      sale: PropTypes.number.isRequired,
+    }).isRequired,
+    variants: PropTypes.arrayOf(
+      PropTypes.shape({
+        sku: PropTypes.string.isRequired,
+        size: PropTypes.string.isRequired,
+        stock: PropTypes.number.isRequired,
+      })
+    ),
+  }).isRequired,
+  onOpenSizeGuide: PropTypes.func.isRequired,
 };
 
 export default ProductPurchaseForm;

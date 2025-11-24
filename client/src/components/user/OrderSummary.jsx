@@ -1,23 +1,24 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Tag, Loader2 } from "lucide-react";
+import { useCart } from "../../features/user/cart/cartHooks";
+import { LoadingSpinner, ErrorDisplay } from "../common/StateDisplays";
 
 /**
  * Reusable component for showing order totals.
  * Used in CartPage and CheckoutPage.
  */
-export const OrderSummary = ({
-  subtotal,
-  total,
-  discount,
-  deliveryFee,
-  onApplyPromo,
-  onCheckout,
-  isCheckoutPage = false, // Hides promo form/checkout btn on checkout page
-  isProcessing = false, // For loading state on checkout button
-}) => {
+export const OrderSummary = ({ isCheckoutPage }) => {
   const [promoCode, setPromoCode] = useState("");
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const onCheckout = () => {
+    setIsProcessing(true);
+    navigate("/checkout");
+  };
 
   const handleApplyPromo = () => {
     if (!promoCode) return;
@@ -29,8 +30,19 @@ export const OrderSummary = ({
       setPromoCode("");
     }, 1000);
   };
-  console.log(deliveryFee);
+  const {
+    data: cartPayload,
+    isLoading: isCartLoading,
+    isError,
+    error,
+  } = useCart();
 
+  const { subtotal, total, discountedPrice, deliveryFee } =
+    cartPayload?.data || {};
+  const discount = subtotal - discountedPrice;
+  if (isCartLoading) return <LoadingSpinner text="Loading checkout..." />;
+  if (isError) return <ErrorDisplay error={error} />;
+  console.log(cartPayload);
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 sticky top-24">
       <h2 className="text-xl font-semibold mb-6 border-b pb-4">

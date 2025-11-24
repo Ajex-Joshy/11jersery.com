@@ -82,13 +82,10 @@ export const useAdminOrderDetails = (orderId) => {
 
   const order = orderPayload?.data?.order;
 
-  // 3. Helper Logic
   const canCancelOrder =
     order && ["Pending", "Processing"].includes(order.orderStatus);
 
-  // Helper to check if an individual item can be cancelled/returned
   const getItemStatus = (item) => {
-    // Logic depends on your backend status flow
     const isCancellable = ["Pending", "Processing"].includes(item.status);
     const isReturnable = item.status === "Delivered"; // Add return window check if needed
     return { isCancellable, isReturnable };
@@ -113,4 +110,77 @@ export const useAdminOrderDetails = (orderId) => {
       getItemStatus,
     },
   };
+};
+
+export const ADMIN_RETURNS_KEY = "adminReturns";
+
+export const useAdminReturnRequests = (params) => {
+  return useQuery({
+    queryKey: [ADMIN_RETURNS_KEY, params],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/admin/orders/returns", {
+        params,
+      });
+      console.log(data);
+      return data;
+    },
+    keepPreviousData: true,
+  });
+};
+
+export const useApproveReturn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, itemId }) => {
+      // If itemId is provided, call item endpoint, else order endpoint (if you implemented it)
+      const url = itemId
+        ? `/admin/orders/${orderId}/items/${itemId}/return/approve`
+        : `/admin/orders/${orderId}/return/approve`;
+      await axiosInstance.patch(url);
+    },
+    onSuccess: () => {
+      toast.success("Return approved");
+      queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
+    },
+    onError: (err) =>
+      toast.error(err.response?.data?.error?.message || "Failed to approve"),
+  });
+};
+
+// Reject Return Mutation
+export const useRejectReturn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, itemId, reason }) => {
+      const url = itemId
+        ? `/admin/orders/${orderId}/items/${itemId}/return/reject`
+        : `/admin/orders/${orderId}/return/reject`;
+      await axiosInstance.patch(url, { reason });
+    },
+    onSuccess: () => {
+      toast.success("Return rejected");
+      queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
+    },
+    onError: (err) =>
+      toast.error(err.response?.data?.error?.message || "Failed to reject"),
+  });
+};
+
+// Confirm Receipt Mutation
+export const useConfirmReturnReceived = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, itemId }) => {
+      const url = `/admin/orders/${orderId}/items/${itemId}/return/confirm`;
+      await axiosInstance.patch(url);
+    },
+    onSuccess: () => {
+      toast.success("Return receipt confirmed & refunded");
+      queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
+    },
+    onError: (err) =>
+      toast.error(
+        err.response?.data?.error?.message || "Failed to confirm receipt"
+      ),
+  });
 };

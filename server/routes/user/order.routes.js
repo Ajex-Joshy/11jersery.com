@@ -8,15 +8,17 @@ import {
   cancelOrderController,
   requestOrderReturnController,
   requestItemReturnController,
+  placeWalletOrderController,
   // submitProductReviewController,
 } from "../../controllers/user/order.controller.js";
 import { generateInvoiceController } from "../../controllers/user/order.controller.js";
-import { validateCodOrder } from "../../validators/user/order.validator.js";
 
 const router = express.Router();
 router.use(authenticateUser);
 
-router.post("/cod", validateCodOrder, placeCodOrderController);
+router.post("/cod", placeCodOrderController);
+
+router.post("/wallet", placeWalletOrderController);
 
 router.get("/", listUserOrdersController);
 

@@ -1,6 +1,7 @@
 import Order from "../../../models/order.model.js";
 import { AppError } from "../../../utils/helpers.js";
 import { STATUS_CODES } from "../../../utils/constants.js";
+import Transaction from "../../../models/order-transaction.model.js";
 
 export const updateOrderStatus = async (orderId, status) => {
   const order = await Order.findById(orderId);
@@ -13,8 +14,6 @@ export const updateOrderStatus = async (orderId, status) => {
     Processing: ["Shipped", "Cancelled"],
     Shipped: ["Delivered"],
     Delivered: [],
-    Cancelled: [],
-    Returned: [],
   };
   if (!validTransitions[order.orderStatus]?.includes(status)) {
     throw new AppError(
@@ -36,8 +35,28 @@ export const updateOrderStatus = async (orderId, status) => {
     order.timeline[timelineMap[status]] = new Date();
   }
 
-  // Sync item statuses
-  order.items.forEach((i) => (i.status = status));
+  order.items.forEach((i) => {
+    if (
+      ["Cancelled", "Return Request", "Return Approved", "Returened"].includes(
+        i.status
+      )
+    )
+      return;
+    i.status = status;
+  });
+  if (status === "Delivered") {
+    order.payment.status = "Paid";
+
+    if (order.transactionIds?.length) {
+      const latestTransactionId =
+        order.transactionIds[order.transactionIds.length - 1];
+      const transaction = await Transaction.findById(latestTransactionId);
+      if (transaction) {
+        transaction.status = "SUCCESS";
+        await transaction.save();
+      }
+    }
+  }
 
   await order.save();
   return order;

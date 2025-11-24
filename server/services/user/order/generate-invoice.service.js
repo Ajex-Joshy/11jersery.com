@@ -92,7 +92,7 @@ export const generateInvoice = async (userId, orderId, res) => {
         customerY + 45
       )
       .text(order.shippingAddress.country, 50, customerY + 60)
-      .text(`Phone: ${order.shippingAddress.phone}`, 50, customerY + 75)
+      .text(`Phone: ${order.shippingAddress.phoneNumber}`, 50, customerY + 75)
       .text(`Email: ${order.shippingAddress.email}`, 50, customerY + 90);
 
     doc.moveDown(4);
@@ -111,8 +111,8 @@ export const generateInvoice = async (userId, orderId, res) => {
       .text("Item", itemCodeX, tableTop, { bold: true })
       .text("Description", descriptionX, tableTop)
       .text("Qty", quantityX, tableTop)
-      .text("Price", priceX, tableTop)
-      .text("Total", totalX, tableTop);
+      .text("List Price", priceX, tableTop)
+      .text("Amount", totalX, tableTop);
 
     doc
       .strokeColor(lineColor)
@@ -125,10 +125,7 @@ export const generateInvoice = async (userId, orderId, res) => {
     let y = tableTop + 30;
 
     order.items.forEach((item) => {
-      const itemTotal = item.salePrice * item.quantity;
-      totalItemsPrice += itemTotal;
-
-      // Handle long titles (basic wrapping)
+      if (["Cancelled", "Returned"].includes(item.status)) return;
       const title =
         item.title.length > 40
           ? item.title.substring(0, 37) + "..."

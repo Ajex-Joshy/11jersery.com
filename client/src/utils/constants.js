@@ -1,4 +1,5 @@
 export const S3_URL = "https://11jersey.com-images.s3.eu-north-1.amazonaws.com";
+import { Wallet, CreditCard, Banknote } from "lucide-react";
 
 export const indianStates = [
   "Andhra Pradesh",
@@ -51,4 +52,31 @@ export const orderStatusOptions = [
   { label: "Delivered", value: "Delivered" },
   { label: "Cancelled", value: "Cancelled" },
   { label: "Returned", value: "Returned" },
+];
+
+export const ICON_MAP = {
+  Wallet,
+  CreditCard,
+  Banknote,
+};
+
+export const paymentMethods = [
+  {
+    id: "wallet",
+    title: "Wallet",
+    description: "Pay using your 11jersey.com wallet balance",
+    icon: "Wallet",
+  },
+  {
+    id: "online",
+    title: "Online Payment",
+    description: "UPI, Cards, Netbanking, Wallets & EMI",
+    icon: "CreditCard",
+  },
+  {
+    id: "cod",
+    title: "Cash on Delivery (COD)",
+    description: "Pay with cash upon delivery",
+    icon: "Banknote",
+  },
 ];

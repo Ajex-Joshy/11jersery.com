@@ -1,156 +1,56 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  ChevronRight,
-  CreditCard,
-  Wallet,
-  Banknote,
-  ShieldCheck,
-  Lock,
-} from "lucide-react";
+import { ChevronRight, ShieldCheck, Lock } from "lucide-react";
 import toast from "react-hot-toast";
-
 // Hooks
 import { useCart } from "../cart/cartHooks";
-import { usePlaceOrder } from "../order/orderHooks";
-import { useGetAddressById } from "../address/addressHooks";
+import { useProcessOrder } from "./useProcesOrder";
 // Components
 import { OrderSummary } from "../../../components/user/OrderSummary";
 import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
-
-const PaymentMethodOption = ({
-  id,
-  title,
-  description,
-  icon: Icon,
-  selected,
-  onSelect,
-}) => (
-  <div
-    onClick={() => onSelect(id)}
-    className={`
-      relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 flex items-center gap-4
-      ${
-        selected
-          ? "border-black bg-gray-50 ring-1 ring-black"
-          : "border-gray-200 hover:border-gray-300 bg-white"
-      }
-    `}
-  >
-    <div
-      className={`p-3 rounded-full ${
-        selected ? "bg-black text-white" : "bg-gray-100 text-gray-500"
-      }`}
-    >
-      <Icon size={24} />
-    </div>
-    <div className="flex-1">
-      <h3 className={`font-bold ${selected ? "text-black" : "text-gray-900"}`}>
-        {title}
-      </h3>
-      <p className="text-sm text-gray-500">{description}</p>
-    </div>
-    <div
-      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-        selected ? "border-black" : "border-gray-300"
-      }`}
-    >
-      {selected && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
-    </div>
-  </div>
-);
+import PaymentMethodOption from "./components/PaymentMethodOption";
+import { paymentMethods } from "../../../utils/constants";
+import { ICON_MAP } from "../../../utils/constants";
 
 const PaymentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { processOrder, isProcessing } = useProcessOrder();
   const selectedAddressId = location.state?.selectedAddressId;
 
   const { data: cartPayload, isLoading, isError, error } = useCart();
-  const {
-    data: addressPayload,
-    isLoading: isAddressLoading,
-    isError: isAddressError,
-    error: addressError,
-  } = useGetAddressById(selectedAddressId);
 
-  const [selectedMethod, setSelectedMethod] = useState("cod"); // Default to COD
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const placeOrderMutation = usePlaceOrder();
+  const [selectedMethod, setSelectedMethod] = useState("wallet");
 
   // Loading/Error States
-  if (isLoading || isAddressLoading)
-    return <LoadingSpinner text="Loading payment options..." />;
+  if (isLoading) return <LoadingSpinner text="Loading payment options..." />;
   if (isError) return <ErrorDisplay error={error} />;
-  if (isAddressError) return <ErrorDisplay error={addressError} />;
 
   const cart = cartPayload?.data || {};
   const items = cart.items || [];
-  const selectedAddress = addressPayload?.data?.address;
+  useEffect(() => {
+    if (items.length === 0) {
+      navigate("/cart");
+    }
+  }, [items, navigate]);
 
-  if (items.length === 0) {
-    navigate("/cart"); // Redirect if empty
-    return null;
-  }
-
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!selectedMethod) {
       toast.error("Please select a payment method");
       return;
     }
-
-    setIsProcessing(true);
-    console.log(cart, "cart");
-    console.log(selectedAddress);
-
-    const ItemsRequiredFields = items.map(({ productId, size, quantity }) => ({
-      productId,
-      size,
-      quantity,
-    }));
-
-    const filteredAddress = {
-      firstName: selectedAddress.firstName,
-      lastName: selectedAddress.lastName,
-      phone: selectedAddress.phoneNumber,
-      pinCode: selectedAddress.pinCode,
-      state: selectedAddress.state,
-      city: selectedAddress.city,
-      country: selectedAddress.country,
-      email: selectedAddress.email,
-      addressLine1: selectedAddress.addressLine1,
-      addressLine2: selectedAddress.addressLine2,
-    };
-    const orderData = {
-      items: ItemsRequiredFields,
-      shippingAddress: filteredAddress,
-    };
-
-    placeOrderMutation.mutate(orderData, {
-      onSuccess: (data) => {
-        setIsProcessing(false);
-        toast.success("Order placed successfully!");
-        const orderId = data?.data?._id;
-        navigate(`/order-confirmation/${orderId}`);
-      },
-      onError: (err) => {
-        console.log(err);
-        setIsProcessing(false);
-        toast.error(
-          err?.response?.data?.error?.message || "Failed to place order"
-        );
-      },
-    });
+    processOrder(selectedMethod, selectedAddressId);
   };
 
   // Determine button text based on selected method
   const getButtonText = () => {
     if (isProcessing) return "Processing...";
-    if (selectedMethod === "cod") return "Place Order";
-    return "Pay with Razorpay"; // For Card and UPI
+    if (selectedMethod === "cod" || selectedMethod === "wallet")
+      return "Place Order";
+    return "Pay with Razorpay";
   };
 
   return (
@@ -176,32 +76,20 @@ const PaymentPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* --- LEFT COLUMN (Payment Methods) --- */}
           <div className="lg:col-span-7 space-y-6">
-            <PaymentMethodOption
-              id="card"
-              title="Credit / Debit Card"
-              description="Pay securely with Visa, Mastercard, or Rupay via Razorpay"
-              icon={CreditCard}
-              selected={selectedMethod === "card"}
-              onSelect={setSelectedMethod}
-            />
-
-            <PaymentMethodOption
-              id="upi"
-              title="UPI"
-              description="Google Pay, PhonePe, Paytm, BHIM via Razorpay"
-              icon={Wallet} // Reusing wallet icon for UPI generic
-              selected={selectedMethod === "upi"}
-              onSelect={setSelectedMethod}
-            />
-
-            <PaymentMethodOption
-              id="cod"
-              title="Cash on Delivery (COD)"
-              description="Pay with cash upon delivery"
-              icon={Banknote}
-              selected={selectedMethod === "cod"}
-              onSelect={setSelectedMethod}
-            />
+            {paymentMethods.map((method) => {
+              const Icon = ICON_MAP[method.icon];
+              return (
+                <PaymentMethodOption
+                  key={method.id}
+                  id={method.id}
+                  title={method.title}
+                  description={method.description}
+                  icon={Icon}
+                  selected={selectedMethod === method.id}
+                  onSelect={setSelectedMethod}
+                />
+              );
+            })}
 
             {/* Security Notice */}
             <div className="bg-blue-50 p-4 rounded-lg flex gap-3 text-sm text-blue-800 mt-6">
@@ -216,35 +104,11 @@ const PaymentPage = () => {
           {/* --- RIGHT COLUMN (Sidebar/Sticky) --- */}
           <div className="lg:col-span-5">
             <div className="sticky top-24 space-y-6">
-              {/* Price Summary & Action */}
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <OrderSummary
-                  subtotal={cart.subtotal}
-                  total={cart.total}
-                  discount={cart.discount}
-                  deliveryFee={cart.deliveryFee}
                   isCheckoutPage={true} // Hide promo input
-                  onCheckout={handlePlaceOrder} // This button now places the order
-                  isProcessing={isProcessing}
-
-                  // You might need to update OrderSummary to accept custom button text if it doesn't already
-                  // If OrderSummary hardcodes "Checkout" or "Place Order", you'll need to update it
-                  // to accept a prop like `checkoutButtonText`.
-                  // Assuming OrderSummary accepts children or a text prop, otherwise modify OrderSummary.
                 />
-
-                {/* Since OrderSummary likely has a hardcoded button, we can OVERRIDE it by 
-                   passing a custom button if OrderSummary supports it, OR (easier here)
-                   we can just render the button *outside* OrderSummary if OrderSummary is flexible,
-                   BUT since OrderSummary encapsulates the button, we should modify OrderSummary
-                   to accept the button text.
-                */}
               </div>
-
-              {/* ALTERNATE APPROACH if OrderSummary is rigid:
-                  Use the OrderSummary only for display (pass a prop to hide its button)
-                  and render the custom button here.
-               */}
               <button
                 onClick={handlePlaceOrder}
                 disabled={isProcessing}

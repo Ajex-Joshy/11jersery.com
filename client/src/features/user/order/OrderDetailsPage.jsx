@@ -8,259 +8,316 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import { OrderTimeline } from "./components/OrderTimeline";
+import OrderTimeline from "./components/OrderTimeline";
 import { OrderItem } from "./components/OrderItem";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
 import InvoiceDownloadButton from "../../../components/user/Buttons";
-import { useOrderDetails } from "./orderHooks";
 import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
 import FeeWarningModal from "./components/FeeWarningModal";
+import { useOrderDetails } from "./orderHooks";
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const [cancelReason, setCancelReason] = useState("");
+
+  // State for input reason (for cancel/return)
+  const [actionReason, setActionReason] = useState("");
+
+  // Modal States
   const [feeWarning, setFeeWarning] = useState({
     isOpen: false,
     onProceed: null,
   });
-  const [cancelModal, setCancelModal] = useState({
+
+  // Unified Modal State for Cancel AND Return actions
+  const [actionModal, setActionModal] = useState({
     isOpen: false,
-    type: null,
+    action: null, // 'cancel_order', 'cancel_item', 'return_order', 'return_item'
     itemId: null,
   });
 
-  const { order, isLoading, isError, error, actions, state } =
+  // Fetch data using the custom hook
+  const { order, isLoading, isError, error, actions, state, helpers } =
     useOrderDetails(orderId);
-
-  // Modal State for Cancellation
 
   if (isLoading) return <LoadingSpinner text="Loading order details..." />;
   if (isError) return <ErrorDisplay error={error} />;
   if (!order) return <div className="p-8 text-center">Order not found</div>;
 
-  const handleCancelClick = (type, itemId = null) => {
-    let newTotal = order.price.discountedPrice;
+  // --- Handler for Action Clicks (Cancel OR Return) ---
+  const handleActionClick = (action, itemId = null) => {
+    setActionReason(""); // Reset reason input
 
-    if (type === "item" && itemId) {
-      const itemToCancel = order.items.find((item) => item._id === itemId);
-      if (itemToCancel) {
-        newTotal -= itemToCancel.salePrice * itemToCancel.quantity;
+    // Fee Warning Logic (Only applies to cancellation)
+    if (action.startsWith("cancel")) {
+      let newTotal = order.price.discountedPrice;
+
+      // Calculate potential new total to check for fee threshold
+      if (action === "cancel_item" && itemId) {
+        const item = order.items.find((i) => i._id === itemId);
+        if (item) newTotal -= item.salePrice * item.quantity;
+      } else if (action === "cancel_order") {
+        newTotal = 0;
       }
-    } else if (type === "order") {
-      newTotal = 0;
+
+      // If new total drops below 500 (example threshold), show warning
+      if (newTotal > 0 && newTotal < 500) {
+        setFeeWarning({
+          isOpen: true,
+          onProceed: () => {
+            setFeeWarning({ isOpen: false, onProceed: null });
+            setActionModal({ isOpen: true, action, itemId });
+          },
+        });
+        return;
+      }
     }
 
-    if (newTotal > 0 && newTotal < 500) {
-      setFeeWarning({
-        isOpen: true,
-        onProceed: () => {
-          setFeeWarning({ isOpen: false, onProceed: null });
-          setCancelModal({ isOpen: true, type, itemId });
-        },
-      });
-      return;
-    }
-
-    setCancelModal({ isOpen: true, type, itemId });
+    // Open the main action modal directly
+    setActionModal({ isOpen: true, action, itemId });
   };
 
-  const confirmCancel = () => {
-    if (cancelModal.type === "order") {
-      actions.cancelOrder(cancelReason);
-    } else if (cancelModal.type === "item") {
-      actions.cancelItem(cancelModal.itemId, cancelReason);
-    }
-    setCancelModal({ isOpen: false, type: null, itemId: null });
-    setCancelReason("");
+  // --- Confirm Action Handler ---
+  const confirmAction = () => {
+    const { action, itemId } = actionModal;
+
+    // Call the appropriate action from the hook
+    if (action === "cancel_order") actions.cancelOrder(actionReason);
+    else if (action === "cancel_item") actions.cancelItem(itemId, actionReason);
+    else if (action === "return_order") actions.returnOrder(actionReason);
+    else if (action === "return_item") actions.returnItem(itemId, actionReason);
+
+    // Close modal and reset state
+    setActionModal({ isOpen: false, action: null, itemId: null });
+    setActionReason("");
   };
+
+  // --- Helper to determine modal text based on action type ---
+  const isReturn = actionModal.action?.startsWith("return");
+
+  const modalTitle = isReturn
+    ? actionModal.action === "return_order"
+      ? "Return Entire Order?"
+      : "Return Item?"
+    : actionModal.action === "cancel_order"
+    ? "Cancel Entire Order?"
+    : "Cancel Item?";
+
+  const modalMessage = isReturn
+    ? "Please confirm you want to return this. Our courier partner will pick it up."
+    : "Are you sure you want to cancel? This action cannot be undone.";
 
   return (
-    <div>
-      {/* --- Header --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-200 rounded-full text-gray-600"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Order #{order.orderId || order._id.slice(-6).toUpperCase()}
-            </h1>
-            <p className="text-sm text-gray-500">
-              Placed on{" "}
-              {new Date(order.timeline.placedAt).toLocaleString("en-IN")}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          {/* Use your reusable Invoice Button */}
-          <InvoiceDownloadButton
-            order={order}
-            variant="default"
-            className="border-gray-300 text-gray-700"
-          />
-
-          {state.canCancelOrder && (
+    <div className=" min-h-screen pb-20">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* --- Header --- */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => handleCancelClick("order")}
-              disabled={state.isCancelling}
-              className="px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-medium rounded-md hover:bg-red-50 transition"
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-gray-200 rounded-full text-gray-600 transition-colors"
             >
-              Cancel Order
+              <ArrowLeft size={20} />
             </button>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* --- Left Column (Timeline & Items) --- */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Timeline Card */}
-          <OrderTimeline timeline={order.timeline} status={order.orderStatus} />
-
-          {/* Items List */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="font-semibold text-gray-900">
-                Items ({order.items.length})
-              </h2>
-              <span
-                className={`text-xs font-bold px-2 py-1 rounded-full ${
-                  order.payment.status === "Paid"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-800"
-                }`}
-              >
-                Payment: {order.payment.status}
-              </span>
-            </div>
             <div>
-              {order.items.map((item) => (
-                <OrderItem
-                  key={item._id}
-                  item={item}
-                  onCancelItem={(id) => handleCancelClick("item", id)}
-                />
-              ))}
+              <h1 className="text-2xl font-bold text-gray-900">
+                Order #{order.orderId || order._id.slice(-6).toUpperCase()}
+              </h1>
+              <p className="text-sm text-gray-500">
+                Placed on{" "}
+                {new Date(order.timeline.placedAt).toLocaleString("en-IN")}
+              </p>
             </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {/* Invoice Button */}
+            <InvoiceDownloadButton
+              order={order}
+              className="border-gray-300 text-gray-700"
+            />
+
+            {/* Cancel Order Button (if eligible) */}
+            {state.canCancelOrder && (
+              <button
+                onClick={() => handleActionClick("cancel_order")}
+                disabled={state.isCancelling}
+                className="px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-medium rounded-md hover:bg-red-50 transition disabled:opacity-50"
+              >
+                Cancel Order
+              </button>
+            )}
+
+            {/* Return Order Button (if eligible) */}
+            {state.canReturnOrder && (
+              <button
+                onClick={() => handleActionClick("return_order")}
+                disabled={state.isReturning}
+                className="px-4 py-2 bg-white border border-blue-200 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition disabled:opacity-50"
+              >
+                Return Order
+              </button>
+            )}
           </div>
         </div>
 
-        {/* --- Right Column (Summary & Address) --- */}
-        <div className="space-y-6">
-          {/* Shipping Address */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin size={18} className="text-gray-400" /> Shipping Details
-            </h2>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p className="font-medium text-gray-900">
-                {order.shippingAddress.firstName}{" "}
-                {order.shippingAddress.lastName}
-              </p>
-              <p>{order.shippingAddress.addressLine1}</p>
-              {order.shippingAddress.addressLine2 && (
-                <p>{order.shippingAddress.addressLine2}</p>
-              )}
-              <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state} -{" "}
-                {order.shippingAddress.pinCode}
-              </p>
-              <p>{order.shippingAddress.country}</p>
-              <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-2">
-                <p className="flex items-center gap-2">
-                  <Phone size={14} /> {order.shippingAddress.phone}
-                </p>
-                <p className="flex items-center gap-2">
-                  <User size={14} /> {order.shippingAddress.email}
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* --- Left Column (Timeline & Items) --- */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Timeline Card */}
+            <OrderTimeline
+              timeline={order.timeline}
+              status={order.orderStatus}
+            />
+
+            {/* Items List */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
+                <h2 className="font-semibold text-gray-900">
+                  Items ({order.items.length})
+                </h2>
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded-full ${
+                    order.payment.status === "Paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  Payment: {order.payment.status}
+                </span>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {order.items.map((item) => (
+                  <OrderItem
+                    key={item._id}
+                    item={item}
+                    // Pass action handlers
+                    onCancelItem={(id) => handleActionClick("cancel_item", id)}
+                    onReturnItem={(id) => handleActionClick("return_item", id)}
+                    // Pass computed eligibility from hook
+                    canReturn={helpers.getItemStatus(item).isReturnable}
+                  />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Price Summary */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <CreditCard size={18} className="text-gray-400" /> Payment Summary
-            </h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Subtotal</span>
-                <span>₹{order.price.subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Discount</span>
-                <span className="text-green-600">
-                  - ₹
-                  {(
-                    order.price.subtotal - order.price.discountedPrice
-                  ).toLocaleString()}
+          {/* --- Right Column (Summary & Address) --- */}
+          <div className="space-y-6">
+            {/* Shipping Address */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              {/* ... (Same address display code as before) ... */}
+              <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                Shipping Address
+              </h2>
+              <address className="not-italic text-sm text-gray-600 leading-relaxed">
+                <strong className="text-gray-900 block mb-1">
+                  {order.shippingAddress.firstName}{" "}
+                  {order.shippingAddress.lastName}
+                </strong>
+                {order.shippingAddress.addressLine1}
+                <br />
+                {order.shippingAddress.addressLine2 && (
+                  <>
+                    {order.shippingAddress.addressLine2}
+                    <br />
+                  </>
+                )}
+                {order.shippingAddress.city}, {order.shippingAddress.state}
+                <br />
+                {order.shippingAddress.country} -{" "}
+                {order.shippingAddress.pinCode}
+                <br />
+                <span className="block mt-2">
+                  Phone: {order.shippingAddress.phone}
                 </span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Delivery</span>
-                <span>
-                  {order.price.deliveryFee === 0
-                    ? "Free"
-                    : `₹${order.price.deliveryFee}`}
-                </span>
-              </div>
-              <div className="pt-3 mt-3 border-t border-gray-100 flex justify-between items-center font-bold text-gray-900 text-base">
-                <span>Total</span>
-                <span>₹{order.price.total.toLocaleString()}</span>
-              </div>
-              <div className="pt-2">
-                <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded text-center">
-                  Paid via {order.payment.method}
+              </address>
+            </div>
+
+            {/* Price Summary */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              {/* ... (Same price summary code as before) ... */}
+              <h2 className="font-semibold text-gray-900 mb-4">
+                Payment Summary
+              </h2>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>₹{order.price.subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Discount</span>
+                  <span className="text-green-600">
+                    - ₹
+                    {(
+                      order.price.subtotal - order.price.discountedPrice
+                    ).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Delivery</span>
+                  <span>
+                    {order.price.deliveryFee === 0
+                      ? "Free"
+                      : `₹${order.price.deliveryFee}`}
+                  </span>
+                </div>
+                <div className="pt-3 mt-3 border-t border-gray-100 flex justify-between items-center font-bold text-gray-900 text-base">
+                  <span>Total</span>
+                  <span>₹{order.price.total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Confirmation Modal for Cancellation */}
-      <FeeWarningModal
-        isOpen={feeWarning.isOpen}
-        onClose={() => setFeeWarning({ isOpen: false, onProceed: null })}
-        onProceed={feeWarning.onProceed}
-      />
-      <ConfirmationModal
-        isOpen={cancelModal.isOpen}
-        onClose={() => setCancelModal({ ...cancelModal, isOpen: false })}
-        onConfirm={confirmCancel}
-        title={
-          cancelModal.type === "order" ? "Cancel Entire Order?" : "Cancel Item?"
-        }
-        message={
-          cancelModal.type === "order"
-            ? "Are you sure you want to cancel this order? This action cannot be undone."
-            : "Are you sure you want to cancel this specific item?"
-        }
-        confirmButtonText="Yes, Cancel"
-        confirmButtonVariant="danger"
-        isLoading={state.isCancelling || state.isItemCancelling}
-      >
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Reason (Optional)
-          </label>
-          <textarea
-            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-black focus:border-black"
-            rows={3}
-            placeholder="Why are you cancelling?"
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-          />
-        </div>
-      </ConfirmationModal>
+        {/* --- Modals --- */}
+
+        {/* Fee Warning Modal (for cancellations below threshold) */}
+        <FeeWarningModal
+          isOpen={feeWarning.isOpen}
+          onClose={() => setFeeWarning({ isOpen: false, onProceed: null })}
+          onProceed={feeWarning.onProceed}
+        />
+
+        {/* Main Confirmation Modal (for Cancel & Return) */}
+        <ConfirmationModal
+          isOpen={actionModal.isOpen}
+          onClose={() => setActionModal({ ...actionModal, isOpen: false })}
+          onConfirm={confirmAction}
+          title={modalTitle}
+          message={modalMessage}
+          confirmButtonText={isReturn ? "Confirm Return" : "Yes, Cancel"}
+          confirmButtonVariant={isReturn ? "primary" : "danger"}
+          isLoading={
+            state.isCancelling ||
+            state.isItemCancelling ||
+            state.isReturning ||
+            state.isItemReturning
+          }
+        >
+          {/* Input Field as Children */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reason {isReturn ? "(Required)" : "(Optional)"}
+            </label>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-black focus:border-black focus:outline-none"
+              rows={3}
+              placeholder={
+                isReturn
+                  ? "Why are you returning this? (e.g. Size too small)"
+                  : "Why are you cancelling?"
+              }
+              value={actionReason}
+              onChange={(e) => setActionReason(e.target.value)}
+            />
+          </div>
+        </ConfirmationModal>
+      </div>
     </div>
   );
 };

@@ -124,7 +124,6 @@ const AddAddressPage = () => {
               error={errors.lastName?.message}
             />
           </div>
-
           <div className="mb-4">
             <FormInput
               label="Pin Code*"
@@ -133,7 +132,6 @@ const AddAddressPage = () => {
               error={errors.pinCode?.message}
             />
           </div>
-
           <div className="mb-4">
             <FormInput
               label="Address Line 1*"
@@ -142,7 +140,6 @@ const AddAddressPage = () => {
               error={errors.addressLine1?.message}
             />
           </div>
-
           <div className="mb-4">
             <FormInput
               label="Address Line 2"
@@ -153,26 +150,6 @@ const AddAddressPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            {/* City Dropdown or Input */}
-            <div className="flex flex-col">
-              <label
-                htmlFor="city"
-                className="mb-1 text-sm font-medium text-gray-700"
-              >
-                City*
-              </label>
-              <input
-                id="city"
-                className="border border-gray-300 p-3 rounded-md text-sm"
-                {...register("city")}
-                placeholder="City"
-              />
-              {errors.city && (
-                <span className="text-red-600 text-xs mt-1">
-                  {errors.city.message}
-                </span>
-              )}
-            </div>
             {/* State Dropdown */}
             <div className="flex flex-col">
               <label
@@ -195,6 +172,26 @@ const AddAddressPage = () => {
               {errors.state && (
                 <span className="text-red-600 text-xs mt-1">
                   {errors.state.message}
+                </span>
+              )}
+            </div>
+            {/* City Dropdown or Input */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="city"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                City*
+              </label>
+              <input
+                id="city"
+                className="border border-gray-300 p-3 rounded-md text-sm"
+                {...register("city")}
+                placeholder="City"
+              />
+              {errors.city && (
+                <span className="text-red-600 text-xs mt-1">
+                  {errors.city.message}
                 </span>
               )}
             </div>

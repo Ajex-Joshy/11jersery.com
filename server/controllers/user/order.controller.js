@@ -6,17 +6,33 @@ import {
   cancelItem,
   requestReturnItem,
   requestReturnOrder,
+  placeWalletOrder,
 } from "../../services/user/order/index.js";
 import { STATUS_CODES } from "../../utils/constants.js";
-import { asyncHandler } from "../../utils/helpers.js";
+import {
+  AppError,
+  asyncHandler,
+  validateObjectId,
+} from "../../utils/helpers.js";
 import { sendResponse } from "../../utils/helpers.js";
 import { generateInvoice } from "../../services/user/order/generate-invoice.service.js";
 // PLACE COD ORDER
 export const placeCodOrderController = asyncHandler(async (req, res) => {
-  const { items, shippingAddress } = req.body;
+  const { shippingAddressId } = req.body;
+  validateObjectId(shippingAddressId);
   const userId = req.user._id;
 
-  const order = await placeCodOrder(userId, items, shippingAddress);
+  const order = await placeCodOrder(userId, shippingAddressId);
+
+  return sendResponse(res, order, STATUS_CODES.CREATED);
+});
+
+export const placeWalletOrderController = asyncHandler(async (req, res) => {
+  const { shippingAddressId } = req.body;
+  validateObjectId(shippingAddressId);
+  const userId = req.user._id;
+
+  const order = await placeWalletOrder(userId, shippingAddressId);
 
   return sendResponse(res, order, STATUS_CODES.CREATED);
 });
@@ -67,17 +83,29 @@ export const cancelItemController = asyncHandler(async (req, res) => {
 export const requestOrderReturnController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
+  if (!reason)
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "VALIDATION_ERROR",
+      "Could not find reason"
+    );
   const userId = req.user._id;
 
-  const updated = await requestReturnOrder(userId, orderId, reason);
+  const updatedOrder = await requestReturnOrder(userId, orderId, reason);
 
-  return sendResponse(res, updated);
+  return sendResponse(res, updatedOrder);
 });
 
 // REQUEST ITEM RETURN
 export const requestItemReturnController = asyncHandler(async (req, res) => {
   const { reason } = req.body;
   const { itemId, orderId } = req.params;
+  if (!reason)
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "VALIDATION_ERROR",
+      "Could not find reason"
+    );
   const userId = req.user._id;
 
   const updatedOrder = await requestReturnItem(userId, orderId, itemId, reason);

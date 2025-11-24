@@ -30,6 +30,7 @@ const PAYMENT_STATUS_ENUM = [
   "Refunded",
   "Cancelled",
   "Unpaid",
+  "Refund Initiated",
 ];
 
 const orderItemSchema = new Schema({
@@ -77,7 +78,7 @@ const orderSchema = new Schema(
       city: { type: String, required: true },
       state: { type: String, required: true },
       pinCode: { type: String, required: true },
-      phone: { type: String, required: true },
+      phoneNumber: { type: String, required: true },
       email: { type: String, required: true },
       country: { type: String, default: "India" },
     },
@@ -124,6 +125,8 @@ const orderSchema = new Schema(
       returnRejectedAt: { type: Date },
       returnedAt: { type: Date },
     },
+    cancelReason: { type: String },
+    returnReason: { type: String },
 
     // Admin Notes (Internal use)
     notes: { type: String },

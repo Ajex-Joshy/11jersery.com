@@ -1,7 +1,7 @@
 import axiosInstance from "../../../api/axiosInstance";
 
 export const getUserProfile = async () => {
-  const { data } = await axiosInstance.get("/user/profile");
+  const { data } = await axiosInstance.get(`/account/profile`);
   return data;
 };
 

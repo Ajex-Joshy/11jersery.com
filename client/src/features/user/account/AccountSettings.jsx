@@ -6,6 +6,7 @@ import { ChangePasswordModal } from "./components/ChangePasswordModal";
 import { ErrorDisplay } from "../../../components/common/StateDisplays";
 import { selectCurrentUser } from "./authSlice";
 import toast from "react-hot-toast";
+import { useUserProfile } from "./userHooks";
 
 const SettingsCard = ({ title, children, onEdit }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -36,24 +37,21 @@ const AccountSettingsPage = () => {
   const [modalView, setModalView] = useState(null); // 'personal' | 'password' | null
 
   // Fetch fresh profile data
-  //   const { data: profilePayload, isLoading, isError, error } = useUserProfile();
+  const { data: profilePayload, isLoading, isError, error } = useUserProfile();
+  const userFromStore = useSelector(selectCurrentUser);
 
   // Get data from Redux as a fallback/initial state
-
-  // Prioritize fresh data from the query, but use store data as a fallback
-  //   const user = profilePayload?.data || userFromStore;
-  const user = useSelector(selectCurrentUser);
+  const user = profilePayload?.data || userFromStore;
 
   // Loading State
-  //   if (isLoading && !user) {
-  //     // Only show full loading if no store data
-  //     return <LoadingSpinner text="Loading Settings..." />;
-  //   }
+  if (isLoading && !user) {
+    return <LoadingSpinner text="Loading Settings..." />;
+  }
 
   // Error State
-  //   if (isError) {
-  //     return <ErrorDisplay error={error} />;
-  //   }
+  if (isError) {
+    return <ErrorDisplay error={error} />;
+  }
 
   // This should not happen if user is logged in, but good to check
   if (!user) {

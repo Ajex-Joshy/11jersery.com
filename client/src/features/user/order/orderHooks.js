@@ -5,13 +5,30 @@ import {
   downloadInvoice,
   getOrderDetails,
   getOrders,
-  placeOrder,
+  placeCODOrder,
+  placeWalletOrder,
   requestReturnItem,
+  returnOrder,
+  returnOrderItem,
 } from "./orderApis";
 import { toast } from "react-hot-toast";
 const ORDER_KEYS = {
   all: ["orders"],
   details: (orderId) => ["orders", orderId],
+};
+export const ORDER_DETAILS_KEY = "orderDetails";
+
+const checkReturnEligibility = (status, deliveredAt) => {
+  if (status !== "Delivered" || !deliveredAt) return false;
+
+  const deliveryDate = new Date(deliveredAt);
+  const currentDate = new Date();
+
+  // Add 7 days to delivery date
+  const returnDeadline = new Date(deliveryDate);
+  returnDeadline.setDate(returnDeadline.getDate() + 7);
+
+  return currentDate <= returnDeadline;
 };
 
 export const useOrders = (searchParams) => {
@@ -25,29 +42,46 @@ export const useOrders = (searchParams) => {
   });
 };
 
-// export const useOrderDetails = (orderId) => {
-//   return useQuery({
-//     queryKey: ORDER_KEYS.details(orderId),
-//     queryFn: () => getOrderDetails(orderId),
-//     enabled: !!orderId,
-//   });
-// };
-export const usePlaceOrder = () => {
+export const usePlaceCODOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: placeOrder,
+    mutationFn: placeCODOrder,
     onSuccess: () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
     },
   });
 };
-
-export const ORDER_DETAILS_KEY = "orderDetails";
-
+export const useWalletPay = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: placeWalletOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries(ORDER_KEYS.all);
+    },
+  });
+};
+export const useRazorpayOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: placeCODOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries(ORDER_KEYS.all);
+    },
+  });
+};
+export const useRazorpayVerify = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: placeCODOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries(ORDER_KEYS.all);
+    },
+  });
+};
 export const useOrderDetails = (orderId) => {
   const queryClient = useQueryClient();
 
-  // 1. Fetch Order Data
+  // 1. Fetch
   const {
     data: orderPayload,
     isLoading,
@@ -57,14 +91,9 @@ export const useOrderDetails = (orderId) => {
     queryKey: [ORDER_DETAILS_KEY, orderId],
     queryFn: () => getOrderDetails(orderId),
     enabled: !!orderId,
-    onError: (err) => {
-      toast.error(
-        err.response?.data?.error?.message || "Failed to fetch order details"
-      );
-    },
   });
 
-  // 2. Mutations
+  // 2. Cancellation Mutations (Existing)
   const { mutate: cancelOrderMutate, isLoading: isCancelling } = useMutation({
     mutationFn: cancelOrder,
     onSuccess: () => {
@@ -72,12 +101,9 @@ export const useOrderDetails = (orderId) => {
       queryClient.invalidateQueries([ORDER_DETAILS_KEY, orderId]);
     },
     onError: (err) =>
-      toast.error(
-        err.response?.data?.error?.message || "Failed to cancel order"
-      ),
+      toast.error(err.response?.data?.message || "Failed to cancel order"),
   });
 
-  // Mutation for individual item cancellation (if supported by backend)
   const { mutate: cancelItemMutate, isLoading: isItemCancelling } = useMutation(
     {
       mutationFn: cancelItem,
@@ -92,17 +118,48 @@ export const useOrderDetails = (orderId) => {
     }
   );
 
+  const { mutate: returnOrderMutate, isLoading: isReturning } = useMutation({
+    mutationFn: returnOrder,
+    onSuccess: () => {
+      toast.success("Return requested successfully");
+      queryClient.invalidateQueries([ORDER_DETAILS_KEY, orderId]);
+    },
+    onError: (err) =>
+      toast.error(
+        err.response?.data?.error?.message || "Failed to request return"
+      ),
+  });
+
+  const { mutate: returnItemMutate, isLoading: isItemReturning } = useMutation({
+    mutationFn: returnOrderItem,
+    onSuccess: () => {
+      toast.success("Item return requested successfully");
+      queryClient.invalidateQueries([ORDER_DETAILS_KEY, orderId]);
+    },
+    onError: (err) =>
+      toast.error(
+        err.response?.data?.error?.message || "Failed to request item return"
+      ),
+  });
+
   const order = orderPayload?.data;
 
-  // 3. Helper Logic
   const canCancelOrder =
     order && ["Pending", "Processing"].includes(order.orderStatus);
 
-  // Helper to check if an individual item can be cancelled/returned
+  // Check if whole order is eligible for return
+  const canReturnOrder =
+    order &&
+    checkReturnEligibility(order.orderStatus, order.timeline?.deliveredAt);
+
+  // Helper for individual items
   const getItemStatus = (item) => {
-    // Logic depends on your backend status flow
     const isCancellable = ["Pending", "Processing"].includes(item.status);
-    const isReturnable = item.status === "Delivered"; // Add return window check if needed
+    // Item is returnable if it's delivered AND the order return window is open AND it hasn't been returned yet
+    const isReturnable =
+      item.status === "Delivered" &&
+      checkReturnEligibility("Delivered", order?.timeline?.deliveredAt);
+
     return { isCancellable, isReturnable };
   };
 
@@ -115,50 +172,23 @@ export const useOrderDetails = (orderId) => {
       cancelOrder: (reason) => cancelOrderMutate({ orderId, reason }),
       cancelItem: (itemId, reason) =>
         cancelItemMutate({ orderId, itemId, reason }),
+      returnOrder: (reason) => returnOrderMutate({ orderId, reason }),
+      returnItem: (itemId, reason) =>
+        returnItemMutate({ orderId, itemId, reason }),
     },
     state: {
       isCancelling,
       isItemCancelling,
+      isReturning, // New
+      isItemReturning, // New
       canCancelOrder,
+      canReturnOrder, // New
     },
     helpers: {
       getItemStatus,
     },
   };
 };
-
-// export const useCancelOrder = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: cancelOrder,
-//     onSuccess: (_, orderId) => {
-//       queryClient.invalidateQueries(ORDER_KEYS.all);
-//       queryClient.invalidateQueries(ORDER_KEYS.details(orderId));
-//     },
-//   });
-// };
-
-// export const useCancelItem = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: cancelItem,
-//     onSuccess: (_, { orderId }) => {
-//       queryClient.invalidateQueries(ORDER_KEYS.details(orderId));
-//       queryClient.invalidateQueries(ORDER_KEYS.all);
-//     },
-//   });
-// };
-
-// export const useRequestReturnItem = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: requestReturnItem,
-//     onSuccess: (_, { orderId }) => {
-//       queryClient.invalidateQueries(ORDER_KEYS.details(orderId));
-//       queryClient.invalidateQueries(ORDER_KEYS.all);
-//     },
-//   });
-// };
 
 export const useDownloadInvoice = () => {
   return useMutation({

@@ -49,7 +49,10 @@ export const getAllOrders = async (queryParams) => {
   if (status && status !== "All") {
     query.orderStatus = status;
   }
-
+  let finalSortBy = sortBy;
+  if (sortBy === "totalAmount") {
+    finalSortBy = "price.total";
+  }
   if (search) {
     const searchRegex = { $regex: search, $options: "i" };
     query.$or = [
@@ -60,7 +63,7 @@ export const getAllOrders = async (queryParams) => {
     ];
   }
   const { pageNumber, pageSize, skip } = getPagination(page, limit);
-  const sort = getSortOption(sortBy, sortOrder);
+  const sort = getSortOption(finalSortBy, sortOrder);
 
   const [orders, totalOrders] = await Promise.all([
     Order.find(query)

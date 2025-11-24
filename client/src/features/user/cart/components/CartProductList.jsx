@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Minus, Trash2, Loader2 } from "lucide-react";
+import {
+  useCart,
+  useDecrementItem,
+  useIncrementItem,
+  useRemoveItemFromCart,
+} from "../cartHooks";
+import toast from "react-hot-toast";
+import {
+  LoadingSpinner,
+  ErrorDisplay,
+} from "../../../../components/common/StateDisplays";
 
 /**
  * A reusable spinner for quantity controls.
@@ -57,18 +68,18 @@ const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
   }
 
   // Get image (use cover image - index 0)
-  const imageUrl = item.productDetails.imageUrl;
+  const imageUrl = item?.imageUrl;
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-200 rounded-lg">
       {/* Image */}
       <Link
-        to={`/product/${item?.productDetails?.slug}`}
+        to={`/product/${item?.slug}`}
         className="w-full sm:w-28 h-28 flex-shrink-0"
       >
         <img
           src={imageUrl}
-          alt={item?.productDetails?.title}
+          alt={item?.title}
           className="w-full h-full object-cover rounded-md bg-gray-100"
           onError={(e) => {
             e.target.src =
@@ -81,15 +92,15 @@ const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <Link
-            to={`/product/${item?.productDetails?.slug}`}
+            to={`/product/${item?.slug}`}
             className="text-md font-semibold text-gray-900 hover:underline"
           >
-            {item?.productDetails?.title}
+            {item?.title}
           </Link>
           <p className="text-sm text-gray-500">Size: {item.size}</p>
         </div>
         <span className="text-md font-bold text-gray-800 mt-2 sm:mt-0">
-          ₹{item.price.toLocaleString()}
+          ₹{item.salePrice.toLocaleString()}
         </span>
       </div>
 
@@ -110,7 +121,7 @@ const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
           value={item.quantity}
           onDecrease={() => onDecrement(item)}
           onIncrease={() => onIncrement(item)}
-          isLoading={isMutating}
+          isLoading={false}
           // maxQuantity={product.stock} // Pass stock if available
         />
       </div>
@@ -121,23 +132,42 @@ const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
 /**
  * The list of cart items. Reusable in cart page, checkout, etc.
  */
-export const CartProductList = ({
-  items,
-  onIncrement,
-  onDecrement,
-  onRemove,
-  mutatingItemId,
-}) => {
+export const CartProductList = () => {
+  const { data: cartPayload, isLoading, isError, error } = useCart();
+  const { mutate: incrementMutate } = useIncrementItem();
+  const { mutate: decrementMutate } = useDecrementItem();
+  const { mutate: removeMutate } = useRemoveItemFromCart();
+
+  const handleIncrement = (item) => {
+    incrementMutate({ itemId: item._id });
+  };
+
+  const handleDecrement = (item) => {
+    if (item.quantity > 1) {
+      decrementMutate({ itemId: item._id });
+    } else {
+      handleRemove(item._id);
+    }
+  };
+
+  const handleRemove = (itemId) => {
+    removeMutate({ itemId });
+  };
+
+  const items = cartPayload?.data?.items || [];
+
+  if (isLoading) return <LoadingSpinner text="Loading checkout..." />;
+  if (isError) return <ErrorDisplay error={error} />;
+
   return (
     <div className="space-y-4">
       {items.map((item) => (
         <CartItem
           key={item._id}
           item={item}
-          onIncrement={onIncrement}
-          onDecrement={onDecrement}
-          onRemove={onRemove}
-          isMutating={mutatingItemId === item._id} // Pass down if this specific item is loading
+          onIncrement={handleIncrement}
+          onDecrement={handleDecrement}
+          onRemove={handleRemove}
         />
       ))}
     </div>

@@ -52,12 +52,11 @@ const transactionSchema = new Schema(
       enum: [
         "ORDER_PAYMENT",
         "ORDER_REFUND",
-        "WALLET_TOPUP",
-        "WALLET_PAYMENT",
         "REFERRAL_BONUS",
         "ORDER_CANCELLED",
         "ORDER_ITEM_CANCELLED",
         "RECALCULATED_ORDER_PAYMENT",
+        "ORDER_REFUND_ITEM",
       ],
       required: true,
     },

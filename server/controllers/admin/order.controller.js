@@ -1,16 +1,19 @@
-import { asyncHandler } from "../../utils/helpers.js";
+import { AppError, asyncHandler } from "../../utils/helpers.js";
 import {
   getOrderStats,
   getAllOrders,
   getOrderDetails,
   updateOrderStatus,
   getReturnRequests,
+  processOrderReturnRequest,
+  processItemReturnRequest,
 } from "../../services/admin/order/index.js";
 import { sendResponse } from "../../utils/helpers.js";
 import {
   cancelItem,
   cancelOrder,
 } from "../../services/user/order/cancel-order.service.js";
+import { STATUS_CODES } from "../../utils/constants.js";
 
 export const getOrdersController = asyncHandler(async (req, res) => {
   const [ordersData, statsData] = await Promise.all([
@@ -62,5 +65,38 @@ export const cancelOrderItemController = asyncHandler(async (req, res) => {
 
 export const getReturnRequestsController = asyncHandler(async (req, res) => {
   const result = await getReturnRequests(req.query);
+  sendResponse(res, { ...result });
+});
+
+export const processOrderReturnController = asyncHandler(async (req, res) => {
+  const { orderId, action } = req.params;
+  const { reason } = req.body || "";
+  if (action !== "approve" && action !== "reject")
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      " VALIDATION_ERROR",
+      "Invalid action"
+    );
+  const result = await processOrderReturnRequest({ orderId, action, reason });
+  sendResponse(res, { ...result });
+});
+
+export const processItemReturnController = asyncHandler(async (req, res) => {
+  console.log("req.params from processItemReturnController", req.params);
+  const { orderId, itemId, action } = req.params;
+  const { reason } = req.body || "";
+  console.log(orderId, action, itemId);
+  if (action !== "approve" && action !== "reject")
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      " VALIDATION_ERROR",
+      "Invalid action"
+    );
+  const result = await processItemReturnRequest({
+    orderId,
+    action,
+    reason,
+    itemId,
+  });
   sendResponse(res, { ...result });
 });

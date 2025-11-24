@@ -16,6 +16,7 @@ const OrderManagement = () => {
     defaultSortBy: "createdAt",
     defaultSortOrder: "desc",
   });
+  console.log(uiState);
 
   // 2. Fetch Data
   const {

@@ -14,10 +14,20 @@ export const getOrderDetails = async (orderId) => {
   }
 };
 
-export const placeOrder = async (orderData) => {
+export const placeCODOrder = async (orderData) => {
   console.log(orderData);
   try {
     const response = await axiosInstance.post("/orders/cod", orderData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const placeWalletOrder = async (orderData) => {
+  console.log(orderData);
+  try {
+    const response = await axiosInstance.post("/orders/wallet", orderData);
     return response.data;
   } catch (error) {
     throw error;
@@ -67,4 +77,19 @@ export const downloadInvoice = async (orderId) => {
   });
 
   return response.data; // blob
+};
+
+export const returnOrder = async ({ orderId, reason }) => {
+  const { data } = await axiosInstance.post(`/orders/${orderId}/return`, {
+    reason,
+  });
+  return data;
+};
+
+export const returnOrderItem = async ({ orderId, itemId, reason }) => {
+  const { data } = await axiosInstance.post(
+    `/orders/${orderId}/items/${itemId}/return`,
+    { reason }
+  );
+  return data;
 };

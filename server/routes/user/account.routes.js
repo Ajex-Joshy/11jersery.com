@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.use(authenticateUser);
 
-router.get("/:userId", getUserAccountController);
+router.get("/profile", getUserAccountController);
 
 router.patch("/update-details", updatePersonalDetailsController);
 

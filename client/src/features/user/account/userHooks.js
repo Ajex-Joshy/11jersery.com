@@ -24,14 +24,32 @@ export const useUpdatePersonalDetails = () => {
 
   return useMutation({
     mutationFn: updatePersonalDetails,
-    onSuccess: (data) => {
-      toast.success("Personal details updated successfully");
-      queryClient.invalidateQueries(USER_PROFILE_KEY);
+    onMutate: async (newDetails) => {
+      await queryClient.cancelQueries(USER_PROFILE_KEY);
+      const previousData = queryClient.getQueryData(USER_PROFILE_KEY);
+      queryClient.setQueryData(USER_PROFILE_KEY, (old) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            ...newDetails,
+          },
+        };
+      });
+      return { previousData };
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(USER_PROFILE_KEY, context.previousData);
+      }
       toast.error(
         error?.response?.data?.error?.message || "Failed to update details"
       );
+    },
+    onSuccess: (data) => {
+      toast.success("Personal details updated successfully");
+      queryClient.setQueryData(USER_PROFILE_KEY, data?.json);
     },
   });
 };

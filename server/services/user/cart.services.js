@@ -1,74 +1,16 @@
 import createError from "http-errors";
 import Cart from "../../models/cart.model.js";
 import Product from "../../models/product.model.js";
-import { getSignedUrlForKey } from "../admin/service-helpers/s3.service.js";
+import { calculateOrderPrice } from "./order/pricing.service.js";
 
-const _findUserCart = async (userId) => {
-  const cart = await Cart.findOne({ userId })
-    .populate({
-      path: "items.productId",
-      select: "title price imageIds slug",
-    })
-    .select("-__v -createdAt -updatedAt")
-    .lean();
-  cart.items = await Promise.all(
-    cart.items.map(async (item) => {
-      const product = item.productId;
-      const productImageIds = product.imageIds || [];
-      let imageUrl = null;
-
-      if (productImageIds.length > 0) {
-        imageUrl = await getSignedUrlForKey(productImageIds[0]);
-      }
-
-      const { imageIds, ...restProduct } = product;
-
-      return {
-        ...item,
-        productDetails: {
-          ...restProduct,
-          imageUrl,
-        },
-        productId: product._id,
-      };
-    })
-  );
-
-  if (!cart) return null;
-
-  let subtotal = 0;
-  let discountAmount = 0;
-
-  cart.items.forEach((item) => {
-    const product = item.productDetails;
-    if (!product) return;
-
-    const price = product.price?.sale || 0;
-    const qtyTotal = price * item.quantity;
-
-    subtotal += qtyTotal;
-
-    const listPrice = product.price?.list || price;
-    const perItemDiscount = Math.max(listPrice - price, 0);
-    discountAmount += perItemDiscount * item.quantity;
-  });
-
-  let total = subtotal - discountAmount;
-
-  const deliveryFee = total > 500 ? 0 : 80;
-  total = total + deliveryFee;
-
-  return {
-    ...cart,
-    subtotal,
-    discount: discountAmount,
-    total,
-    deliveryFee,
-  };
+const findUserCart = async (userId) => {
+  const cart = await Cart.findOne({ userId });
+  const result = calculateOrderPrice(cart.items);
+  return result;
 };
 
 export const getCart = async (userId) => {
-  let cart = await _findUserCart(userId);
+  let cart = await findUserCart(userId);
 
   if (!cart) {
     return await Cart.create({ userId, items: [] });
@@ -78,7 +20,11 @@ export const getCart = async (userId) => {
 
 export const addItem = async (userId, { productId, size, quantity }) => {
   // Validate the product and stock
-  const product = await Product.findById(productId);
+  const product = await Product.findOne({
+    _id: productId,
+    isDeleted: false,
+    isListed: true,
+  });
   if (!product || !product.isListed || product.isDeleted) {
     throw createError(404, "Product not found or is no longer available.");
   }
@@ -132,7 +78,7 @@ export const addItem = async (userId, { productId, size, quantity }) => {
 
   await cart.save();
 
-  return await _findUserCart(userId);
+  return await findUserCart(userId);
 };
 
 export const adjustItemQuantity = async (userId, itemId, action) => {
@@ -144,7 +90,11 @@ export const adjustItemQuantity = async (userId, itemId, action) => {
   });
   if (!item) throw createError(404, "Item not found in cart.");
 
-  const product = await Product.findById(item.productId);
+  const product = await Product.findOne({
+    _id: item.productId,
+    isDeleted: false,
+    isListed: true,
+  });
   if (!product) throw createError(404, "Product not found.");
 
   const variant = product.variants.find((v) => v.size === item.size);
@@ -167,7 +117,7 @@ export const adjustItemQuantity = async (userId, itemId, action) => {
     if (item.quantity === 1) {
       cart.items.pull({ _id: itemId });
       await cart.save();
-      return await _findUserCart(userId);
+      return await findUserCart(userId);
     }
 
     newQuantity -= 1;
@@ -176,7 +126,7 @@ export const adjustItemQuantity = async (userId, itemId, action) => {
   item.quantity = newQuantity;
   await cart.save();
 
-  return await _findUserCart(userId);
+  return await findUserCart(userId);
 };
 
 export const removeItem = async (userId, itemId) => {
@@ -189,7 +139,7 @@ export const removeItem = async (userId, itemId) => {
   cart.items.pull({ _id: itemId });
 
   await cart.save();
-  return await _findUserCart(userId);
+  return await findUserCart(userId);
 };
 
 export const clearCart = async (userId) => {

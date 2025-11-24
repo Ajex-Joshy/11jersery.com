@@ -1,84 +1,65 @@
 import UserLayout from "../layouts/UserLayout";
+import AccountLayout from "../layouts/AccountLayout";
 import { Route, Routes } from "react-router-dom";
-import { SignIn, SignUp } from "@clerk/clerk-react";
+import React, { Suspense } from "react";
 import { ProtectedRoutes } from "./ProtectedRoutes";
-import LandingPage from "../features/user/landingPage/LandingPage";
-import ProductOverview from "../features/user/productPages/ProductDetailsPage";
-import ProductDetailsPage from "../features/user/productPages/ProductDetailsPage";
-import ResetPasswordPage from "../features/user/account/components/ResetPasswordPage.jsx";
-import ForgotPasswordForm from "../features/user/account/components/ForgotPasswordForm.jsx";
-import AccountLayout from "../layouts/AccountLayout.jsx";
-import AccountOverview from "../features/user/account/AccountOverview.jsx";
-import ProductListingPage from "../features/user/productPages/ProductListingPage.jsx";
-import AboutUsPage from "../features/user/company/AboutUs.jsx";
-import OurStoryPage from "../features/user/company/OurStory.jsx";
-import TermsAndConditionsPage from "../features/user/company/TermsAndConditionsPage.jsx";
-import PrivacyPolicyPage from "../features/user/company/PrivacyPolicyPage.jsx";
-import NotFoundPage from "../features/user/company/NotFoundPage.jsx";
-import ErrorPage from "../features/user/company/ErrorPage.jsx";
-import AccountSettingsPage from "../features/user/account/AccountSettings.jsx";
-import CartPage from "../features/user/cart/CartPage.jsx";
-import AddressesPage from "../features/user/address/AddressPage.jsx";
-import AddAddressPage from "../features/user/address/AddAddressPage.jsx";
-import CheckoutPage from "../features/user/checkout/CheckoutPage.jsx";
-import PaymentPage from "../features/user/checkout/PaymentPage.jsx";
-import OrderConfirmationPage from "../features/user/order/OrderConfirmationPage.jsx";
-import OrderHistoryPage from "../features/user/order/OrderHistoryPage.jsx";
-import OrderDetailsPage from "../features/user/order/OrderDetailsPage.jsx";
+import ResetPasswordPage from "../features/user/account/components/ResetPasswordPage";
 
-const UserRoutes = () => {
-  return (
+import * as Pages from "./userLazyPages";
+
+const UserRoutes = () => (
+  <Suspense fallback={<div>Loading...</div>}>
     <Routes>
-      <Route element={<UserLayout />} errorElement={<ErrorPage />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/product/:slug" element={<ProductDetailsPage />} />
-        <Route path="/products" element={<ProductListingPage />} />
-        <Route path="/about-us" element={<AboutUsPage />} />
-        <Route path="/our-story" element={<OurStoryPage />} />
+      <Route element={<UserLayout />} errorElement={<Pages.ErrorPage />}>
+        <Route path="/" element={<Pages.LandingPage />} />
+        <Route path="/product/:slug" element={<Pages.ProductDetailsPage />} />
+        <Route path="/products" element={<Pages.ProductListingPage />} />
+        <Route path="/about-us" element={<Pages.AboutUsPage />} />
+        <Route path="/our-story" element={<Pages.OurStoryPage />} />
         <Route
           path="/terms-and-conditions"
-          element={<TermsAndConditionsPage />}
+          element={<Pages.TermsAndConditionsPage />}
         />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="/privacy-policy" element={<Pages.PrivacyPolicyPage />} />
       </Route>
+
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       <Route element={<ProtectedRoutes />}>
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/cart" element={<Pages.CartPage />} />
+        <Route path="/checkout" element={<Pages.CheckoutPage />} />
+        <Route path="/payment" element={<Pages.PaymentPage />} />
         <Route
           path="/order-confirmation/:orderId"
-          element={<OrderConfirmationPage />}
+          element={<Pages.OrderConfirmationPage />}
         />
         <Route path="/account" element={<AccountLayout />}>
-          <Route index element={<AccountOverview />} />
-          <Route path="/account/settings" element={<AccountSettingsPage />} />
-          <Route path="/account/addresses" element={<AddressesPage />} />
-          <Route path="/account/addresses/new" element={<AddAddressPage />} />
-          <Route path="/account/orders" element={<OrderHistoryPage />} />
+          <Route index element={<Pages.AccountOverview />} />
+          <Route
+            path="/account/settings"
+            element={<Pages.AccountSettingsPage />}
+          />
+          <Route path="/account/addresses" element={<Pages.AddressesPage />} />
+          <Route
+            path="/account/addresses/new"
+            element={<Pages.AddAddressPage />}
+          />
+          <Route path="/account/orders" element={<Pages.OrderHistoryPage />} />
+          <Route path="/account/wallet" element={<Pages.WalletPage />} />
           <Route
             path="/account/orders/:orderId"
-            element={<OrderDetailsPage />}
+            element={<Pages.OrderDetailsPage />}
           />
           <Route
             path="/account/addresses/edit/:addressId"
-            element={<AddAddressPage />}
+            element={<Pages.AddAddressPage />}
           />
-          {/* <Route path="orders" element={<OrderHistory />} />
-            <Route path="wishlist" element={<Wishlist />} />
-           <Route path="addresses" element={<Addresses />} />
-            <Route path="wallet" element={<Wallet />} />
-            <Route path="coupons" element={<Coupons />} />
-            <Route path="settings" element={<AccountSettings />} />
-            */}
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
-      <Route path="*" element={<NotFoundPage />} />
+
+      <Route path="*" element={<Pages.NotFoundPage />} />
     </Routes>
-  );
-};
+  </Suspense>
+);
 
 export default UserRoutes;

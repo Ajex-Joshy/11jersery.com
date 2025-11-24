@@ -200,7 +200,8 @@ const OrderConfirmationPage = () => {
                 {order.shippingAddress.country}
                 <br />
                 <span className="block mt-2">
-                  Phone: {order.shippingAddress.phone}
+                  {console.log(order.hippingAddress)}
+                  Phone: {order.shippingAddress.phoneNumber}
                 </span>
               </address>
             </div>

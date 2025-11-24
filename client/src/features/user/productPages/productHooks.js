@@ -42,7 +42,10 @@ export const useProductPageData = (slug) => {
 
 export const useProductsListing = (params) => {
   // Convert URLSearchParams to a plain object to use as a stable query key
-  const queryParams = Object.fromEntries(params.entries());
+  const queryParams =
+    typeof params.entries === "function"
+      ? Object.fromEntries(params.entries())
+      : { ...params };
 
   return useQuery({
     queryKey: [PRODUCTS_LISTING_KEY, queryParams],
@@ -52,4 +55,48 @@ export const useProductsListing = (params) => {
     keepPreviousData: true, // Prevents flickering during pagination
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+};
+
+import { useSearchParams, useParams } from "react-router-dom";
+import { useMemo } from "react";
+
+export const useProductQueryParams = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { slug: categorySlug } = useParams();
+
+  if (categorySlug && !searchParams.has("category")) {
+    searchParams.set("category", categorySlug);
+  }
+
+  const activeFilters = useMemo(
+    () => ({
+      category: searchParams.get("category") || "",
+      size: searchParams.get("size") || "",
+      price: {
+        min: searchParams.get("minPrice") || "",
+        max: searchParams.get("maxPrice") || "",
+      },
+      sortBy: searchParams.get("sortBy") || "createdAt",
+      sortOrder: searchParams.get("sortOrder") || "desc",
+      page: Number(searchParams.get("page") || 1),
+    }),
+    [searchParams]
+  );
+
+  const updateParams = (callback) => {
+    setSearchParams(
+      (prev) => {
+        const updated = new URLSearchParams(prev);
+        callback(updated);
+        return updated;
+      },
+      { replace: true }
+    );
+  };
+
+  return {
+    searchParams,
+    activeFilters,
+    updateParams,
+  };
 };

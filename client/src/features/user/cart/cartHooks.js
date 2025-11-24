@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getCart,
@@ -7,6 +8,8 @@ import {
   removeItemFromCart,
   clearCart,
 } from "./cartApis";
+import { cloneCart, recalcTotals } from "./cartUtils";
+import { useCartOptimisticMutation } from "./useCartOptimisticMutation";
 
 export const CART_KEY = "Cart";
 
@@ -26,49 +29,50 @@ export const useAddItemToCart = () => {
     onSuccess: () => {
       queryClient.invalidateQueries([CART_KEY]);
     },
-  });
-};
-
-export const useIncrementItem = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: incrementItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries([CART_KEY]);
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
     },
   });
 };
 
-export const useDecrementItem = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: decrementItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries([CART_KEY]);
-    },
+export const useIncrementItem = () =>
+  useCartOptimisticMutation(incrementItem, (cart, { itemId }) => {
+    if (!cart) return cart;
+    const updated = cloneCart(cart);
+    const item = updated.data.items.find((i) => i._id === itemId);
+    if (item) item.quantity += 1;
+    return recalcTotals(updated);
   });
-};
 
-export const useRemoveItemFromCart = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: removeItemFromCart,
-    onSuccess: () => {
-      queryClient.invalidateQueries([CART_KEY]);
-    },
+export const useDecrementItem = () =>
+  useCartOptimisticMutation(decrementItem, (cart, { itemId }) => {
+    if (!cart) return cart;
+    const updated = cloneCart(cart);
+    const item = updated.data.items.find((i) => i._id === itemId);
+    if (item && item.quantity > 1) item.quantity -= 1;
+    return recalcTotals(updated);
   });
-};
 
-export const useClearCart = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: clearCart,
-    onSuccess: () => {
-      queryClient.invalidateQueries([CART_KEY]);
-    },
+export const useRemoveItemFromCart = () =>
+  useCartOptimisticMutation(removeItemFromCart, (cart, { itemId }) => {
+    if (!cart) return cart;
+    const updated = cloneCart(cart);
+    updated.data.items = updated.data.items.filter((i) => i._id !== itemId);
+    return recalcTotals(updated);
   });
-};
+
+export const useClearCart = () =>
+  useCartOptimisticMutation(clearCart, (cart) => {
+    if (!cart) return cart;
+    const updated = cloneCart(cart);
+    updated.data.items = [];
+    updated.data.totals = {
+      subTotal: 0,
+      shipping: 0,
+      tax: 0,
+      grandTotal: 0,
+    };
+    return updated;
+  });

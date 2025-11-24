@@ -24,7 +24,7 @@ export const decrementItem = async ({ itemId }) => {
   return data;
 };
 
-export const removeItemFromCart = async (itemId) => {
+export const removeItemFromCart = async ({ itemId }) => {
   console.log("apiItemId", itemId);
   const { data } = await axiosInstance.delete(`/cart/remove/${itemId}`);
   return data;

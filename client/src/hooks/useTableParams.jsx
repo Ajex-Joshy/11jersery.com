@@ -1,4 +1,3 @@
-// src/hooks/useTableParams.js
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";

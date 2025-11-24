@@ -1,20 +1,25 @@
-import React, { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save, AlertTriangle, X, Info, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
-import { useAdminOrderDetails } from "./orderHooks";
+import {
+  useAdminOrderDetails,
+  useApproveReturn,
+  useConfirmReturnReceived,
+  useRejectReturn,
+} from "./orderHooks";
 import axiosInstance from "../../../api/axiosInstance";
 import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
 import StatusBadge from "./components/StatusBadge";
-import { OrderTimeline } from "../../user/order/components/OrderTimeline";
-import { OrderItem } from "../../user/order/components/OrderItem";
+import OrderTimeline from "../../user/order/components/OrderTimeline";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
 import FeeWarningModal from "../../user/order/components/FeeWarningModal";
+import OrderItem from "./components/orderItem";
 
 const AdminOrderDetails = () => {
   const { orderId } = useParams();
@@ -76,18 +81,54 @@ const AdminOrderDetails = () => {
     setCancelModal({ isOpen: false, type: null, itemId: null });
     setCancelReason("");
   };
+  // Inside AdminOrderDetails.jsx
 
-  //   const confirmCancel = () => {
-  //     if (cancelModal.type === "order") {
-  //       actions.cancelOrder(cancelReason);
-  //     } else if (cancelModal.type === "item") {
-  //       actions.cancelItem(cancelModal.itemId, cancelReason);
-  //     }
-  //     setCancelModal({ isOpen: false, type: null, itemId: null });
-  //     setCancelReason("");
-  //   };
+  // --- Return/Action Handlers ---
+  const approveReturnMutation = useApproveReturn();
+  const rejectReturnMutation = useRejectReturn();
+  const confirmReturnMutation = useConfirmReturnReceived();
 
-  // --- Mutations ---
+  // --- Unified Action Modal Handler ---
+  const [actionModal, setActionModal] = useState({
+    isOpen: false,
+    type: null, // "cancel_order" | "cancel_item" | "approve_return" | "reject_return" | "confirm_return"
+    itemId: null,
+  });
+  const [actionReason, setActionReason] = useState("");
+
+  const handleActionModal = (type, itemId = null) => {
+    setActionModal({ isOpen: true, type, itemId });
+    setActionReason("");
+  };
+
+  const confirmActionModal = () => {
+    const { type, itemId } = actionModal;
+    if (!order) return;
+
+    switch (type) {
+      case "cancel_order":
+        actions.cancelOrder(order.userId, actionReason);
+        break;
+      case "cancel_item":
+        actions.cancelItem(order.userId, itemId, actionReason);
+        break;
+      case "approve_return":
+        approveReturnMutation.mutate({ orderId, itemId });
+        break;
+      case "reject_return":
+        rejectReturnMutation.mutate({ orderId, itemId, reason: actionReason });
+        break;
+      case "confirm_return":
+        confirmReturnMutation.mutate({ orderId, itemId });
+        break;
+      default:
+        console.warn("Unknown action:", type);
+        break;
+    }
+
+    setActionModal({ isOpen: false, type: null, itemId: null });
+    setActionReason("");
+  };
 
   // 1. Update Order Status
   const { mutate: updateStatus, isLoading: isUpdating } = useMutation({
@@ -122,14 +163,7 @@ const AdminOrderDetails = () => {
   if (!order)
     return <div className="p-8 text-center text-gray-500">Order not found</div>;
 
-  const statusOptions = [
-    "Pending",
-    "Processing",
-    "Shipped",
-    "Delivered",
-    "Cancelled",
-    "Returned",
-  ];
+  const statusOptions = ["Pending", "Processing", "Shipped", "Delivered"];
 
   const canCancel = ["Pending", "Processing", "Placed"].includes(
     order.orderStatus
@@ -228,6 +262,13 @@ const AdminOrderDetails = () => {
                 key={item._id}
                 item={item}
                 onCancelItem={(id) => handleCancelClick("item", id)}
+                onApproveReturn={(id) =>
+                  handleActionModal("approve_return", id)
+                }
+                onRejectReturn={(id) => handleActionModal("reject_return", id)}
+                onConfirmReturn={(id) =>
+                  handleActionModal("confirm_return", id)
+                }
               />
             ))}
           </div>
@@ -354,6 +395,69 @@ const AdminOrderDetails = () => {
             onChange={(e) => setCancelReason(e.target.value)}
           />
         </div>
+      </ConfirmationModal>
+
+      {/* Unified Action Modal */}
+      <ConfirmationModal
+        isOpen={actionModal.isOpen}
+        onClose={() => setActionModal({ ...actionModal, isOpen: false })}
+        onConfirm={confirmActionModal}
+        title={
+          actionModal.type === "cancel_order"
+            ? "Cancel Entire Order?"
+            : actionModal.type === "cancel_item"
+            ? "Cancel Item?"
+            : actionModal.type === "approve_return"
+            ? "Approve Return?"
+            : actionModal.type === "reject_return"
+            ? "Reject Return?"
+            : "Confirm Receipt & Refund?"
+        }
+        message={
+          actionModal.type === "cancel_order" ||
+          actionModal.type === "cancel_item"
+            ? "Are you sure you want to cancel this?"
+            : actionModal.type === "approve_return"
+            ? "The user will be notified to ship the item back."
+            : actionModal.type === "reject_return"
+            ? "Please provide a reason for rejection."
+            : "Confirming receipt will automatically restock the item and refund the user."
+        }
+        confirmButtonText={
+          actionModal.type === "cancel_order" ||
+          actionModal.type === "cancel_item"
+            ? "Yes, Cancel"
+            : actionModal.type === "approve_return"
+            ? "Approve"
+            : actionModal.type === "reject_return"
+            ? "Reject Request"
+            : "Confirm & Refund"
+        }
+        confirmButtonVariant={
+          actionModal.type === "cancel_order" ||
+          actionModal.type === "cancel_item" ||
+          actionModal.type === "reject_return"
+            ? "danger"
+            : "success"
+        }
+        isLoading={state.isCancelling || state.isItemCancelling}
+      >
+        {(actionModal.type === "cancel_order" ||
+          actionModal.type === "cancel_item" ||
+          actionModal.type === "reject_return") && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reason (Optional)
+            </label>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-black focus:border-black"
+              rows={3}
+              placeholder="Provide reason..."
+              value={actionReason}
+              onChange={(e) => setActionReason(e.target.value)}
+            />
+          </div>
+        )}
       </ConfirmationModal>
     </div>
   );

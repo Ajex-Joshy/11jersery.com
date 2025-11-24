@@ -1,5 +1,6 @@
 import slugify from "slugify";
 import { STATUS_CODES } from "./constants.js";
+import mongoose from "mongoose";
 
 export class AppError extends Error {
   constructor(
@@ -74,4 +75,10 @@ export const createSlug = (text) => {
     strict: true, // removes special characters
     trim: true, // trims whitespace
   });
+};
+
+export const validateObjectId = (id, entity = "") => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError(400, "INVALID_ID", `Provided ${entity} ID is invalid`);
+  }
 };

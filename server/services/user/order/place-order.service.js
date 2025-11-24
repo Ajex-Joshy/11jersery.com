@@ -1,123 +1,122 @@
-import Order from "../../../models/order.model.js";
+import { calculateOrderPrice } from "./pricing.service.js";
+import { finalizeOrderCreation } from "./order-core.service.js";
+import {
+  createRazorpayOrder,
+  verifyRazorpaySignature,
+} from "../razorpay.service.js";
+
+import { debitWallet } from "../wallet.services.js";
+import Cart from "../../../models/cart.model.js";
 import mongoose from "mongoose";
-import { reduceStock, validateStock } from "./stock.service.js";
-import Product from "../../../models/product.model.js";
-import Transaction from "../../../models/transaction.model.js";
-import { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 
-const calculateOrderPrice = async (items) => {
-  for (const item of items) {
-    await validateStock(item.productId, item.size, item.quantity);
+export const placeCodOrder = async (userId, shippingAddressId) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const cart = await Cart.findOne({ userId });
+    const items = cart.items || [];
+    const priceData = await calculateOrderPrice(items);
+    console.log(cart.toJSON(), items);
+
+    const order = await finalizeOrderCreation(session, {
+      userId,
+      items: priceData.items,
+      shippingAddressId,
+      paymentMethod: "COD",
+      priceData,
+    });
+
+    await session.commitTransaction();
+    return order;
+  } catch (err) {
+    await session.abortTransaction();
+    throw err;
+  } finally {
+    session.endSession();
   }
-
-  const productIds = items.map((item) => item.productId);
-  const products = await Product.find({ _id: { $in: productIds } });
-
-  const productMap = new Map();
-  products.forEach((product) => {
-    productMap.set(product._id.toString(), product);
-  });
-
-  let subtotal = 0;
-  let discountedPrice = 0;
-
-  for (const item of items) {
-    const product = productMap.get(item.productId.toString());
-    item.listPrice = product.price.list;
-    item.salePrice = product.price.sale;
-    item.title = product.title;
-    item.slug = product.slug;
-    item.imageId = product.imageIds[0];
-
-    subtotal += product.price.list * item.quantity;
-    discountedPrice += product.price.sale * item.quantity;
-  }
-
-  const deliveryFee = discountedPrice < 500 ? 80 : 0;
-  const total = discountedPrice + deliveryFee;
-
-  return { items, subtotal, discountedPrice, deliveryFee, total };
 };
 
-export const generateOrderTimeline = () => {
-  const now = new Date();
+export const initOnlineOrder = async (userId, items) => {
+  const priceData = await calculateOrderPrice(items);
+
+  const razorpayOrder = await createRazorpayOrder(priceData.total, receiptId);
+
   return {
-    placedAt: now,
-    confirmedAt: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000),
-    shippedAt: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000),
-    deliveredAt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+    razorpayOrderId: razorpayOrder.id,
+    amount: priceData.total,
+    currency: razorpayOrder.currency,
+    priceData, // Send this back so frontend can confirm totals
   };
 };
 
-export const placeCodOrder = async (userId, items, shippingAddress) => {
+export const verifyAndPlaceOnlineOrder = async (
+  userId,
+  items,
+  shippingAddress,
+  paymentDetails // { razorpayOrderId, razorpayPaymentId, razorpaySignature }
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
-    const {
-      items: updatedItems,
-      subtotal,
-      discountedPrice,
-      deliveryFee,
-      total,
-    } = await calculateOrderPrice(items);
-
-    for (const item of updatedItems) {
-      await reduceStock(session, item.productId, item.size, item.quantity);
-    }
-
-    const order = await Order.create(
-      [
-        {
-          userId,
-          items: updatedItems,
-          shippingAddress,
-          payment: {
-            method: "COD",
-          },
-          status: "pending",
-          price: {
-            subtotal,
-            discountedPrice,
-            couponCode: null,
-            couponId: null,
-            deliveryFee,
-            total,
-          },
-          timeline: generateOrderTimeline(),
-        },
-      ],
-      { session }
-    );
-    const transaction = await Transaction.create(
-      [
-        {
-          userId,
-          orderId: order[0]._id,
-          amount: {
-            subtotal,
-            discountedPrice,
-            deliveryFee,
-            total,
-          },
-          type: "CREDIT",
-          reason: "ORDER_PAYMENT",
-          status: "PENDING",
-          paymentMethod: "COD",
-        },
-      ],
-      { session }
+    // 1. Security Check
+    const isValid = verifyRazorpaySignature(
+      paymentDetails.razorpayOrderId,
+      paymentDetails.razorpayPaymentId,
+      paymentDetails.razorpaySignature
     );
 
-    order[0].transactionIds = [transaction[0]._id];
-    await order[0].save({ session });
+    if (!isValid) throw new Error("Invalid Payment Signature");
+
+    // 2. Recalculate (Security: ensure client didn't change items between Init and Pay)
+    const priceData = await calculateOrderPrice(items);
+
+    // 3. Create Order in DB
+    const order = await finalizeOrderCreation(session, {
+      userId,
+      items: priceData.items,
+      shippingAddress,
+      paymentMethod: "ONLINE",
+      priceData,
+      transactionStatus: "SUCCESS",
+    });
+
     await session.commitTransaction();
-    sendOrderConfirmationEmail(order[0]);
-    session.endSession();
-    return order[0];
+    return order;
   } catch (err) {
     await session.abortTransaction();
-    session.endSession();
     throw err;
+  } finally {
+    session.endSession();
+  }
+};
+
+export const placeWalletOrder = async (userId, shippingAddressId) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const cart = await Cart.findOne({ userId });
+    const items = cart.items || [];
+    const priceData = await calculateOrderPrice(items);
+
+    // 1. Check and Debit Wallet
+    await debitWallet(session, userId, priceData.total, null, "Order Payment");
+
+    // 2. Create Order
+    const order = await finalizeOrderCreation(session, {
+      userId,
+      items: priceData.items,
+      shippingAddressId,
+      paymentMethod: "WALLET",
+      priceData,
+      transactionStatus: "SUCCESS",
+    });
+
+    await session.commitTransaction();
+    return order;
+  } catch (err) {
+    await session.abortTransaction();
+    throw err;
+  } finally {
+    session.endSession();
   }
 };

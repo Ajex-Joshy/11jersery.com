@@ -1,19 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { S3_URL } from "../../../../utils/constants";
-export const OrderItem = ({ item, onCancelItem }) => {
-  const isCancelled =
-    item.status === "Cancelled" ||
-    item.status === "Returned" ||
-    item.status === "Return Requested";
 
-  // Determine actions available for this specific item
-  // This logic assumes you have a handler passed down to cancel individual items
-  const canCancel = item.status === "Pending" || item.status === "Processing";
+export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
+  const isCancelled = [
+    "Cancelled",
+    "Returned",
+    "Return Requested",
+    "Return Rejected",
+  ].includes(item.status);
+  const canCancel = ["Pending", "Processing"].includes(item.status);
+
+  // Simple status color logic
+  const getStatusColor = (s) => {
+    if (s === "Delivered") return "text-green-600";
+    if (s === "Cancelled" || s === "Return Rejected") return "text-red-600";
+    if (s === "Return Requested") return "text-orange-600";
+    if (s === "Returned" || s === "Return Approved") return "text-blue-600";
+    return "text-gray-600";
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 p-4 border-b border-gray-100 last:border-0">
-      {/* Image */}
       <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
         <img
           src={item.imageUrl}
@@ -27,7 +34,6 @@ export const OrderItem = ({ item, onCancelItem }) => {
         />
       </div>
 
-      {/* Details */}
       <div className="flex-1">
         <div className="flex justify-between items-start">
           <div>
@@ -48,35 +54,31 @@ export const OrderItem = ({ item, onCancelItem }) => {
           </p>
         </div>
 
-        {/* Item Status & Actions */}
         <div className="mt-3 flex flex-wrap justify-between items-center gap-2">
-          <div className="text-xs">
-            <span
-              className={`font-medium ${
-                item.status === "Delivered"
-                  ? "text-green-600"
-                  : item.status === "Cancelled"
-                  ? "text-red-600"
-                  : item.status === "Return Requested"
-                  ? "text-orange-600"
-                  : "text-blue-600"
-              }`}
-            >
-              {item.status}
-            </span>
-            {item.cancelReason && (
-              <span className="text-gray-400 ml-2">- {item.cancelReason}</span>
-            )}
+          <div className="text-xs font-medium">
+            <span className={getStatusColor(item.status)}>{item.status}</span>
           </div>
 
-          {canCancel && (
-            <button
-              onClick={() => onCancelItem(item._id)}
-              className="text-xs text-red-600 hover:text-red-800 hover:underline"
-            >
-              Cancel Item
-            </button>
-          )}
+          <div className="flex gap-3">
+            {canCancel && (
+              <button
+                onClick={() => onCancelItem(item._id)}
+                className="text-xs text-red-600 hover:text-red-800 hover:underline font-medium"
+              >
+                Cancel Item
+              </button>
+            )}
+
+            {/* --- NEW RETURN BUTTON --- */}
+            {canReturn && (
+              <button
+                onClick={() => onReturnItem(item._id)}
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium"
+              >
+                Return Item
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

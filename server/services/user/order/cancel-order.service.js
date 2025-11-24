@@ -7,7 +7,7 @@ import {
   ensureItemCancelable,
 } from "./validations.service.js";
 import { markAsCanceled } from "./item-actions.service.js";
-import Transaction from "../../../models/transaction.model.js";
+import Transaction from "../../../models/order-transaction.model.js";
 
 export const cancelOrder = async (userId, orderId, reason) => {
   const session = await mongoose.startSession();
@@ -31,7 +31,7 @@ export const cancelOrder = async (userId, orderId, reason) => {
         order.transactionIds[order.transactionIds.length - 1];
       await Transaction.findByIdAndUpdate(
         latestTransactionId,
-        { status: "Unpaid", reason: "ORDER_CANCELLED" },
+        { status: "Unpaid" },
         { session }
       );
     }

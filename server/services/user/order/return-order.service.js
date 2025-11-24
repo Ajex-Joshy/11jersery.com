@@ -29,6 +29,7 @@ export const requestReturnOrder = async (userId, orderId, reason) => {
     } else {
       order.orderStatus = order.orderStatus;
     }
+    order.timeline.returnRequestedAt = new Date();
 
     await order.save({ session });
 
@@ -56,12 +57,14 @@ export const requestReturnItem = async (userId, orderId, itemId, reason) => {
         "items._id": itemId,
       }).session(session);
     }
+    console.log(orderId, order);
 
     ensureOrderExists(order);
 
     const item = order.items.id(itemId);
     ensureItemExists(item);
     ensureReturnable(item);
+    item.timeline.returnRequestedAt = new Date();
 
     requestItemReturn(item, reason);
 
