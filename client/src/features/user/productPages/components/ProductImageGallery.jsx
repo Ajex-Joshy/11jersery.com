@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { S3_URL } from "../../../../utils/constants";
 
 const ProductImageGallery = ({ imageUrls = [], title }) => {
@@ -19,7 +20,7 @@ const ProductImageGallery = ({ imageUrls = [], title }) => {
         {imageUrls.map((url, index) => (
           <button
             key={index}
-            className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition ${
+            className={`w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-lg overflow-hidden border-2 transition ${
               mainImage.includes(url)
                 ? "border-black" // Highlight active thumbnail
                 : "border-gray-200 hover:border-gray-400"
@@ -40,7 +41,7 @@ const ProductImageGallery = ({ imageUrls = [], title }) => {
       </div>
 
       {/* Main Image */}
-      <div className="flex-grow aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm border border-gray-200">
+      <div className="grow aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm border border-gray-200">
         <img
           src={mainImage}
           alt={title}
@@ -53,6 +54,11 @@ const ProductImageGallery = ({ imageUrls = [], title }) => {
       </div>
     </div>
   );
+};
+
+ProductImageGallery.propTypes = {
+  imageUrls: PropTypes.arrayOf(PropTypes.string),
+  title: PropTypes.string,
 };
 
 export default ProductImageGallery;

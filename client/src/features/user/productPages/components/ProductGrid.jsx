@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import ProductCard from "../../landingPage/components/ProductCard";
 import { AlertTriangle } from "lucide-react";
 
@@ -20,6 +21,14 @@ const ProductGrid = ({ products }) => {
       ))}
     </div>
   );
+};
+
+ProductGrid.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    }).isRequired
+  ).isRequired,
 };
 
 export default ProductGrid;

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import ProductCard from "../../landingPage/components/ProductCard";
 
 const ProductCarousel = ({ title, products = [] }) => {
@@ -17,6 +18,15 @@ const ProductCarousel = ({ title, products = [] }) => {
       </div>
     </section>
   );
+};
+
+ProductCarousel.propTypes = {
+  title: PropTypes.string,
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    })
+  ),
 };
 
 export default ProductCarousel;

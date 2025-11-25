@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import StarRating from "../../../../components/common/StarRating"; // Adjust path
 import { CheckCircle } from "lucide-react"; // For verified badge
 
@@ -13,10 +14,18 @@ const ReviewCard = ({ review }) => {
         <span className="font-semibold text-gray-800">{review.userName}</span>
         <span className="text-xs text-gray-500"> - {review.place}</span>
         <CheckCircle className="w-4 h-4 text-green-500 ml-auto" />{" "}
-        {/* Verified badge */}
       </div>
     </div>
   );
+};
+
+ReviewCard.propTypes = {
+  review: PropTypes.shape({
+    rating: PropTypes.number.isRequired,
+    comment: PropTypes.string.isRequired,
+    userName: PropTypes.string.isRequired,
+    place: PropTypes.string,
+  }).isRequired,
 };
 
 export default ReviewCard;

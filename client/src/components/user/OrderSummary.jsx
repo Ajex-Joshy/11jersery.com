@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Tag, Loader2 } from "lucide-react";
 import { useCart } from "../../features/user/cart/cartHooks";
@@ -19,13 +20,17 @@ export const OrderSummary = ({ isCheckoutPage }) => {
     setIsProcessing(true);
     navigate("/checkout");
   };
+  const onApplyPromo = () => {
+    setIsProcessing(true);
+    navigate("/checkout");
+  };
 
   const handleApplyPromo = () => {
     if (!promoCode) return;
     setIsApplyingPromo(true);
     // Simulate API call
     setTimeout(() => {
-      onApplyPromo(promoCode); // Call parent handler
+      onApplyPromo(promoCode);
       setIsApplyingPromo(false);
       setPromoCode("");
     }, 1000);
@@ -42,7 +47,6 @@ export const OrderSummary = ({ isCheckoutPage }) => {
   const discount = subtotal - discountedPrice;
   if (isCartLoading) return <LoadingSpinner text="Loading checkout..." />;
   if (isError) return <ErrorDisplay error={error} />;
-  console.log(cartPayload);
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 sticky top-24">
       <h2 className="text-xl font-semibold mb-6 border-b pb-4">
@@ -96,7 +100,7 @@ export const OrderSummary = ({ isCheckoutPage }) => {
               Add promo code
             </label>
             <div className="flex gap-2">
-              <div className="relative flex-grow">
+              <div className="relative grow">
                 <Tag
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -154,4 +158,8 @@ export const OrderSummary = ({ isCheckoutPage }) => {
       )}
     </div>
   );
+};
+
+OrderSummary.propTypes = {
+  isCheckoutPage: PropTypes.bool,
 };

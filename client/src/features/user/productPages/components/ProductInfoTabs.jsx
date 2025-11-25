@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import StarRating from "../../../../components/common/StarRating";
 import AccordionItem from "./AccordionItem";
 
@@ -21,6 +22,18 @@ const ProductDetailsTab = ({ product }) => (
     </ul>
   </div>
 );
+
+ProductDetailsTab.propTypes = {
+  product: PropTypes.shape({
+    description: PropTypes.string.isRequired,
+    details: PropTypes.arrayOf(
+      PropTypes.shape({
+        attribute: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+      })
+    ),
+  }).isRequired,
+};
 
 // --- Tab: Product Reviews ---
 const ProductReviewsTab = ({ reviews = [] }) => (
@@ -63,6 +76,18 @@ const ProductReviewsTab = ({ reviews = [] }) => (
   </div>
 );
 
+ProductReviewsTab.propTypes = {
+  reviews: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      userName: PropTypes.string.isRequired,
+      place: PropTypes.string,
+      rating: PropTypes.number.isRequired,
+      comment: PropTypes.string,
+    })
+  ),
+};
+
 // --- Tab: FAQs ---
 const ProductFaqsTab = ({ faqs = [] }) => (
   <div className="max-w-2xl mx-auto">
@@ -78,6 +103,15 @@ const ProductFaqsTab = ({ faqs = [] }) => (
     </div>
   </div>
 );
+
+ProductFaqsTab.propTypes = {
+  faqs: PropTypes.arrayOf(
+    PropTypes.shape({
+      question: PropTypes.string.isRequired,
+      answer: PropTypes.string.isRequired,
+    })
+  ),
+};
 
 // --- Main Tabs Component ---
 const TABS = ["Product Details", "Rating & Reviews", "FAQs"];
@@ -123,6 +157,33 @@ const ProductInfoTabs = ({ product, reviews, faqs }) => {
       <div className="container mx-auto px-4">{renderTabContent()}</div>
     </div>
   );
+};
+
+ProductInfoTabs.propTypes = {
+  product: PropTypes.shape({
+    description: PropTypes.string.isRequired,
+    details: PropTypes.arrayOf(
+      PropTypes.shape({
+        attribute: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+      })
+    ),
+  }).isRequired,
+  reviews: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      userName: PropTypes.string.isRequired,
+      place: PropTypes.string,
+      rating: PropTypes.number.isRequired,
+      comment: PropTypes.string,
+    })
+  ),
+  faqs: PropTypes.arrayOf(
+    PropTypes.shape({
+      question: PropTypes.string.isRequired,
+      answer: PropTypes.string.isRequired,
+    })
+  ),
 };
 
 export default ProductInfoTabs;

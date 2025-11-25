@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import PropTypes from "prop-types";
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
   <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between">
     <div className="flex justify-between items-start mb-4">
@@ -91,6 +92,15 @@ OrderStatsGrid.propTypes = {
     completedOrders: PropTypes.number,
     canceledOrders: PropTypes.number,
   }),
+};
+
+OrderStatsGrid.defaultProps = {
+  stats: {
+    totalOrders: 0,
+    newOrders: 0,
+    completedOrders: 0,
+    canceledOrders: 0,
+  },
 };
 
 export default OrderStatsGrid;

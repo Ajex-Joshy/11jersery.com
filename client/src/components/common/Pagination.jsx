@@ -24,6 +24,7 @@ const Pagination = ({ pagination, onPageChange }) => {
   const startItem = (currentPage - 1) * limit + 1;
   let totalItem = totalUsers || totalOrders || totalTransactions;
   const endItem = Math.min(currentPage * limit, totalItem);
+  console.log(startItem, totalItem, endItem, totalPages);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center p-4 bg-white border-t border-gray-200">

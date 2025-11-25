@@ -73,11 +73,10 @@ export const getAllOrders = async (queryParams) => {
       .select(
         "orderId shippingAddress.firstName shippingAddress.lastName createdAt price payment.status orderStatus items"
       )
-      .lean(), // Use lean() for plain JS objects (faster)
+      .lean(),
     Order.countDocuments(query),
   ]);
 
-  // 4. Format the response (Optional: Clean up data for frontend)
   const formattedOrders = orders.map((order) => ({
     _id: order._id,
     orderId: order.orderId || order._id.toString().slice(-6).toUpperCase(),

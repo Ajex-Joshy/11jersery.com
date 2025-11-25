@@ -17,7 +17,7 @@ import ConfirmationModal from "../../../components/common/ConfirmationModal.jsx"
 
 const DiscoverCard = ({ data }) => (
   <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
+    <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
       {data?.imageId ? (
         <img
           src={data.imageUrl}

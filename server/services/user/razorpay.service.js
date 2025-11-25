@@ -44,18 +44,3 @@ export const verifyRazorpaySignature = (orderId, paymentId, signature) => {
   }
   return true;
 };
-
-export const refundRazorpayPayment = async (paymentId, amount) => {
-  try {
-    const options = amount ? { amount } : undefined; // If no amount, full refund
-    const refund = await razorpay.payments.refund(paymentId, options);
-    return refund;
-  } catch (error) {
-    logger.error("Razorpay Refund Error:", error);
-    throw new AppError(
-      502,
-      "REFUND_FAILED",
-      "Failed to process refund with provider."
-    );
-  }
-};

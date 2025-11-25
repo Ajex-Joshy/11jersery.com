@@ -32,6 +32,7 @@ const Sidebar = () => {
               {title}
             </h3>
             <div className="space-y-1">
+              {/* eslint-disable-next-line no-unused-vars */}
               {links.map(({ path, icon: Icon, label, showInboxBadge }) => (
                 <NavLink
                   key={path}

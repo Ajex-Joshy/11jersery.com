@@ -78,14 +78,13 @@ export const processOrderReturnController = asyncHandler(async (req, res) => {
       "Invalid action"
     );
   const result = await processOrderReturnRequest({ orderId, action, reason });
+
   sendResponse(res, { ...result });
 });
 
 export const processItemReturnController = asyncHandler(async (req, res) => {
-  console.log("req.params from processItemReturnController", req.params);
   const { orderId, itemId, action } = req.params;
   const { reason } = req.body || "";
-  console.log(orderId, action, itemId);
   if (action !== "approve" && action !== "reject")
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,

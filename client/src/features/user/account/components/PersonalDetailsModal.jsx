@@ -7,6 +7,7 @@ import { useUpdatePersonalDetails } from "../userHooks";
 import { FormInput } from "../../../../components/common/FormComponents.jsx";
 import toast from "react-hot-toast";
 import { useRequestEmailOtp, useConfirmEmailChange } from "../userHooks";
+import PropTypes from "prop-types";
 
 export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
   const { mutate, isLoading } = useUpdatePersonalDetails();
@@ -242,3 +243,15 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
     </div>
   );
 };
+
+PersonalDetailsModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    email: PropTypes.string,
+  }).isRequired,
+};
+
+export default PersonalDetailsModal;

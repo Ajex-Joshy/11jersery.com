@@ -35,12 +35,12 @@ const CheckoutPage = () => {
     navigate("/payment", { state: { selectedAddressId } });
   };
   const { data: cartPayload } = useCart();
-  const items = cartPayload?.data?.items || [];
   useEffect(() => {
+    const items = cartPayload?.data?.items || [];
     if (items.length === 0) {
       navigate("/cart");
     }
-  }, [items, navigate]);
+  }, [cartPayload, navigate]);
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <div className="container mx-auto px-4 py-8">

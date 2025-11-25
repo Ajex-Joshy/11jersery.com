@@ -80,3 +80,5 @@ export const paymentMethods = [
     icon: "Banknote",
   },
 ];
+
+export const MAX_QUANTITY_PER_ORDER = 20;

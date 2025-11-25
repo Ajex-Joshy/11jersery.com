@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Minus, Plus, Heart } from "lucide-react";
 import toast from "react-hot-toast";
-import StarRating from "../../../../components/common/StarRating";
-import { useAddItemToCart } from "../../cart/cartHooks";
-import { useIncrementItem } from "../../cart/cartHooks";
-import { useDecrementItem } from "../../cart/cartHooks";
-import { useCart } from "../../cart/cartHooks";
-import { useEffect } from "react";
 import PropTypes from "prop-types";
+import StarRating from "../../../../components/common/StarRating";
+
+// We only need the Cart getter and the Add/Update hook now
+import { useAddItemToCart, useCart } from "../../cart/cartHooks";
+import { MAX_QUANTITY_PER_ORDER } from "../../../../utils/constants";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
@@ -15,11 +14,16 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   // State for user selections
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+  // API Hooks
   const { mutate: addItemToCart, isPending } = useAddItemToCart();
-  const { mutate: incrementItem } = useIncrementItem();
-  const { mutate: decrementItem } = useDecrementItem();
   const { data: cart } = useCart();
 
+  // Create a map for quick stock lookup
+  const stockMap = new Map((variants || []).map((v) => [v.size, v.stock]));
+  const selectedStock = stockMap.get(selectedSize) || 0;
+
+  // 1. SYNC WITH CART: If item exists in cart, sync local quantity to that value on load
   useEffect(() => {
     if (!selectedSize || !cart?.data?.items) return;
 
@@ -30,92 +34,39 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
 
     if (existingItem) {
       setQuantity(existingItem.quantity);
-    }
-  }, [cart, selectedSize, product._id]);
-
-  // Create a map for quick stock lookup
-  const stockMap = new Map((variants || []).map((v) => [v.size, v.stock]));
-
-  // Calculate discount
-  const hasDiscount = price.sale < price.list;
-  const discountPercentage = hasDiscount
-    ? Math.round(((price.list - price.sale) / price.list) * 100)
-    : 0;
-
-  const handleSizeSelect = (size) => {
-    setSelectedSize(size);
-
-    const existingItem =
-      cart?.data?.items?.find(
-        (item) => item.productId === product._id && item.size === size
-      ) || null;
-
-    if (existingItem) {
-      setQuantity(existingItem.quantity);
     } else {
       setQuantity(1);
     }
-  };
+  }, [cart, selectedSize, product._id]);
 
+  // 2. LOCAL ONLY: Update state without API calls
   const handleQuantityChange = (amount) => {
     if (!selectedSize) {
       toast.error("Please select a size.");
       return;
     }
 
-    // Find the item in the cart that matches product + size
-    const existingItem =
-      cart?.data?.items?.find(
-        (item) => item.productId === product._id && item.size === selectedSize
-      ) || null;
-    if (!existingItem) {
-      const payload = {
-        productId: product._id,
-        size: selectedSize,
-        quantity: 1,
-      };
+    setQuantity((prevQty) => {
+      const newQty = prevQty + amount;
 
-      addItemToCart(payload, {
-        onSuccess: () => {
-          setQuantity(1);
-          toast.success("Item added to cart");
-        },
-      });
+      if (newQty > MAX_QUANTITY_PER_ORDER) {
+        toast.error("Maximum quantity per order is 20");
+        return prevQty;
+      }
 
-      return;
-    }
+      if (newQty < 1) return 1;
 
-    const itemId = existingItem._id;
+      if (newQty > selectedStock) {
+        toast.error(`Only ${selectedStock} items available`);
+        return prevQty;
+      }
 
-    if (amount === 1) {
-      incrementItem(
-        { itemId },
-        {
-          onSuccess: () => {
-            setQuantity(existingItem.quantity + 1);
-            toast.success(`Quantity increased to ${existingItem.quantity + 1}`);
-          },
-          onError: (error) =>
-            toast.error(
-              error?.response?.data?.message || "Failed to update quantity"
-            ),
-        }
-      );
-    } else if (amount === -1) {
-      decrementItem(
-        { itemId },
-        {
-          onSuccess: () => {
-            setQuantity(existingItem.quantity - 1);
-            toast.success(`Quantity decreased to ${existingItem.quantity - 1}`);
-          },
-          onError: (error) =>
-            toast.error(
-              error?.response?.data?.message || "Failed to update quantity"
-            ),
-        }
-      );
-    }
+      return newQty;
+    });
+  };
+
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
   };
 
   const handleAddToCart = () => {
@@ -123,24 +74,49 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
       toast.error("Please select a size.");
       return;
     }
+    if (quantity > MAX_QUANTITY_PER_ORDER) {
+      toast.error(`Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`);
+      return;
+    }
 
     const payload = {
       productId: product._id,
       size: selectedSize,
-      quantity,
+      quantity: quantity,
     };
 
     addItemToCart(payload, {
       onSuccess: () => {
-        toast.success("Added to cart!");
+        // Check if item was already in cart to customize message
+        const existingItem = cart?.data?.items?.find(
+          (item) => item.productId === product._id && item.size === selectedSize
+        );
+
+        if (existingItem) {
+          toast.success("Cart updated successfully!");
+        } else {
+          toast.success("Added to cart!");
+        }
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to add to cart");
       },
     });
   };
 
-  const selectedStock = stockMap.get(selectedSize) || 0;
+  // Calculation helpers
+  const hasDiscount = price.sale < price.list;
+  const discountPercentage = hasDiscount
+    ? Math.round(((price.list - price.sale) / price.list) * 100)
+    : 0;
+
   const isOutOfStock = selectedSize && selectedStock === 0;
   const isAddToCartDisabled =
-    !selectedSize || isOutOfStock || quantity > selectedStock;
+    !selectedSize ||
+    isOutOfStock ||
+    quantity > selectedStock ||
+    quantity > MAX_QUANTITY_PER_ORDER ||
+    isPending;
 
   return (
     <div className="flex flex-col space-y-5">
@@ -179,20 +155,18 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
 
       {/* Size Selector */}
       <div>
-        {/* --- ADDED THIS SECTION --- */}
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-semibold text-gray-700">
             Choose Size
           </span>
           <button
             type="button"
-            onClick={onOpenSizeGuide} // Calls the function from props
+            onClick={onOpenSizeGuide}
             className="text-sm font-medium text-blue-600 hover:underline"
           >
             See size guide
           </button>
         </div>
-        {/* --- END OF ADDED SECTION --- */}
 
         <div className="flex flex-wrap gap-2">
           {(variants || []).map((variant) => {
@@ -250,14 +224,20 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
             <Plus size={16} />
           </button>
         </div>
+
         {/* Add to Cart */}
         <button
           onClick={handleAddToCart}
           disabled={isAddToCartDisabled}
-          className="flex-grow bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="grow bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
         >
-          {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          {isPending
+            ? "Processing..."
+            : isOutOfStock
+            ? "Out of Stock"
+            : "Add to Cart"}
         </button>
+
         {/* Wishlist */}
         <button className="px-3 py-3 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 hover:text-red-500 transition-colors">
           <Heart size={20} />

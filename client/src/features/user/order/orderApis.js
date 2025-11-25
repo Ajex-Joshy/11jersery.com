@@ -5,70 +5,46 @@ export const getOrders = async (params) => {
   return data;
 };
 export const getOrderDetails = async (orderId) => {
-  try {
-    const response = await axiosInstance.get(`/orders/${orderId}`);
-    console.log(orderId, response.data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.get(`/orders/${orderId}`);
+  console.log(orderId, response.data);
+  return response.data;
 };
 
 export const placeCODOrder = async (orderData) => {
   console.log(orderData);
-  try {
-    const response = await axiosInstance.post("/orders/cod", orderData);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post("/orders/cod", orderData);
+  return response.data;
 };
 
 export const placeWalletOrder = async (orderData) => {
   console.log(orderData);
-  try {
-    const response = await axiosInstance.post("/orders/wallet", orderData);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post("/orders/wallet", orderData);
+  return response.data;
 };
 
 export const cancelOrder = async ({ orderId, reason }) => {
   console.log(orderId, reason);
-  try {
-    const response = await axiosInstance.post(`/orders/${orderId}/cancel`, {
-      reason,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post(`/orders/${orderId}/cancel`, {
+    reason,
+  });
+  return response.data;
 };
 
 export const cancelItem = async ({ orderId, itemId, reason }) => {
   console.log(orderId, itemId);
-  try {
-    const response = await axiosInstance.post(
-      `/orders/${orderId}/items/${itemId}/cancel`,
-      { reason }
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post(
+    `/orders/${orderId}/items/${itemId}/cancel`,
+    { reason }
+  );
+  return response.data;
 };
 
 export const requestReturnItem = async (orderId, itemId, returnData) => {
-  try {
-    const response = await axiosInstance.post(
-      `/orders/${orderId}/items/${itemId}/return`,
-      returnData
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await axiosInstance.post(
+    `/orders/${orderId}/items/${itemId}/return`,
+    returnData
+  );
+  return response.data;
 };
 
 export const downloadInvoice = async (orderId) => {

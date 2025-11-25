@@ -37,7 +37,6 @@ export const getReturnRequests = async (queryParams) => {
       .lean(),
     Order.countDocuments(query),
   ]);
-  console.log(query, orders);
 
   return {
     requests: orders,
@@ -60,7 +59,6 @@ export const processOrderReturnRequest = async ({
 
   try {
     const order = await Order.findById(orderId);
-    console.log(order, orderId);
     ensureOrderExists(order);
 
     const targetStatus =
@@ -122,7 +120,6 @@ export const processOrderReturnRequest = async ({
     await order.save();
     await session.commitTransaction();
     session.endSession();
-    console.log(order);
     return order.toObject();
   } catch (error) {
     await session.abortTransaction();
@@ -145,7 +142,7 @@ export const processItemReturnRequest = async ({
     if (!order) throw createError(404, "Order not found");
 
     const item = order.items.id(itemId);
-    console.log(order.items, itemId, item);
+
     if (!item) throw createError(404, "Item not found in order");
 
     if (item.status !== "Return Requested") {

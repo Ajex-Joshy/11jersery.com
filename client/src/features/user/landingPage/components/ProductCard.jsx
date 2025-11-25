@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { S3_URL } from "../../../../utils/constants";
 import StarRating from "../../../../components/common/StarRating";
@@ -22,7 +23,7 @@ const ProductCard = ({ product }) => {
       className="group block overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col" // Added flex-col
     >
       {/* Image container with background */}
-      <div className="aspect-[1/1] overflow-hidden bg-gray-100 rounded-t-xl">
+      <div className="aspect-square overflow-hidden bg-gray-100 rounded-t-xl">
         {" "}
         <img
           src={product?.imageUrls[0]}
@@ -35,7 +36,7 @@ const ProductCard = ({ product }) => {
         />
       </div>
       {/* Details Section */}
-      <div className="p-4 space-y-2 flex flex-col flex-grow">
+      <div className="p-4 space-y-2 flex flex-col grow">
         <h3 className="text-sm md:text-base font-semibold text-gray-900 leading-tight group-hover:text-blue-600 mb-1">
           {product.title}
         </h3>
@@ -69,6 +70,22 @@ const ProductCard = ({ product }) => {
       </div>
     </Link>
   );
+};
+
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    imageUrls: PropTypes.arrayOf(PropTypes.string).isRequired,
+    price: PropTypes.shape({
+      list: PropTypes.number.isRequired,
+      sale: PropTypes.number.isRequired,
+    }).isRequired,
+    rating: PropTypes.shape({
+      average: PropTypes.number,
+    }),
+  }).isRequired,
 };
 
 export default ProductCard;

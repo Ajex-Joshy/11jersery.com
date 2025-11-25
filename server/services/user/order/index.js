@@ -107,7 +107,7 @@ export const getOrderDetails = async (userId, orderId) => {
       state,
       pinCode,
       country,
-      phone,
+      phoneNumber,
       email,
     } = orderObj.shippingAddress;
     orderObj.shippingAddress = {
@@ -117,7 +117,7 @@ export const getOrderDetails = async (userId, orderId) => {
       state,
       pinCode,
       country,
-      phone,
+      phoneNumber,
       email,
     };
   }

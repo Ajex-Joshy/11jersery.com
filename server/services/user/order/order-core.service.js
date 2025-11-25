@@ -4,6 +4,7 @@ import { reduceStock } from "./stock.service.js";
 import { sendOrderConfirmationEmail } from "./sendOrderConfirmationEmail.js";
 import Address from "../../../models/address.model.js";
 import { clearCart } from "../cart.services.js";
+import { MAX_QUANTITY_PER_ORDER } from "../../../utils/constants.js";
 
 export const generateOrderTimeline = () => {
   const now = new Date();
@@ -27,6 +28,9 @@ export const finalizeOrderCreation = async (
   }
 ) => {
   for (const item of items) {
+    if (item.quantity > MAX_QUANTITY_PER_ORDER) {
+      throw new Error(`Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`);
+    }
     await reduceStock(session, item.productId, item.size, item.quantity);
   }
   const [shippingAddress] = await Address.find({

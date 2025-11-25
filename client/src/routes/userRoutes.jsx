@@ -6,9 +6,21 @@ import { ProtectedRoutes } from "./ProtectedRoutes";
 import ResetPasswordPage from "../features/user/account/components/ResetPasswordPage";
 
 import * as Pages from "./userLazyPages";
+import { Loader2 } from "lucide-react";
+
+const AppLoader = () => {
+  return (
+    <div className="flex flex-col justify-center items-center gap-4 py-20 text-center">
+      <Loader2 className="w-10 h-10 animate-spin text-gray-700 dark:text-gray-300" />
+      <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        Please wait while we prepare your experience…
+      </p>
+    </div>
+  );
+};
 
 const UserRoutes = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<AppLoader />}>
     <Routes>
       <Route element={<UserLayout />} errorElement={<Pages.ErrorPage />}>
         <Route path="/" element={<Pages.LandingPage />} />

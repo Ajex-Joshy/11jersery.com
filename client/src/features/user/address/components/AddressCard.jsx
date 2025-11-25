@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Edit2, Trash2 } from "lucide-react";
 import ConfirmationModal from "../../../../components/common/ConfirmationModal";
+import PropTypes from "prop-types";
 
 const AddressCard = ({ address, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,6 +82,25 @@ const AddressCard = ({ address, onDelete }) => {
       />
     </>
   );
+};
+
+AddressCard.propTypes = {
+  address: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    addressLine1: PropTypes.string,
+    addressLine2: PropTypes.string,
+    city: PropTypes.string,
+    state: PropTypes.string,
+    pinCode: PropTypes.string,
+    country: PropTypes.string,
+    phone: PropTypes.string,
+    isDefault: PropTypes.bool,
+    addressName: PropTypes.string,
+  }).isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default AddressCard;

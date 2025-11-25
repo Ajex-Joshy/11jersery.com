@@ -7,8 +7,6 @@ import {
   verifyEmailOtp,
 } from "./userApis";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { setUser } from "./authSlice";
 export const USER_PROFILE_KEY = ["userProfile"];
 
 export const useUserProfile = () => {

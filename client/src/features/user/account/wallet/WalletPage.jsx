@@ -22,7 +22,7 @@ const WalletPage = () => {
     error,
   } = useWalletData({
     page,
-    limit: 10,
+    limit: 5,
     type: filterType || undefined, // Don't send empty string
   });
 

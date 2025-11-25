@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Plus, Minus } from "lucide-react";
+import PropTypes from "prop-types";
 
 const AccordionItem = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,9 +13,9 @@ const AccordionItem = ({ title, children }) => {
       >
         <span className="font-semibold text-gray-800">{title}</span>
         {isOpen ? (
-          <Minus size={18} className="flex-shrink-0" />
+          <Minus size={18} className="shrink-0" />
         ) : (
-          <Plus size={18} className="flex-shrink-0" />
+          <Plus size={18} className="shrink-0" />
         )}
       </button>
       <div
@@ -30,6 +31,11 @@ const AccordionItem = ({ title, children }) => {
       </div>
     </div>
   );
+};
+
+AccordionItem.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node,
 };
 
 export default AccordionItem;

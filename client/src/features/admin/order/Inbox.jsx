@@ -11,6 +11,7 @@ import DynamicTable from "../../../components/admin/DynamicTable";
 import StatusBadge from "./components/StatusBadge";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
 import { Eye, CheckCircle, XCircle, PackageCheck } from "lucide-react";
+import { ErrorDisplay } from "../../../components/common/StateDisplays";
 
 const Inbox = () => {
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ const Inbox = () => {
       );
     }
   };
+  if (isError) <ErrorDisplay error={error} />;
 
   // Columns
   const columns = [

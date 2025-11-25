@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save, AlertTriangle, X, Info, Trash2 } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import toast from "react-hot-toast";
 import { useState } from "react";
 
@@ -165,9 +165,9 @@ const AdminOrderDetails = () => {
 
   const statusOptions = ["Pending", "Processing", "Shipped", "Delivered"];
 
-  const canCancel = ["Pending", "Processing", "Placed"].includes(
-    order.orderStatus
-  );
+  // const canCancel = ["Pending", "Processing", "Placed"].includes(
+  //   order.orderStatus
+  // );
 
   return (
     <div className="p-6 bg-gray-50/50 min-h-screen font-sans">

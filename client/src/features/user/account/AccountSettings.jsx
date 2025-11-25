@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Pencil, AlertTriangle, Loader2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useSelector } from "react-redux";
 import { PersonalDetailsModal } from "./components/PersonalDetailsModal";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 import { ErrorDisplay } from "../../../components/common/StateDisplays";
 import { selectCurrentUser } from "./authSlice";
-import toast from "react-hot-toast";
 import { useUserProfile } from "./userHooks";
 
 const SettingsCard = ({ title, children, onEdit }) => (
@@ -26,10 +25,10 @@ const SettingsCard = ({ title, children, onEdit }) => (
 
 const InfoRow = ({ label, value }) => (
   <div className="flex flex-col sm:flex-row sm:items-center">
-    <span className="text-sm font-medium text-gray-500 w-28 flex-shrink-0">
+    <span className="text-sm font-medium text-gray-500 w-28 shrink-0">
       {label}
     </span>
-    <span className="text-md text-gray-800 break-words">{value}</span>
+    <span className="text-md text-gray-800 wrap-break-words">{value}</span>
   </div>
 );
 

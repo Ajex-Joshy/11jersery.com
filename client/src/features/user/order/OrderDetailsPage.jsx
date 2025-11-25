@@ -1,13 +1,7 @@
 import React, { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Download,
-  MapPin,
-  CreditCard,
-  Phone,
-  User,
-} from "lucide-react";
+import { toast } from "react-hot-toast";
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import OrderTimeline from "./components/OrderTimeline";
 import { OrderItem } from "./components/OrderItem";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
@@ -84,7 +78,12 @@ const OrderDetailsPage = () => {
   const confirmAction = () => {
     const { action, itemId } = actionModal;
 
-    // Call the appropriate action from the hook
+    if (action.startsWith("return") && !actionReason.trim()) {
+      toast.error("Please provide a reason to proceed with return.");
+      return;
+    }
+
+    // Execute the action
     if (action === "cancel_order") actions.cancelOrder(actionReason);
     else if (action === "cancel_item") actions.cancelItem(itemId, actionReason);
     else if (action === "return_order") actions.returnOrder(actionReason);

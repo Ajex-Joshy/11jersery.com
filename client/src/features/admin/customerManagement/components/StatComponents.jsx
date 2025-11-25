@@ -1,4 +1,5 @@
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import PropTypes from "prop-types";
 
 export const MainStatCard = ({ title, value, percentage, timeframe }) => {
   const isPositive = percentage >= 0;
@@ -26,9 +27,21 @@ export const MainStatCard = ({ title, value, percentage, timeframe }) => {
   );
 };
 
+MainStatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  percentage: PropTypes.number.isRequired,
+  timeframe: PropTypes.string,
+};
+
 export const OverviewStat = ({ value, title }) => (
   <div className="text-center md:text-left">
     <p className="text-3xl font-bold text-gray-900">{value}</p>
     <p className="text-sm text-gray-500">{title}</p>
   </div>
 );
+
+OverviewStat.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  title: PropTypes.string.isRequired,
+};

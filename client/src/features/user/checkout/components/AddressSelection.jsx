@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Plus, MapPin, CheckCircle2, Loader2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAddresses } from "../../address/addressHooks";
@@ -104,6 +105,11 @@ const AddressSelection = ({ selectedId, onSelect }) => {
       )}
     </div>
   );
+};
+
+AddressSelection.propTypes = {
+  selectedId: PropTypes.string,
+  onSelect: PropTypes.func,
 };
 
 export default AddressSelection;

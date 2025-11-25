@@ -5,6 +5,7 @@ import { X, Loader2 } from "lucide-react";
 import { changePasswordSchema } from "../profileSchema.js";
 import { useUpdatePassword } from "../userHooks.js";
 import { FormInput } from "../../../../components/common/FormComponents.jsx";
+import PropTypes from "prop-types";
 export const ChangePasswordModal = ({ isOpen, onClose, userEmail }) => {
   const { mutate, isLoading } = useUpdatePassword();
 
@@ -102,3 +103,11 @@ export const ChangePasswordModal = ({ isOpen, onClose, userEmail }) => {
     </div>
   );
 };
+
+ChangePasswordModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  userEmail: PropTypes.string,
+};
+
+export default ChangePasswordModal;

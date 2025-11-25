@@ -7,12 +7,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Separate instance for refresh
-const refreshAxios = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
-  withCredentials: true,
-});
-
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {

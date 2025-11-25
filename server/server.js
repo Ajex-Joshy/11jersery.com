@@ -34,7 +34,7 @@ const httpLogger = pinoHttp({
 });
 
 app.use(express.json());
-// app.use(httpLogger);
+app.use(httpLogger);
 
 app.use((req, res, next) => {
   // Start a timer for request duration

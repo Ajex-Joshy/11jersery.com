@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import { S3_URL } from "../../../../utils/constants";
 
 const CollectionCard = ({ collection }) => {
@@ -10,7 +11,7 @@ const CollectionCard = ({ collection }) => {
   return (
     <Link
       to={`/collection/${collection.slug}`}
-      className="group relative block aspect-[4/3] overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+      className="group relative block aspect-4/3 overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
     >
       <img
         src={imageUrl}
@@ -21,7 +22,7 @@ const CollectionCard = ({ collection }) => {
         }}
       />
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent"></div>
       <div className="absolute bottom-0 left-0 p-4">
         <h3 className="text-lg font-semibold text-white group-hover:underline">
           {collection.title}
@@ -29,6 +30,14 @@ const CollectionCard = ({ collection }) => {
       </div>
     </Link>
   );
+};
+
+CollectionCard.propTypes = {
+  collection: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    cloudinaryImageId: PropTypes.string,
+  }).isRequired,
 };
 
 export default CollectionCard;

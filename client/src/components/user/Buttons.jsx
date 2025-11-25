@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { FileText, Loader2 } from "lucide-react";
 import { useDownloadInvoice } from "../../features/user/order/orderHooks";
 
@@ -54,6 +55,12 @@ const InvoiceDownloadButton = ({
       {isLoading ? "Downloading..." : "Download Invoice"}
     </button>
   );
+};
+
+InvoiceDownloadButton.propTypes = {
+  order: PropTypes.object.isRequired,
+  className: PropTypes.string,
+  variant: PropTypes.string,
 };
 
 export default InvoiceDownloadButton;

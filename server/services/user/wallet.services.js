@@ -1,4 +1,3 @@
-import Transaction from "../../models/order-transaction.model.js";
 import User from "../../models/user.model.js";
 import walletTransaction from "../../models/wallet-transaction.js";
 import { getPagination } from "../../utils/helpers.js";
@@ -34,25 +33,28 @@ export const debitWallet = async (session, userId, amount, orderId, reason) => {
   await user.save({ session });
 };
 
-export const creditWallet = async (session, userId, amount, paymentId) => {
-  let wallet = await Wallet.findOne({ userId }).session(session);
-
-  if (!wallet) {
-    wallet = new Wallet({ userId, balance: 0 });
-  }
+export const creditWallet = async (
+  session,
+  userId,
+  amount,
+  reason,
+  paymentMethod
+) => {
+  const user = await User.findById(userId).select("wallet");
+  let wallet = user.wallet || 0;
 
   wallet.balance += amount;
   await wallet.save({ session });
 
-  return await Transaction.create(
+  return await walletTransaction.create(
     [
       {
         userId,
         amount: { total: amount },
         type: "CREDIT",
-        reason: "WALLET_TOPUP",
+        reason,
         status: "SUCCESS",
-        paymentMethod: "RAZORPAY",
+        paymentMethod,
         paymentId,
       },
     ],
@@ -61,14 +63,7 @@ export const creditWallet = async (session, userId, amount, paymentId) => {
 };
 
 export const getUserWalletData = async (userId, queryParams) => {
-  const {
-    page = 1,
-    limit = 10,
-    type,
-    status,
-    startDate,
-    endDate,
-  } = queryParams;
+  const { page = 1, limit = 5, type, status, startDate, endDate } = queryParams;
 
   const user = await User.findById(userId).select("wallet");
   if (!user) throw createError(404, "User not found");
@@ -92,7 +87,7 @@ export const getUserWalletData = async (userId, queryParams) => {
       .limit(pageSize)
       .select("-__v")
       .lean(),
-    Transaction.countDocuments(walletQuery),
+    walletTransaction.countDocuments(walletQuery),
   ]);
 
   return {

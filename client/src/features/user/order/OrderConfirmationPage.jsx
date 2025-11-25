@@ -108,7 +108,7 @@ const OrderConfirmationPage = () => {
                     key={item._id}
                     className="p-6 flex flex-col sm:flex-row gap-6"
                   >
-                    <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
+                    <div className="w-24 h-24 shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
                       <img
                         src={item.imageUrl}
                         alt={item.title}
@@ -199,6 +199,7 @@ const OrderConfirmationPage = () => {
                 <br />
                 {order.shippingAddress.country}
                 <br />
+                {console.log(order.shippingAddress)}
                 <span className="block mt-2">
                   {console.log(order.hippingAddress)}
                   Phone: {order.shippingAddress.phoneNumber}

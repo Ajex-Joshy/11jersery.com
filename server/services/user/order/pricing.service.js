@@ -1,9 +1,13 @@
 import Product from "../../../models/product.model.js";
 import { getSignedUrlForKey } from "../../admin/service-helpers/s3.service.js";
 import { validateStock } from "./stock.service.js";
+import { MAX_QUANTITY_PER_ORDER } from "../../../utils/constants.js";
 
 export const calculateOrderPrice = async (items) => {
   for (const item of items) {
+    if (item.quantity > MAX_QUANTITY_PER_ORDER) {
+      throw new Error(`Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`);
+    }
     await validateStock(item.productId, item.size, item.quantity);
   }
 
@@ -44,7 +48,6 @@ export const calculateOrderPrice = async (items) => {
 
   const deliveryFee = discountedPrice < 500 ? 80 : 0;
   const total = discountedPrice + deliveryFee;
-  console.log(items.length);
 
   return { items: updatedItems, subtotal, discountedPrice, deliveryFee, total };
 };

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { Search, Package, Filter, ArrowRight, Download } from "lucide-react";
+import { Search, Package, ArrowRight } from "lucide-react";
 import { useOrders } from "./orderHooks";
 import {
   LoadingSpinner,
@@ -73,7 +72,7 @@ const OrderHistoryCard = ({ order }) => {
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
         {/* Image Stack */}
         <div className="flex -space-x-3 overflow-hidden py-2">
-          {previewItems.map((item, idx) => (
+          {previewItems.map((item) => (
             <img
               key={item._id}
               src={item.imageUrl}
@@ -115,7 +114,7 @@ const OrderHistoryCard = ({ order }) => {
           )}
           <button
             onClick={() => navigate(`/account/orders/${order._id}`)}
-            className="flex-grow md:flex-grow-0 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
+            className="grow md:grow-0 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
           >
             View Details <ArrowRight size={16} />
           </button>

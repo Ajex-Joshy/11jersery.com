@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { X, SlidersHorizontal } from "lucide-react";
 
 const FilterSidebar = ({
@@ -137,6 +138,44 @@ const PriceFilter = ({ range, activePrice, onPriceChange }) => {
       {/* TODO: Add a price range slider component here */}
     </div>
   );
+};
+
+FilterSidebar.propTypes = {
+  metadata: PropTypes.object,
+  activeFilters: PropTypes.object,
+  onFilterChange: PropTypes.func,
+  onPriceChange: PropTypes.func,
+  onClearFilters: PropTypes.func,
+};
+
+CategoryFilter.propTypes = {
+  categories: PropTypes.arrayOf(
+    PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      count: PropTypes.number.isRequired,
+    })
+  ),
+  activeCategory: PropTypes.string,
+  onCategoryChange: PropTypes.func,
+};
+
+SizeFilter.propTypes = {
+  sizes: PropTypes.arrayOf(PropTypes.string),
+  activeSize: PropTypes.string,
+  onSizeChange: PropTypes.func,
+};
+
+PriceFilter.propTypes = {
+  range: PropTypes.shape({
+    starts: PropTypes.number,
+    ends: PropTypes.number,
+  }),
+  activePrice: PropTypes.shape({
+    min: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    max: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }),
+  onPriceChange: PropTypes.func,
 };
 
 export default FilterSidebar;

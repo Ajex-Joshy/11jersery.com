@@ -19,9 +19,6 @@ export const useCategories = (params) => {
     queryKey: [CATEGORIES_QUERY_KEY, params],
     queryFn: getCategories,
     keepPreviousData: true,
-
-    // Pro-tip: Add a staleTime to prevent unnecessary refetches
-    // if the data doesn't change often.
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
@@ -32,11 +29,19 @@ export const useAddCategory = () => {
 
   return useMutation({
     mutationFn: addCategory,
-    onSuccess: (data) => {
-      toast.success(data.data || "Category added successfully!");
+    onSuccess: async (data) => {
+      toast.success("Category added successfully!");
 
-      // Invalidate the main category list query so it refetches
-      queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
+      await queryClient.setQueryData([CATEGORIES_QUERY_KEY], (old) => {
+        if (!old?.data?.categories) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            categories: [data.data, ...old.data.categories],
+          },
+        };
+      });
 
       navigate("/admin/categories");
     },
@@ -49,7 +54,6 @@ export const useToggleCategoryList = () => {
   return useMutation({
     mutationFn: toggleCategoryList,
 
-    // ---- OPTIMISTIC UPDATE ----
     onMutate: async ({ categoryId }) => {
       await queryClient.cancelQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
 

@@ -3,7 +3,6 @@ import {
   updatePersonalDetails,
   updatePassword,
   confirmEmailChange,
-  requestEmailChange,
 } from "../../services/user/account.services.js";
 import { sendResponse } from "../../utils/helpers.js";
 export const getUserAccountController = async (req, res) => {
@@ -48,7 +47,9 @@ export const requestEmailOtpController = async (req, res, next) => {
     const userId = req.user._id;
     const { newEmail } = req.body;
 
-    const result = await requestEmailChange(userId, newEmail);
+    const result = await requestEmai;
+
+    lChange(userId, newEmail);
 
     sendResponse(res, {
       message: "OTP sent successfully",

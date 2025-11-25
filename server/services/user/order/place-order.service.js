@@ -16,7 +16,8 @@ export const placeCodOrder = async (userId, shippingAddressId) => {
     const cart = await Cart.findOne({ userId });
     const items = cart.items || [];
     const priceData = await calculateOrderPrice(items);
-    console.log(cart.toJSON(), items);
+
+    
 
     const order = await finalizeOrderCreation(session, {
       userId,

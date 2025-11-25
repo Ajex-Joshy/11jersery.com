@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   CheckCircle,
   XCircle,
@@ -137,6 +138,24 @@ export const OrderItem = ({
       </div>
     </div>
   );
+};
+
+OrderItem.propTypes = {
+  item: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    size: PropTypes.string.isRequired,
+    quantity: PropTypes.number.isRequired,
+    salePrice: PropTypes.number.isRequired,
+    status: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    cancelReason: PropTypes.string,
+    returnReason: PropTypes.string,
+  }).isRequired,
+  onCancelItem: PropTypes.func.isRequired,
+  onApproveReturn: PropTypes.func.isRequired,
+  onRejectReturn: PropTypes.func.isRequired,
+  onConfirmReturn: PropTypes.func.isRequired,
 };
 
 export default OrderItem;

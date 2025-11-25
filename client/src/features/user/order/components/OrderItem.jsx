@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
   const isCancelled = [
@@ -84,3 +85,21 @@ export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
     </div>
   );
 };
+
+OrderItem.propTypes = {
+  item: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    size: PropTypes.string.isRequired,
+    quantity: PropTypes.number.isRequired,
+    salePrice: PropTypes.number.isRequired,
+    status: PropTypes.string.isRequired,
+  }).isRequired,
+  onCancelItem: PropTypes.func,
+  onReturnItem: PropTypes.func,
+  canReturn: PropTypes.bool,
+};
+
+export default OrderItem;

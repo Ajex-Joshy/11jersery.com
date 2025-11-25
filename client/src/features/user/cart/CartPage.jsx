@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Home, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart, useClearCart } from "./cartHooks";
@@ -10,8 +9,6 @@ import { EmptyCart } from "./components/EmptyCart";
 import CartPageSkeleton from "./components/CartSkelton";
 
 const CartPage = () => {
-  const navigate = useNavigate();
-
   const { data: cartPayload, isLoading, isError, error } = useCart();
   console.log(cartPayload);
 

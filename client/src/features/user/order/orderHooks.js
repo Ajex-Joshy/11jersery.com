@@ -7,7 +7,6 @@ import {
   getOrders,
   placeCODOrder,
   placeWalletOrder,
-  requestReturnItem,
   returnOrder,
   returnOrderItem,
 } from "./orderApis";
@@ -91,6 +90,11 @@ export const useOrderDetails = (orderId) => {
     queryKey: [ORDER_DETAILS_KEY, orderId],
     queryFn: () => getOrderDetails(orderId),
     enabled: !!orderId,
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Failed to fetch order details"
+      );
+    },
   });
 
   // 2. Cancellation Mutations (Existing)

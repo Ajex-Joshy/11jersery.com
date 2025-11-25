@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 // Hooks
 import { useCart } from "../cart/cartHooks";
 import { useProcessOrder } from "./useProcesOrder";
+import { useEffect } from "react";
 // Components
 import { OrderSummary } from "../../../components/user/OrderSummary";
 import {
@@ -25,17 +26,16 @@ const PaymentPage = () => {
 
   const [selectedMethod, setSelectedMethod] = useState("wallet");
 
-  // Loading/Error States
-  if (isLoading) return <LoadingSpinner text="Loading payment options..." />;
-  if (isError) return <ErrorDisplay error={error} />;
-
-  const cart = cartPayload?.data || {};
-  const items = cart.items || [];
   useEffect(() => {
+    const items = cartPayload?.data?.items || [];
     if (items.length === 0) {
       navigate("/cart");
     }
-  }, [items, navigate]);
+  }, [cartPayload, navigate]);
+
+  // Loading/Error States
+  if (isLoading) return <LoadingSpinner text="Loading payment options..." />;
+  if (isError) return <ErrorDisplay error={error} />;
 
   const handlePlaceOrder = async () => {
     if (!selectedMethod) {
@@ -93,7 +93,7 @@ const PaymentPage = () => {
 
             {/* Security Notice */}
             <div className="bg-blue-50 p-4 rounded-lg flex gap-3 text-sm text-blue-800 mt-6">
-              <ShieldCheck className="flex-shrink-0" size={20} />
+              <ShieldCheck className="shrink-0" size={20} />
               <p>
                 Your payment information is encrypted and secure. We do not
                 store your card details.

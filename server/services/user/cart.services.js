@@ -2,6 +2,7 @@ import createError from "http-errors";
 import Cart from "../../models/cart.model.js";
 import Product from "../../models/product.model.js";
 import { calculateOrderPrice } from "./order/pricing.service.js";
+import { MAX_QUANTITY_PER_ORDER } from "../../utils/constants.js";
 
 const findUserCart = async (userId) => {
   const cart = await Cart.findOne({ userId });
@@ -47,6 +48,12 @@ export const addItem = async (userId, { productId, size, quantity }) => {
   if (existingItem) {
     // --- Update Existing Item ---
     const newQuantity = existingItem.quantity + quantity;
+    if (newQuantity > MAX_QUANTITY_PER_ORDER) {
+      throw createError(
+        400,
+        `Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`
+      );
+    }
 
     // Check stock
     if (variant.stock < newQuantity) {
@@ -67,7 +74,12 @@ export const addItem = async (userId, { productId, size, quantity }) => {
         `Insufficient stock. Only ${variant.stock} available.`
       );
     }
-
+    if (quantity > MAX_QUANTITY_PER_ORDER) {
+      throw createError(
+        400,
+        `Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`
+      );
+    }
     cart.items.push({
       productId,
       size,
@@ -104,7 +116,12 @@ export const adjustItemQuantity = async (userId, itemId, action) => {
 
   if (action === "increment") {
     newQuantity += 1;
-
+    if (newQuantity > MAX_QUANTITY_PER_ORDER) {
+      throw createError(
+        400,
+        `Maximum quantity per item is ${MAX_QUANTITY_PER_ORDER}`
+      );
+    }
     if (newQuantity > variant.stock) {
       throw createError(
         400,

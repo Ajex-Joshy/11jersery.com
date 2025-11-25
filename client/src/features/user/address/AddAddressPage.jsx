@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router-dom";
 import { Loader2, ArrowLeft } from "lucide-react";
@@ -18,18 +18,16 @@ const AddAddressPage = () => {
   const { mutate: addAddress, isLoading: isAdding } = useAddAddress();
   const { mutate: updateAddress, isLoading: isUpdating } = useUpdateAddress();
 
-  let addressData = null;
-  let isFetching = false;
-  if (addressId && addressId !== "new") {
-    const result = useGetAddressById(addressId, { enabled: true });
-    addressData = result.data;
-    isFetching = result.isLoading;
-  }
+  const shouldFetch = addressId && addressId !== "new";
+
+  const { data: addressData, isLoading: isFetching } = useGetAddressById(
+    addressId,
+    { enabled: shouldFetch }
+  );
 
   const {
     register,
     handleSubmit,
-    control,
     reset,
     formState: { errors },
   } = useForm({
@@ -241,7 +239,7 @@ const AddAddressPage = () => {
 
         {/* Section: Address Name / Type */}
         <div className="flex flex-col md:flex-row gap-6 items-end">
-          <div className="flex-grow">
+          <div className="grow">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Address Name
             </label>

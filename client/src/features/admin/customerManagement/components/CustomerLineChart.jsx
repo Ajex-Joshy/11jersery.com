@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   LineChart,
   Line,
@@ -66,4 +67,13 @@ export const CustomerLineChart = ({ data }) => {
       </ResponsiveContainer>
     </div>
   );
+};
+
+CustomerLineChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      newCustomers: PropTypes.number.isRequired,
+    })
+  ).isRequired,
 };

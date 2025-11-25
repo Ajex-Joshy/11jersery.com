@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { User, Mail, Phone } from "lucide-react";
 
 import {
-  LoadingSpinner,
   ErrorDisplay,
+  LoadingSpinner,
 } from "../../../components/common/StateDisplays.jsx";
 import { selectCurrentUser } from "./authSlice.js";
 import { useUserProfile } from "./userHooks.js";
@@ -43,8 +43,15 @@ const InfoRow = ({ icon: Icon, label, value }) => (
 
 const AccountOverview = () => {
   const { data: profilePayload, isLoading, isError, error } = useUserProfile();
-
   const userFromStore = useSelector(selectCurrentUser);
+
+  if (isLoading) {
+    return <LoadingSpinner text="Loading your profile..." />;
+  }
+
+  if (isError) {
+    return <ErrorDisplay error={error} />;
+  }
 
   // Get data from Redux as a fallback/initial state
   const user = profilePayload?.data || userFromStore;
@@ -70,7 +77,7 @@ const AccountOverview = () => {
 
       {/* --- Main Content --- */}
       <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col md:flex-row items-start gap-8">
-        <div className="flex-shrink-0 w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
+        <div className="shrink-0 w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
           <img
             src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png"
             alt="Profile"

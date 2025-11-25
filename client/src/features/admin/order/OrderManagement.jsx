@@ -7,6 +7,7 @@ import StatusBadge from "./components/StatusBadge";
 import DynamicTable from "../../../components/admin/DynamicTable";
 import { Eye } from "lucide-react";
 import { orderStatusOptions } from "../../../utils/constants.js";
+import { ErrorDisplay } from "../../../components/common/StateDisplays.jsx";
 
 const OrderManagement = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const OrderManagement = () => {
     error,
   } = useAdminOrders(queryParams);
   console.log(ordersPayload);
+  if (isError) return <ErrorDisplay error={error} />;
 
   const orders = ordersPayload?.data?.orders || [];
   const pagination = ordersPayload?.data?.pagination;

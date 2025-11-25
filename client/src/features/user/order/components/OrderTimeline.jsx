@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import PropTypes from "prop-types";
 import {
   Check,
   Package,
@@ -181,6 +182,18 @@ export const OrderTimeline = ({ timeline = {}, status = "Pending" }) => {
       </div>
     </div>
   );
+};
+
+OrderTimeline.propTypes = {
+  timeline: PropTypes.shape({
+    placedAt: PropTypes.string,
+    confirmedAt: PropTypes.string,
+    shippedAt: PropTypes.string,
+    deliveredAt: PropTypes.string,
+    cancelledAt: PropTypes.string,
+    returnedAt: PropTypes.string,
+  }),
+  status: PropTypes.string,
 };
 
 export default OrderTimeline;

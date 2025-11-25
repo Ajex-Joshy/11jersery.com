@@ -52,6 +52,7 @@ export const listUserOrdersController = asyncHandler(async (req, res) => {
 export const getOrderDetailsController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user._id;
+  validateObjectId(orderId);
 
   const order = await getOrderDetails(userId, orderId);
 

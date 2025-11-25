@@ -1,4 +1,5 @@
 import { AlertTriangle, Info, X } from "lucide-react";
+import PropTypes from "prop-types";
 
 const FeeWarningModal = ({ isOpen, onClose, onProceed }) => {
   if (!isOpen) return null;
@@ -68,6 +69,12 @@ const FeeWarningModal = ({ isOpen, onClose, onProceed }) => {
       </div>
     </div>
   );
+};
+
+FeeWarningModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onProceed: PropTypes.func.isRequired,
 };
 
 export default FeeWarningModal;
