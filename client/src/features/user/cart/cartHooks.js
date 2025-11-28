@@ -50,55 +50,93 @@ export const useAddItemToCart = () => {
 
     onError: (err) => {
       toast.error(
-        err?.message ||
-          err?.response?.data?.error?.message ||
-          "Something went wrong"
+        err?.response?.data?.error?.message || "Something went wrong"
       );
     },
   });
 };
 export const useIncrementItem = () =>
-  useCartOptimisticMutation(incrementItem, (cart, { itemId }) => {
-    if (!cart) return cart;
-    const updated = cloneCart(cart);
-    const item = updated.data.items.find((i) => i._id === itemId);
-    if (item) {
-      if (item.quantity >= MAX_QUANTITY_PER_ORDER) {
-        toast.error("Maximum quantity per order is 20");
-        return cart;
+  useCartOptimisticMutation(
+    incrementItem,
+    (cart, { itemId }) => {
+      if (!cart) return cart;
+      const updated = cloneCart(cart);
+      const item = updated.data.items.find((i) => i._id === itemId);
+      if (item) {
+        if (item.quantity >= MAX_QUANTITY_PER_ORDER) {
+          toast.error("Maximum quantity per order is 20");
+          return cart;
+        }
+        item.quantity += 1;
       }
-      item.quantity += 1;
+      return recalcTotals(updated);
+    },
+    {
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.error?.message || "Something went wrong"
+        );
+      },
     }
-    return recalcTotals(updated);
-  });
+  );
 
 export const useDecrementItem = () =>
-  useCartOptimisticMutation(decrementItem, (cart, { itemId }) => {
-    if (!cart) return cart;
-    const updated = cloneCart(cart);
-    const item = updated.data.items.find((i) => i._id === itemId);
-    if (item && item.quantity > 1) item.quantity -= 1;
-    return recalcTotals(updated);
-  });
+  useCartOptimisticMutation(
+    decrementItem,
+    (cart, { itemId }) => {
+      if (!cart) return cart;
+      const updated = cloneCart(cart);
+      const item = updated.data.items.find((i) => i._id === itemId);
+      if (item && item.quantity > 1) item.quantity -= 1;
+      return recalcTotals(updated);
+    },
+    {
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.error?.message || "Something went wrong"
+        );
+      },
+    }
+  );
 
 export const useRemoveItemFromCart = () =>
-  useCartOptimisticMutation(removeItemFromCart, (cart, { itemId }) => {
-    if (!cart) return cart;
-    const updated = cloneCart(cart);
-    updated.data.items = updated.data.items.filter((i) => i._id !== itemId);
-    return recalcTotals(updated);
-  });
+  useCartOptimisticMutation(
+    removeItemFromCart,
+    (cart, { itemId }) => {
+      if (!cart) return cart;
+      const updated = cloneCart(cart);
+      updated.data.items = updated.data.items.filter((i) => i._id !== itemId);
+      return recalcTotals(updated);
+    },
+    {
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.error?.message || "Something went wrong"
+        );
+      },
+    }
+  );
 
 export const useClearCart = () =>
-  useCartOptimisticMutation(clearCart, (cart) => {
-    if (!cart) return cart;
-    const updated = cloneCart(cart);
-    updated.data.items = [];
-    updated.data.totals = {
-      subTotal: 0,
-      shipping: 0,
-      tax: 0,
-      grandTotal: 0,
-    };
-    return updated;
-  });
+  useCartOptimisticMutation(
+    clearCart,
+    (cart) => {
+      if (!cart) return cart;
+      const updated = cloneCart(cart);
+      updated.data.items = [];
+      updated.data.totals = {
+        subTotal: 0,
+        shipping: 0,
+        tax: 0,
+        grandTotal: 0,
+      };
+      return updated;
+    },
+    {
+      onError: (err) => {
+        toast.error(
+          err?.response?.data?.error?.message || "Something went wrong"
+        );
+      },
+    }
+  );

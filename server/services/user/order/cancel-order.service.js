@@ -51,6 +51,8 @@ export const cancelOrder = async (userId, orderId, reason) => {
 };
 
 export const cancelItem = async (userId, orderId, itemId, reason) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const order = await Order.findOne({ "items._id": itemId, userId }).session(
       session

@@ -9,6 +9,8 @@ import {
   requestOrderReturnController,
   requestItemReturnController,
   placeWalletOrderController,
+  initRazorpayOrderController,
+  verifyRazorpayOrderController,
   // submitProductReviewController,
 } from "../../controllers/user/order.controller.js";
 import { generateInvoiceController } from "../../controllers/user/order.controller.js";
@@ -19,6 +21,10 @@ router.use(authenticateUser);
 router.post("/cod", placeCodOrderController);
 
 router.post("/wallet", placeWalletOrderController);
+
+router.post("/online", initRazorpayOrderController);
+
+router.post("/verify-online-order", verifyRazorpayOrderController);
 
 router.get("/", listUserOrdersController);
 

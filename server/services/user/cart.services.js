@@ -1,22 +1,31 @@
 import createError from "http-errors";
 import Cart from "../../models/cart.model.js";
 import Product from "../../models/product.model.js";
-import { calculateOrderPrice } from "./order/pricing.service.js";
 import { MAX_QUANTITY_PER_ORDER } from "../../utils/constants.js";
+import { calculateOrderPrice } from "./order/pricing/pricing.service.js";
+import { processCartItems } from "./order/utils/processCartItems.js";
 
-const findUserCart = async (userId) => {
+export const findUserCart = async (userId) => {
   const cart = await Cart.findOne({ userId });
-  const result = calculateOrderPrice(cart.items);
-  return result;
+  const price = await calculateOrderPrice(cart);
+  const processedItems = await processCartItems(cart);
+  return { items: processedItems, ...price };
 };
 
 export const getCart = async (userId) => {
-  let cart = await findUserCart(userId);
+  let cartData = await findUserCart(userId);
 
-  if (!cart) {
+  if (!cartData) {
     return await Cart.create({ userId, items: [] });
   }
-  return cart;
+  console.log(cartData);
+  return { items: cartData.processedItems, ...cartData };
+};
+
+export const clearCoupon = async (userId) => {
+  const cart = await Cart.findOne({ userId });
+  cart.couponCode = null;
+  await cart.save();
 };
 
 export const addItem = async (userId, { productId, size, quantity }) => {
@@ -166,6 +175,7 @@ export const clearCart = async (userId) => {
   }
 
   cart.items = [];
+  cart.couponCode = "";
   await cart.save();
   return cart;
 };

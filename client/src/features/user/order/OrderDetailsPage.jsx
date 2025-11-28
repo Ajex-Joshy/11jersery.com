@@ -12,6 +12,8 @@ import {
 } from "../../../components/common/StateDisplays";
 import FeeWarningModal from "./components/FeeWarningModal";
 import { useOrderDetails } from "./orderHooks";
+import PriceSummary from "./components/PriceSummary";
+import AddressCard from "./components/AddressCard";
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();
@@ -206,70 +208,8 @@ const OrderDetailsPage = () => {
 
           {/* --- Right Column (Summary & Address) --- */}
           <div className="space-y-6">
-            {/* Shipping Address */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              {/* ... (Same address display code as before) ... */}
-              <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                Shipping Address
-              </h2>
-              <address className="not-italic text-sm text-gray-600 leading-relaxed">
-                <strong className="text-gray-900 block mb-1">
-                  {order.shippingAddress.firstName}{" "}
-                  {order.shippingAddress.lastName}
-                </strong>
-                {order.shippingAddress.addressLine1}
-                <br />
-                {order.shippingAddress.addressLine2 && (
-                  <>
-                    {order.shippingAddress.addressLine2}
-                    <br />
-                  </>
-                )}
-                {order.shippingAddress.city}, {order.shippingAddress.state}
-                <br />
-                {order.shippingAddress.country} -{" "}
-                {order.shippingAddress.pinCode}
-                <br />
-                <span className="block mt-2">
-                  Phone: {order.shippingAddress.phone}
-                </span>
-              </address>
-            </div>
-
-            {/* Price Summary */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              {/* ... (Same price summary code as before) ... */}
-              <h2 className="font-semibold text-gray-900 mb-4">
-                Payment Summary
-              </h2>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>₹{order.price.subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Discount</span>
-                  <span className="text-green-600">
-                    - ₹
-                    {(
-                      order.price.subtotal - order.price.discountedPrice
-                    ).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Delivery</span>
-                  <span>
-                    {order.price.deliveryFee === 0
-                      ? "Free"
-                      : `₹${order.price.deliveryFee}`}
-                  </span>
-                </div>
-                <div className="pt-3 mt-3 border-t border-gray-100 flex justify-between items-center font-bold text-gray-900 text-base">
-                  <span>Total</span>
-                  <span>₹{order.price.total.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
+            <AddressCard address={order.shippingAddress} />
+            <PriceSummary price={order.price} />
           </div>
         </div>
 

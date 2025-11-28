@@ -37,8 +37,23 @@ export const validateStock = async (productId, size, quantity) => {
 };
 
 export const reduceStock = async (session, productId, size, quantity) => {
-  return Product.updateOne(
-    { _id: productId, "variants.size": size },
+  const result = await Product.updateOne(
+    {
+      _id: productId,
+      "variants.size": size,
+      "variants.stock": { $gte: quantity },
+    },
     { $inc: { "variants.$.stock": -quantity } }
   ).session(session);
+  console.log(result);
+
+  if (result.modifiedCount === 0) {
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "INSUFFICIENT_STOCK",
+      "Insufficient stock available"
+    );
+  }
+
+  return result;
 };

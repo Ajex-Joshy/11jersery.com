@@ -17,11 +17,9 @@ export const recalcTotals = (cart) => {
   );
 
   cart.data.subtotal = subtotal;
-  cart.data.discountedPrice = discountedPrice;
+  cart.data.discount = subtotal - discountedPrice;
 
-  cart.data.total = discountedPrice;
   cart.data.deliveryFee = discountedPrice < 500 ? 80 : 0;
-  cart.data.total += cart.data.deliveryFee;
 
   return cart;
 };

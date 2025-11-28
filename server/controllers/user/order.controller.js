@@ -7,6 +7,8 @@ import {
   requestReturnItem,
   requestReturnOrder,
   placeWalletOrder,
+  initOnlineOrder,
+  verifyAndPlaceOnlineOrder,
 } from "../../services/user/order/index.js";
 import { STATUS_CODES } from "../../utils/constants.js";
 import {
@@ -132,3 +134,34 @@ export const generateInvoiceController = asyncHandler(async (req, res) => {
 
 //   return sendResponse(res, result, STATUS_CODES.CREATED);
 // });
+
+// INIT RAZORPAY ORDER
+export const initRazorpayOrderController = asyncHandler(async (req, res) => {
+  const { shippingAddressId } = req.body;
+  validateObjectId(shippingAddressId);
+  const userId = req.user._id;
+
+  const order = await initOnlineOrder(userId, shippingAddressId);
+
+  return sendResponse(res, order, STATUS_CODES.CREATED);
+});
+
+// VERIFY RAZORPAY ORDER
+export const verifyRazorpayOrderController = asyncHandler(async (req, res) => {
+  const { paymentDetails } = req.body;
+  const userId = req.user._id;
+
+  if (!paymentDetails)
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "VALIDATION_ERROR",
+      "Payment details are required"
+    );
+
+  const verifiedOrder = await verifyAndPlaceOnlineOrder({
+    userId,
+    paymentDetails,
+  });
+
+  return sendResponse(res, verifiedOrder);
+});

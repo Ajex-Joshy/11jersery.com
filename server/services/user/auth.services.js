@@ -9,10 +9,19 @@ import { config } from "dotenv";
 config();
 import admin from "../../config/firebaseAdmin.js";
 import { STATUS_CODES } from "../../utils/constants.js";
+import { customAlphabet } from "nanoid";
+const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8);
 
 export const signupUser = async (userData) => {
-  const { firstName, lastName, email, phone, password, firebaseToken } =
-    userData;
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    firebaseToken,
+    referralCode,
+  } = userData;
   const existingUser = await User.findOne({
     $or: [{ email }, { phone }],
   });
@@ -43,22 +52,53 @@ export const signupUser = async (userData) => {
     );
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let referrer = null;
 
+  if (referralCode) {
+    referrer = await User.findOne({
+      referralCode,
+      isDeleted: false,
+      isBlocked: false,
+    });
+    if (!referrer) {
+      throw new AppError(
+        STATUS_CODES.BAD_REQUEST,
+        "INVALID_REFERRAL",
+        "Referral code is invalid."
+      );
+    }
+
+    // 2. Prevent self-referral
+    if (referrer.email === email) {
+      throw new AppError(
+        STATUS_CODES.BAD_REQUEST,
+        "SELF_REFERRAL",
+        "You cannot use your own referral code."
+      );
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const userReferralCode = nanoid();
   const newUser = new User({
     email,
     password: hashedPassword,
     firstName,
     lastName,
     phone,
+    referralCode: userReferralCode,
+    referrerId: referrer._id,
+    referralBonus: 1,
   });
 
   await newUser.save();
   const user = await User.findById(newUser._id)
     .select("_id firstName lastName email phone imageId")
     .lean();
+  referrer.referralBonus += 1;
+  referrer.referredUsers.push(newUser._id);
   const { refreshToken, accessToken } = generateTokens({ user });
-
+  await referrer.save();
   newUser.refreshToken = refreshToken;
   await newUser.save();
 

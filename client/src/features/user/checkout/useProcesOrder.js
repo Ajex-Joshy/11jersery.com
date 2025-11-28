@@ -7,6 +7,8 @@ import {
   useRazorpayVerify,
 } from "../order/orderHooks";
 import { useState } from "react";
+import { loadRazorpayScript } from "../../../utils/loadRazorpay";
+const loaded = await loadRazorpayScript();
 
 export const useProcessOrder = () => {
   const navigate = useNavigate();
@@ -71,18 +73,21 @@ export const useProcessOrder = () => {
         { shippingAddressId: selectedAddressId },
         {
           onSuccess: (razorOrder) => {
+            const { amount, currency, razorpayOrderId } = razorOrder.data;
+            console.log(amount, currency, razorpayOrderId);
             const razor = new window.Razorpay({
               key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-              amount: razorOrder.amount,
-              currency: razorOrder.currency,
-              order_id: razorOrder.id,
+              amount,
+              currency,
+              order_id: razorpayOrderId,
               name: "11jersey.com",
               handler: (paymentResult) => {
+                console.log("paymentResult", paymentResult);
                 razorpayVerifyMutation(
                   {
-                    razorOrderId: razorOrder.id,
-                    razorPaymentId: paymentResult.razorpay_payment_id,
-                    razorSignature: paymentResult.razorpay_signature,
+                    razorpayOrderId: paymentResult.razorpay_order_id,
+                    razorpayPaymentId: paymentResult.razorpay_payment_id,
+                    razorpaySignature: paymentResult.razorpay_signature,
                     shippingAddressId: selectedAddressId,
                   },
                   {
@@ -98,7 +103,8 @@ export const useProcessOrder = () => {
             razor.open();
             setIsProcessing(false);
           },
-          onError: () => {
+          onError: (err) => {
+            console.log(err);
             setIsProcessing(false);
             toast.error("Unable to initiate Razorpay payment");
           },

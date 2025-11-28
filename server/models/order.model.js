@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
 const STATUS_ENUM = [
+  "Initialized",
   "Pending",
   "Processing",
   "Shipped",
@@ -89,8 +90,11 @@ const orderSchema = new Schema(
 
     price: {
       subtotal: { type: Number, required: true },
-      discountedPrice: { type: Number }, // Global discount
-      couponCode: { type: String }, // Snapshot code
+      discount: { type: Number },
+      specialDiscount: { type: Number, default: 0 },
+      couponDiscount: { type: Number, default: null },
+      couponCode: { type: String },
+      referralBonus: { type: Number, default: 0 },
       couponId: { type: Types.ObjectId, ref: "Coupon" },
       deliveryFee: { type: Number, default: 0 },
       total: { type: Number, required: true },

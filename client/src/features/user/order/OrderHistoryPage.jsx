@@ -31,11 +31,15 @@ const OrderStatusBadge = ({ status }) => {
 
 // --- Component: Single Order Card ---
 const OrderHistoryCard = ({ order }) => {
+  console.log("order", order);
   const navigate = useNavigate();
 
   // Get first few items for preview
   const previewItems = order.items.slice(0, 3);
   const remainingCount = order.items.length - 3;
+  if (order.items.length === 0) {
+    return <div>No Orders Found</div>;
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow mb-4">
@@ -89,11 +93,12 @@ const OrderHistoryCard = ({ order }) => {
         </div>
 
         {/* Summary Text */}
-        <div className="flex-grow">
+        {console.log(order)}
+        <div className="grow">
           <h4 className="font-semibold text-gray-900 mb-1">
-            {order.items.length === 1
-              ? order.items[0].title
-              : `${order.items[0].title} + ${order.items.length - 1} others`}
+            {order?.items.length === 1
+              ? order.items[0]?.title
+              : `${order?.items[0].title} + ${order?.items?.length - 1} others`}
           </h4>
           <p className="text-sm text-gray-500">
             Total Amount:{" "}

@@ -1,8 +1,5 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-/**
- * Sub-document schema for items within the cart.
- */
 const cartItemSchema = new Schema(
   {
     productId: {
@@ -45,6 +42,10 @@ const cartSchema = new Schema(
     items: {
       type: [cartItemSchema], // An array of cart items
       default: [],
+    },
+    couponCode: {
+      type: String,
+      default: null,
     },
   },
   {

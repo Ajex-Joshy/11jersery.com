@@ -133,6 +133,7 @@ const SignupForm = () => {
       signupMutate({
         ...signupData,
         firebaseToken,
+        referralCode: localStorage.getItem("referral-code") || null,
       });
     } catch {
       toast.dismiss();

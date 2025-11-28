@@ -146,9 +146,7 @@ export const getProducts = async (queryParams) => {
   });
 
   // This query is used to get the actual products
-  const finalQuery = await buildPr;
-
-  oductQuery({
+  const finalQuery = await buildProductQuery({
     search,
     category,
     size,

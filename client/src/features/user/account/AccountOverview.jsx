@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { User, Mail, Phone } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 import {
   ErrorDisplay,
@@ -63,44 +64,79 @@ const AccountOverview = () => {
   const joinDate = getJoinDateFromObjectId(user._id);
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
-      {/* --- Header --- */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">
-        Hello, {user.firstName}
-      </h1>
-      <div>
-        <label className="text-xs font-semibold text-gray-500 uppercase">
-          Member Since
+    <>
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
+        {/* --- Header --- */}
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Hello, {user.firstName}
+        </h1>
+        <div>
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            Member Since
+          </label>
+          <p className="text-md text-gray-800">{joinDate}</p>
+        </div>
+
+        {/* --- Main Content --- */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col md:flex-row items-start gap-8">
+          <div className="shrink-0 w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png"
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Profile Details */}
+          <div className="flex my-auto space-x-10">
+            <InfoRow
+              icon={User}
+              label="Full Name"
+              value={`${user.firstName} ${user.lastName}`}
+            />
+            <InfoRow icon={Mail} label="Email Address" value={user.email} />
+            <InfoRow
+              icon={Phone}
+              label="Phone Number"
+              value={user.phone || "Not provided"}
+            />
+          </div>
+        </div>
+      </div>
+      {/* Referral Section */}
+      <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 shadow-sm">
+        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+          Referral & Earn
         </label>
-        <p className="text-md text-gray-800">{joinDate}</p>
-      </div>
+        <p className="text-xs text-gray-600 mt-3">
+          For every successful referral, you will receive{" "}
+          <span className="font-semibold">10% discount</span> up to{" "}
+          <span className="font-semibold">₹100</span> on your next order.
+        </p>
+        <div className="flex items-center justify-between mt-2">
+          <div>
+            <p className="text-sm text-gray-500">Your Referral Code</p>
+            <p className="text-xl font-bold tracking-widest text-gray-900">
+              {user.referralCode}
+            </p>
+          </div>
 
-      {/* --- Main Content --- */}
-      <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col md:flex-row items-start gap-8">
-        <div className="shrink-0 w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png"
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Profile Details */}
-        <div className="flex my-auto space-x-10">
-          <InfoRow
-            icon={User}
-            label="Full Name"
-            value={`${user.firstName} ${user.lastName}`}
-          />
-          <InfoRow icon={Mail} label="Email Address" value={user.email} />
-          <InfoRow
-            icon={Phone}
-            label="Phone Number"
-            value={user.phone || "Not provided"}
-          />
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `${window.location.origin}/?ref=${user.referralCode}`
+              );
+              toast.success("Referral link copied!", {
+                duration: 1800,
+              });
+            }}
+            className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-200 active:scale-95 transition-all"
+          >
+            Copy Link
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

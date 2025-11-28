@@ -11,7 +11,7 @@ export const getAccountDetails = async (userId) => {
     _id: userId,
     isBlocked: false,
     isDeleted: false,
-  }).select(" _id firstName lastName email phone ");
+  }).select(" _id firstName lastName email phone referralCode");
   if (!user)
     throw new AppError(
       STATUS_CODES.NOT_FOUND,
@@ -88,6 +88,7 @@ export const confirmEmailChange = async (userId, details) => {
   }
 
   const { otp, newEmail } = JSON.parse(data);
+  console.log(data);
 
   if (otp !== details.otp) {
     throw new AppError(

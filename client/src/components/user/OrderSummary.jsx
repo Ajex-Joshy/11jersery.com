@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Tag, Loader2 } from "lucide-react";
+import { ArrowRight, Tag, Loader2, X } from "lucide-react";
 import { useCart } from "../../features/user/cart/cartHooks";
 import { LoadingSpinner, ErrorDisplay } from "../common/StateDisplays";
+import {
+  useApplyCoupon,
+  useRemoveCoupon,
+} from "../../features/user/cart/couponHooks";
 
 /**
  * Reusable component for showing order totals.
  * Used in CartPage and CheckoutPage.
  */
 export const OrderSummary = ({ isCheckoutPage }) => {
-  const [promoCode, setPromoCode] = useState("");
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const { mutate: applyCoupon, isLoading: isApplying } = useApplyCoupon();
+  const { mutate: removeCoupon, isLoading: isRemoving } = useRemoveCoupon();
 
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -20,20 +25,11 @@ export const OrderSummary = ({ isCheckoutPage }) => {
     setIsProcessing(true);
     navigate("/checkout");
   };
-  const onApplyPromo = () => {
-    setIsProcessing(true);
-    navigate("/checkout");
-  };
 
-  const handleApplyPromo = () => {
-    if (!promoCode) return;
-    setIsApplyingPromo(true);
-    // Simulate API call
-    setTimeout(() => {
-      onApplyPromo(promoCode);
-      setIsApplyingPromo(false);
-      setPromoCode("");
-    }, 1000);
+  const handleApply = () => {
+    if (!couponInput.trim()) return;
+    applyCoupon(couponInput);
+    setCouponInput("");
   };
   const {
     data: cartPayload,
@@ -42,9 +38,19 @@ export const OrderSummary = ({ isCheckoutPage }) => {
     error,
   } = useCart();
 
-  const { subtotal, total, discountedPrice, deliveryFee } =
-    cartPayload?.data || {};
-  const discount = subtotal - discountedPrice;
+  const cart = cartPayload.data;
+  console.log("cart", cart);
+
+  const {
+    subtotal,
+    total,
+    deliveryFee,
+    discount,
+    specialDiscount,
+    couponDiscount,
+    referralBonus,
+  } = cart || {};
+
   if (isCartLoading) return <LoadingSpinner text="Loading checkout..." />;
   if (isError) return <ErrorDisplay error={error} />;
   return (
@@ -70,6 +76,31 @@ export const OrderSummary = ({ isCheckoutPage }) => {
           </div>
         )}
 
+        {specialDiscount > 0 && (
+          <div className="flex justify-between">
+            <span className="text-green-600">Special Discount</span>
+            <span className="font-medium text-green-600">
+              - ₹{specialDiscount.toLocaleString()}
+            </span>
+          </div>
+        )}
+        {couponDiscount > 0 && (
+          <div className="flex justify-between">
+            <span className="text-green-600">Coupon Discount</span>
+            <span className="font-medium text-green-600">
+              - ₹{couponDiscount.toLocaleString()}
+            </span>
+          </div>
+        )}
+        {referralBonus > 0 && (
+          <div className="flex justify-between">
+            <span className="text-green-600">Referral Bonus</span>
+            <span className="font-medium text-green-600">
+              - ₹{referralBonus.toLocaleString()}
+            </span>
+          </div>
+        )}
+
         <div className="flex justify-between">
           <span className="text-gray-600">Delivery Fee</span>
           <span className="font-medium text-gray-900">
@@ -84,7 +115,7 @@ export const OrderSummary = ({ isCheckoutPage }) => {
         <div className="flex justify-between items-center">
           <span className="text-lg font-bold text-gray-900">Total</span>
           <span className="text-lg font-bold text-gray-900">
-            ₹{total.toLocaleString()}
+            {console.log("total", total)}₹{total.toLocaleString()}
           </span>
         </div>
       </div>
@@ -92,40 +123,42 @@ export const OrderSummary = ({ isCheckoutPage }) => {
       {!isCheckoutPage && (
         <>
           {/* Promo Code Form */}
-          <div className="mt-6 space-y-2">
-            <label
-              htmlFor="promo"
-              className="text-sm font-medium text-gray-700"
-            >
-              Add promo code
-            </label>
-            <div className="flex gap-2">
-              <div className="relative grow">
-                <Tag
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+          <div className="py-4 border-y border-gray-200 my-4">
+            {cart.couponCode ? (
+              <div className="flex justify-between items-center bg-green-50 p-2 rounded border border-green-200 text-sm">
+                <span className="text-green-700 font-medium flex items-center gap-2">
+                  <Tag size={14} /> {cart.couponCode} applied
+                </span>
+                <button
+                  onClick={() => removeCoupon()}
+                  disabled={isRemoving}
+                  className="text-gray-400 hover:text-red-500"
+                >
+                  {isRemoving ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <X size={14} />
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
                 <input
                   type="text"
-                  id="promo"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                  placeholder="Promo code"
-                  className="w-full border border-gray-300 rounded-md py-2 pl-9 pr-2 text-sm"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  placeholder="Enter Coupon Code"
+                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
                 />
+                <button
+                  onClick={handleApply}
+                  disabled={isApplying || !couponInput}
+                  className="bg-black text-white px-4 py-2 rounded text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isApplying ? "..." : "Apply"}
+                </button>
               </div>
-              <button
-                onClick={handleApplyPromo}
-                disabled={isApplyingPromo}
-                className="bg-gray-200 text-gray-700 px-4 rounded-md text-sm font-semibold hover:bg-gray-300 disabled:opacity-50"
-              >
-                {isApplyingPromo ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  "Apply"
-                )}
-              </button>
-            </div>
+            )}
           </div>
 
           {/* Checkout Button */}

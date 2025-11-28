@@ -1,6 +1,7 @@
 import logger from "../../config/logger.js";
 import razorpayInstance from "../../config/razorpay.js";
 import { AppError } from "../../utils/helpers.js";
+import crypto from "crypto";
 import { config } from "dotenv";
 config();
 
@@ -11,7 +12,7 @@ export const createRazorpayOrder = async (
 ) => {
   try {
     const options = {
-      amount,
+      amount: amount * 100,
       currency,
       receipt: `receipt_${Date.now()}`,
       notes,

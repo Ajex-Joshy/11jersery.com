@@ -39,6 +39,7 @@
     "keycloak-connect": "^26.1.1",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
+    "nanoid": "^5.1.6",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2",

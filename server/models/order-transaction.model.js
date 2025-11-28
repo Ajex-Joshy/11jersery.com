@@ -24,10 +24,16 @@ const transactionSchema = new Schema(
         required: true,
         min: [0, "Subtotal cannot be negative"],
       },
-      discountedPrice: {
+      discount: {
         type: Number,
-        required: true,
+        // required: true,
         min: [0, "Discounted price cannot be negative"],
+      },
+      specialDiscount: {
+        type: Number,
+      },
+      referralBonus: {
+        type: Number,
       },
       deliveryFee: {
         type: Number,

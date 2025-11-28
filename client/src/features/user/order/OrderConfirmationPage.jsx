@@ -16,6 +16,8 @@ import {
 } from "../../../components/common/StateDisplays";
 import Confetti from "react-confetti";
 import InvoiceDownloadButton from "../../../components/user/Buttons";
+import PriceSummary from "./components/PriceSummary";
+import AddressCard from "./components/AddressCard";
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
@@ -144,68 +146,8 @@ const OrderConfirmationPage = () => {
 
           {/* Right Column: Summary & Address */}
           <div className="lg:col-span-4 space-y-8">
-            {/* Order Summary */}
-            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">
-                Order Summary
-              </h2>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>₹{order?.price?.subtotal}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Discount</span>
-                  <span className="text-green-600">
-                    - ₹{order?.price?.subtotal - order?.price?.discountedPrice}
-                  </span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Delivery</span>
-                  <span>
-                    {order?.price?.deliveryFee === 0
-                      ? "Free"
-                      : `₹${order?.price?.deliveryFee}`}
-                  </span>
-                </div>
-                <div className="border-t border-gray-300 my-4 pt-4 flex justify-between text-lg font-bold text-gray-900">
-                  <span>Total</span>
-                  <span>₹{order?.price?.total}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Shipping Address */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <MapPin size={20} className="text-gray-400" /> Shipping Address
-              </h2>
-              <address className="not-italic text-sm text-gray-600 leading-relaxed">
-                <strong className="text-gray-900 block mb-1">
-                  {order.shippingAddress.firstName}{" "}
-                  {order.shippingAddress.lastName}
-                </strong>
-                {order.shippingAddress.addressLine1}
-                <br />
-                {order.shippingAddress.addressLine2 && (
-                  <>
-                    {order.shippingAddress.addressLine2}
-                    <br />
-                  </>
-                )}
-                {order.shippingAddress.city}, {order.shippingAddress.state}
-                <br />
-                {order.shippingAddress.pinCode}
-                <br />
-                {order.shippingAddress.country}
-                <br />
-                {console.log(order.shippingAddress)}
-                <span className="block mt-2">
-                  {console.log(order.hippingAddress)}
-                  Phone: {order.shippingAddress.phoneNumber}
-                </span>
-              </address>
-            </div>
+            <PriceSummary price={order.price} />
+            <AddressCard address={order.shippingAddress} />
 
             {/* Actions */}
             <div className="space-y-3">

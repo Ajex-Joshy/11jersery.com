@@ -59,9 +59,30 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    referralCode: {
+      type: String,
+      unique: true,
+      index: true,
+    },
+    referrerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    referredUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    referralBonus: {
+      type: Number,
+      default: 0,
+    },
+    referralRewards: {
+      count: { type: Number, default: 0 },
+      amount: { type: Number, default: 0 },
+    },
 
-
-    
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

@@ -17,8 +17,22 @@ export const placeCODOrder = async (orderData) => {
 };
 
 export const placeWalletOrder = async (orderData) => {
-  console.log(orderData);
   const response = await axiosInstance.post("/orders/wallet", orderData);
+  console.log(response.data);
+  return response.data;
+};
+
+export const placeOnlineOrder = async (orderData) => {
+  console.log(orderData);
+  const response = await axiosInstance.post("/orders/online", orderData);
+  return response.data;
+};
+
+export const verifyRazorpayOrder = async (paymentDetails) => {
+  console.log("paymentDetails", paymentDetails);
+  const response = await axiosInstance.post("/orders/verify-online-order", {
+    paymentDetails,
+  });
   return response.data;
 };
 

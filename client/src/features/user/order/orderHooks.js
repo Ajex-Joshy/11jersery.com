@@ -6,9 +6,11 @@ import {
   getOrderDetails,
   getOrders,
   placeCODOrder,
+  placeOnlineOrder,
   placeWalletOrder,
   returnOrder,
   returnOrderItem,
+  verifyRazorpayOrder,
 } from "./orderApis";
 import { toast } from "react-hot-toast";
 const ORDER_KEYS = {
@@ -48,6 +50,11 @@ export const usePlaceCODOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
     },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
+    },
   });
 };
 export const useWalletPay = () => {
@@ -57,23 +64,39 @@ export const useWalletPay = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
     },
+    onError: (err) => {
+      console.log("err", err);
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
+    },
   });
 };
 export const useRazorpayOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: placeCODOrder,
+    mutationFn: placeOnlineOrder,
     onSuccess: () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
     },
   });
 };
 export const useRazorpayVerify = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: placeCODOrder,
+    mutationFn: verifyRazorpayOrder,
     onSuccess: () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
     },
   });
 };

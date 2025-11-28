@@ -1,4 +1,11 @@
 import axios from "axios";
+import toast from "react-hot-toast";
+
+// Callback for opening login modal
+let openLoginModalCallback = null;
+export const setOpenLoginModal = (callback) => {
+  openLoginModalCallback = callback;
+};
 
 // Main Axios instance
 const axiosInstance = axios.create({
@@ -23,8 +30,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.log(error);
     const originalRequest = error.config;
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -33,16 +40,17 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        console.log("success");
-        const res = await axiosInstance.post("/auth/refresh-token");
-        console.log("res", res);
-        console.log("refresToken requested");
+        // Use separate axios instance to avoid recursion
+        const res = await axios({
+          method: "post",
+          url: `${import.meta.env.VITE_BASE_URL}/auth/refresh-token`,
+          withCredentials: true,
+        });
 
         const newAccessToken = res.data.token;
 
         if (newAccessToken) {
           localStorage.setItem("token", newAccessToken);
-
           axiosInstance.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${newAccessToken}`;
@@ -50,9 +58,13 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (err) {
-        console.log(err.message);
         localStorage.removeItem("token");
-        window.location.href = "/";
+        toast.error("Session expired. Please log in again.");
+
+        if (openLoginModalCallback) {
+          openLoginModalCallback();
+        }
+
         return Promise.reject(err);
       }
     }
