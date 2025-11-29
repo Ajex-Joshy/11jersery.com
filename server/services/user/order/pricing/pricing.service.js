@@ -1,4 +1,8 @@
 import Product from "../../../../models/product.model.js";
+import {
+  MAX_REFERRAL_BONUS,
+  REFERRAL_BONUS_PERCENT,
+} from "../../../../utils/constants.js";
 
 import {
   buildCategoryTotals,
@@ -26,21 +30,28 @@ export const calculateOrderPrice = async (cart) => {
   });
 
   let bestCategoryDiscount = 0;
+  let appliedCategoryOffer = null;
   for (const entry of Object.values(categoryTotals)) {
-    bestCategoryDiscount = Math.max(
-      bestCategoryDiscount,
-      evaluateCategoryDiscount(entry)
-    );
+    const discountValue = evaluateCategoryDiscount(entry);
+    if (discountValue > bestCategoryDiscount) {
+      bestCategoryDiscount = discountValue;
+      appliedCategoryOffer = {
+        categoryId: entry.category._id,
+        minPurchaseAmount: entry.category.minPurchaseAmount,
+        maxRedeemable: entry.category.maxRedeemable,
+        discountType: entry.category.discountType,
+        discount: entry.category.discount,
+      };
+    }
   }
 
   let priceAfterCategory = discountedPriceBeforeCategory - bestCategoryDiscount;
 
-  const { couponDiscount } = await applyCouponDiscount(
+  const { couponDiscount, appliedCoupon } = await applyCouponDiscount(
     discountedPriceBeforeCategory,
     couponCode,
     cart.userId
   );
-
   let finalPrice = priceAfterCategory - couponDiscount;
   let referralBonus = 0;
   const isReferalBonusApplicable = await checkReferralBonus(
@@ -49,7 +60,9 @@ export const calculateOrderPrice = async (cart) => {
   );
 
   if (isReferalBonusApplicable) {
-    referralBonus = Math.round(Math.min(finalPrice * 0.1, 100));
+    referralBonus = Math.round(
+      Math.min((finalPrice * REFERRAL_BONUS_PERCENT) / 100, MAX_REFERRAL_BONUS)
+    );
     finalPrice -= referralBonus;
   }
   const deliveryFee = finalPrice < 500 && finalPrice > 0 ? 80 : 0;
@@ -58,10 +71,12 @@ export const calculateOrderPrice = async (cart) => {
     subtotal,
     discount: subtotal - discountedPriceBeforeCategory,
     specialDiscount: bestCategoryDiscount,
+    appliedCategoryOffer,
     couponDiscount,
     referralBonus,
     couponCode,
     deliveryFee,
     total: finalPrice + deliveryFee,
+    appliedCoupon,
   };
 };

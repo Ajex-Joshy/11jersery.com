@@ -6,8 +6,6 @@ import { STATUS_CODES } from "../../utils/constants.js";
 export const applyCoupon = async (userId, couponCode) => {
   const cart = await Cart.findOne({ userId });
 
-  console.log(cart);
-
   if (!cart || cart.items.length === 0)
     throw new AppError(STATUS_CODES.BAD_REQUEST, "CART_EMPTY", "Cart is empty");
 

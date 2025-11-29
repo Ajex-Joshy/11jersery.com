@@ -11,7 +11,6 @@ export const checkReferralBonus = async (userId) => {
   if (user.referralBonus > 0) {
     return true;
   }
-  console.log(user.referralBonus);
 
   return false;
 };

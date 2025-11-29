@@ -38,7 +38,7 @@ export const OrderSummary = ({ isCheckoutPage }) => {
     error,
   } = useCart();
 
-  const cart = cartPayload.data;
+  const cart = cartPayload?.data;
   console.log("cart", cart);
 
   const {

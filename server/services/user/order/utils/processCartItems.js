@@ -27,8 +27,6 @@ export const processCartItems = async (cart) => {
     isDeleted: false,
   });
 
-  const categoriesMap = new Map(categories.map((c) => [c._id.toString(), c]));
-
   const processedItems = [];
 
   for (const item of cartItems) {
@@ -37,11 +35,6 @@ export const processCartItems = async (cart) => {
 
     const imageUrl = await getSignedUrlForKey(product.imageIds?.[0]);
 
-    const itemCategories = (product.categoryIds || [])
-      .map((c) => c.toString())
-      .filter((cId) => categoriesMap.has(cId))
-      .map((cId) => categoriesMap.get(cId));
-
     processedItems.push({
       _id: item._id,
       productId: item.productId,
@@ -49,11 +42,11 @@ export const processCartItems = async (cart) => {
       quantity: item.quantity,
       title: product.title,
       slug: product.slug,
+      categoryIds: product.categoryIds,
       listPrice: product.price.list,
       salePrice: product.price.sale,
       imageId: product.imageIds?.[0],
       imageUrl,
-      categories: itemCategories,
     });
   }
 

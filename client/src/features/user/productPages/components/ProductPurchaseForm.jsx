@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Minus, Plus, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import PropTypes from "prop-types";
@@ -7,6 +7,7 @@ import StarRating from "../../../../components/common/StarRating";
 // We only need the Cart getter and the Add/Update hook now
 import { useAddItemToCart, useCart } from "../../cart/cartHooks";
 import { MAX_QUANTITY_PER_ORDER } from "../../../../utils/constants";
+import { useToggleWishlist, useWishlist } from "../../wishlist/wishlistHooks";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
@@ -18,6 +19,15 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   // API Hooks
   const { mutate: addItemToCart, isPending } = useAddItemToCart();
   const { data: cart } = useCart();
+
+  const { mutate: toggleWishlist, isLoading: isTogglingWishlist } =
+    useToggleWishlist();
+  const { data: wishlistPayload, isLoading: isWishlistLoading } = useWishlist();
+
+  const isInWishlist = useMemo(() => {
+    const wishlistItems = wishlistPayload?.payload?.products || [];
+    return wishlistItems.some((item) => item._id === product._id);
+  }, [wishlistPayload, product._id]);
 
   // Create a map for quick stock lookup
   const stockMap = new Map((variants || []).map((v) => [v.size, v.stock]));
@@ -102,6 +112,11 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
         toast.error(error?.response?.data?.message || "Failed to add to cart");
       },
     });
+  };
+  const handleWishlistToggle = () => {
+    if (product) {
+      toggleWishlist(product._id);
+    }
   };
 
   // Calculation helpers
@@ -239,8 +254,26 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
         </button>
 
         {/* Wishlist */}
-        <button className="px-3 py-3 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 hover:text-red-500 transition-colors">
-          <Heart size={20} />
+        <button
+          onClick={handleWishlistToggle}
+          disabled={isTogglingWishlist || isWishlistLoading}
+          className={`
+            px-3 py-3 border rounded-md transition-colors flex items-center justify-center
+            ${
+              isInWishlist
+                ? "border-red-200 bg-red-50 text-red-500 hover:bg-red-100" // Active Style
+                : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-red-500" // Inactive Style
+            }
+            disabled:opacity-50 disabled:cursor-not-allowed
+          `}
+          title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          {/* Fill the heart if active */}
+          <Heart
+            size={20}
+            fill={isInWishlist ? "currentColor" : "none"}
+            strokeWidth={2}
+          />
         </button>
       </div>
     </div>

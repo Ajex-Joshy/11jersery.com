@@ -18,7 +18,7 @@ const AddAddressPage = () => {
   const { mutate: addAddress, isLoading: isAdding } = useAddAddress();
   const { mutate: updateAddress, isLoading: isUpdating } = useUpdateAddress();
 
-  const shouldFetch = addressId && addressId !== "new";
+  const shouldFetch = Boolean(addressId && addressId !== "new");
 
   const { data: addressData, isLoading: isFetching } = useGetAddressById(
     addressId,

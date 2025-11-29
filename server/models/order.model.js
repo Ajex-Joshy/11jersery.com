@@ -39,6 +39,7 @@ const orderItemSchema = new Schema({
   title: { type: String, required: true }, // Snapshot title
   slug: { type: String, required: true },
   imageId: { type: String, required: true },
+  categoryIds: [{ type: Types.ObjectId, ref: "Transaction" }],
 
   size: { type: String, required: true },
 
@@ -96,6 +97,20 @@ const orderSchema = new Schema(
       couponCode: { type: String },
       referralBonus: { type: Number, default: 0 },
       couponId: { type: Types.ObjectId, ref: "Coupon" },
+      appliedCategoryOffer: {
+        categoryId: { type: Types.ObjectId, ref: "Category" },
+        minPurchaseAmount: { type: Number },
+        maxRedeemable: { type: Number },
+        discountType: { type: String },
+        discount: { type: Number },
+      },
+      appliedCoupon: {
+        code: { type: String },
+        discount: { type: Number },
+        discountType: { type: String },
+        minPurchaseAmount: { type: Number },
+        maxDiscountAmount: { type: Number },
+      },
       deliveryFee: { type: Number, default: 0 },
       total: { type: Number, required: true },
     },

@@ -10,6 +10,7 @@ const PriceSummary = ({ price }) => {
     specialDiscount,
     referralBonus,
     deliveryFee,
+    couponDiscount,
     total,
   } = price;
 
@@ -32,6 +33,14 @@ const PriceSummary = ({ price }) => {
             <span className="text-green-600">Special Discount</span>
             <span className="font-medium text-green-600">
               - {formatCurrency(specialDiscount)}
+            </span>
+          </div>
+        )}
+        {couponDiscount > 0 && (
+          <div className="flex justify-between">
+            <span className="text-green-600">Coupon Discount</span>
+            <span className="font-medium text-green-600">
+              - {formatCurrency(couponDiscount)}
             </span>
           </div>
         )}

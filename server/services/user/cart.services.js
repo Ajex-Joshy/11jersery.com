@@ -18,7 +18,6 @@ export const getCart = async (userId) => {
   if (!cartData) {
     return await Cart.create({ userId, items: [] });
   }
-  console.log(cartData);
   return { items: cartData.processedItems, ...cartData };
 };
 

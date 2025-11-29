@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import Order from "../../../models/order.model.js";
+import Order from "../../../../models/order.model.js";
 import {
   ensureOrderExists,
   ensureItemExists,
   ensureReturnable,
-} from "./validations.service.js";
+} from "../utils/validations.service.js";
 import { requestItemReturn } from "./item-actions.service.js";
 
 export const requestReturnOrder = async (userId, orderId, reason) => {

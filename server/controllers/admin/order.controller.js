@@ -12,7 +12,7 @@ import { sendResponse } from "../../utils/helpers.js";
 import {
   cancelItem,
   cancelOrder,
-} from "../../services/user/order/cancel-order.service.js";
+} from "../../services/user/order/order-post-actions/cancel-order.service.js";
 import { STATUS_CODES } from "../../utils/constants.js";
 
 export const getOrdersController = asyncHandler(async (req, res) => {

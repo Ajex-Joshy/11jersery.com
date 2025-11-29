@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
-import Order from "../../../models/order.model.js";
-import { restoreStock } from "./stock.service.js";
+import Order from "../../../../models/order.model.js";
+import { restoreStock } from "../helper-services/stock.service.js";
 import {
   ensureOrderExists,
   ensureCancelable,
   ensureItemCancelable,
-} from "./validations.service.js";
+} from "../utils/validations.service.js";
 import { markAsCanceled } from "./item-actions.service.js";
-import Transaction from "../../../models/order-transaction.model.js";
+import Transaction from "../../../../models/order-transaction.model.js";
+import { recalculatedOrderAmount } from "../refund/item/item-refund.js";
 
 export const cancelOrder = async (userId, orderId, reason) => {
   const session = await mongoose.startSession();
@@ -60,9 +61,34 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
     ensureOrderExists(order);
     const item = order.items.id(itemId);
     ensureItemCancelable(item);
+    const {
+      subtotal,
+      specialDiscount,
+      couponDiscount,
+      referralBonus,
+      total,
+      deliveryFee,
+    } = await recalculatedOrderAmount(order, item);
+    console.log(
+      subtotal,
+      specialDiscount,
+      couponDiscount,
+      referralBonus,
+      total,
+      deliveryFee
+    );
 
     await restoreStock(session, item.productId, item.size, item.quantity);
     markAsCanceled(item, reason);
+
+    order.price.subtotal = subtotal;
+    order.price.discount =
+      order.price.discount - (item.listPrice - item.salePrice) * item.quantity;
+    order.price.deliveryFee = deliveryFee;
+    order.price.specialDiscount = specialDiscount;
+    order.price.couponDiscount = couponDiscount;
+    order.price.referralBonus = referralBonus;
+    order.price.total = total + deliveryFee;
 
     if (order.payment.method === "COD" && order.payment.status === "Pending") {
       const latestTransactionId =
@@ -73,20 +99,12 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
         { session }
       );
 
-      let price = order.price;
-      price.subtotal -= item.listPrice * item.quantity;
-      price.discountedPrice -= item.salePrice * item.quantity;
-      price.deliveryFee = price.discountedPrice < 500 ? 80 : 0;
-      price.total = price.discountedPrice + price.deliveryFee;
-
-      order.price = price;
-
       const [newTransaction] = await Transaction.create(
         [
           {
             orderId: order._id,
             userId: order.userId,
-            amount: price,
+            amount: order.price.total,
             type: "CREDIT",
             status: "PENDING",
             paymentMethod: "COD",
@@ -114,6 +132,8 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
       }
     }
 
+    console.log("price", order.price);
+    order.markModified("price");
     await order.save({ session });
 
     await session.commitTransaction();

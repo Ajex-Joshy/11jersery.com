@@ -9,6 +9,7 @@ import {
   placeWalletOrder,
   initOnlineOrder,
   verifyAndPlaceOnlineOrder,
+  generateInvoice,
 } from "../../services/user/order/index.js";
 import { STATUS_CODES } from "../../utils/constants.js";
 import {
@@ -17,7 +18,6 @@ import {
   validateObjectId,
 } from "../../utils/helpers.js";
 import { sendResponse } from "../../utils/helpers.js";
-import { generateInvoice } from "../../services/user/order/generate-invoice.service.js";
 // PLACE COD ORDER
 export const placeCodOrderController = asyncHandler(async (req, res) => {
   const { shippingAddressId } = req.body;

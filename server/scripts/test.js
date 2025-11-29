@@ -142,4 +142,3 @@ const generateProduct = () => {
 };
 
 const data = generateProduct();
-console.log(data);

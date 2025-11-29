@@ -58,3 +58,7 @@ export const OrderDetailsPage = lazy(() =>
 export const WalletPage = lazy(() =>
   import("../features/user/account/wallet/WalletPage")
 );
+
+export const WishlistPage = lazy(() =>
+  import("../features/user/wishlist/WishlistPage")
+);

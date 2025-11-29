@@ -7,6 +7,7 @@ import {
   openAuthModal,
 } from "../../../features/user/account/authSlice.js";
 import { useCart } from "../../../features/user/cart/cartHooks.js";
+import { useWishlist } from "../../../features/user/wishlist/wishlistHooks.js";
 
 const Header = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
@@ -15,7 +16,9 @@ const Header = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const { data: cartPayload } = useCart();
-  const items = cartPayload?.data?.items?.length;
+  const cartItems = cartPayload?.data?.items?.length;
+  const { data: wishlistPayload } = useWishlist();
+  const whislistItems = wishlistPayload?.payload?.products?.length;
 
   const handleOpenLogin = () => dispatch(openAuthModal("login"));
   const handleSearchSubmit = (e) => {
@@ -77,16 +80,24 @@ const Header = () => {
             </div>
           </form>
 
-          <Link to="/wishlist">
-            <Heart size={22} />
-          </Link>
+          {renderProtectedIcon(
+            <div className="relative">
+              <Heart size={22} />
+              {whislistItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] h-5 w-5 rounded-full flex items-center justify-center">
+                  {whislistItems}
+                </span>
+              )}
+            </div>,
+            "/account/wishlist"
+          )}
 
           {renderProtectedIcon(
             <div className="relative">
               <ShoppingCart size={22} />
-              {items > 0 && (
+              {cartItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] h-5 w-5 rounded-full flex items-center justify-center">
-                  {items}
+                  {cartItems}
                 </span>
               )}
             </div>,

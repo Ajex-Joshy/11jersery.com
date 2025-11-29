@@ -1,5 +1,5 @@
-import logger from "../../../config/logger.js";
-import orderModel from "../../../models/order.model.js";
+import logger from "../../../../config/logger.js";
+import orderModel from "../../../../models/order.model.js";
 
 export const generateInvoice = async (userId, orderId, res) => {
   try {

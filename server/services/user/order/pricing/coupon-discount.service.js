@@ -4,7 +4,11 @@ import { AppError } from "../../../../utils/helpers.js";
 import { clearCoupon } from "../../cart.services.js";
 
 export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
-  if (!couponCode) return { couponDiscount: 0 };
+  if (!couponCode)
+    return {
+      couponDiscount: 0,
+      appliedCoupon: null,
+    };
 
   const coupon = await Coupon.findOne({ code: couponCode });
   if (!coupon)
@@ -24,7 +28,7 @@ export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
   }
 
   let couponDiscount = 0;
-  if (coupon.discountType === "FIXED") {
+  if (coupon.discountType === "FLAT") {
     couponDiscount = coupon.discountValue;
   } else if (coupon.discountType === "PERCENTAGE") {
     couponDiscount = (subtotal * coupon.discountValue) / 100;
@@ -37,5 +41,14 @@ export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
     }
   }
 
-  return { couponDiscount };
+  return {
+    couponDiscount,
+    appliedCoupon: {
+      code: coupon.code,
+      discount: coupon.discountValue,
+      discountType: coupon.discountType,
+      minPurchaseAmount: coupon.minPurchaseAmount,
+      maxDiscountAmount: coupon.maxDiscountAmount,
+    },
+  };
 };

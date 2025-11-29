@@ -66,6 +66,7 @@ const UserRoutes = () => (
             path="/account/addresses/edit/:addressId"
             element={<Pages.AddAddressPage />}
           />
+          <Route path="/account/wishlist" element={<Pages.WishlistPage />} />
         </Route>
       </Route>
 

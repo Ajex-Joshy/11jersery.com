@@ -4,8 +4,8 @@ import createError from "http-errors";
 import {
   ensureOrderExists,
   ensureReturnable,
-} from "../../user/order/validations.service.js";
-import { restoreStock } from "../../user/order/stock.service.js";
+} from "../../user/order/utils/validations.service.js";
+import { restoreStock } from "../../user/order/helper-services/stock.service.js";
 import Transaction from "../../../models/order-transaction.model.js";
 import mongoose from "mongoose";
 

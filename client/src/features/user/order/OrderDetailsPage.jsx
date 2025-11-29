@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -11,9 +11,11 @@ import {
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
 import FeeWarningModal from "./components/FeeWarningModal";
-import { useOrderDetails } from "./orderHooks";
+import { useOrderDetails, useRazorpayVerify } from "./orderHooks";
 import PriceSummary from "./components/PriceSummary";
 import AddressCard from "./components/AddressCard";
+import { loadRazorpayScript } from "../../../utils/loadRazorpay";
+const loaded = await loadRazorpayScript();
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();
@@ -39,9 +41,61 @@ const OrderDetailsPage = () => {
   const { order, isLoading, isError, error, actions, state, helpers } =
     useOrderDetails(orderId);
 
+  // Timer state for payment retry
+  const [remainingTime, setRemainingTime] = useState(0);
+
+  useEffect(() => {
+    if (!order?.timeline?.placedAt) return;
+
+    const createdAt = new Date(order.timeline.placedAt).getTime();
+    const expiryTime = createdAt + 5 * 60 * 1000; // 5 minutes
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = expiryTime - now;
+      if (diff <= 0) {
+        setRemainingTime(0);
+      } else {
+        setRemainingTime(Math.floor(diff / 1000));
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [order]);
+
+  const { mutate: razorpayVerifyMutation } = useRazorpayVerify();
+
   if (isLoading) return <LoadingSpinner text="Loading order details..." />;
   if (isError) return <ErrorDisplay error={error} />;
   if (!order) return <div className="p-8 text-center">Order not found</div>;
+  const handleRetryPayment = () => {
+    const razor = new window.Razorpay({
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      order_id: order.payment.razorpayOrderId,
+      name: "11jersey.com",
+      handler: (paymentResult) => {
+        console.log("paymentResult", paymentResult);
+        razorpayVerifyMutation(
+          {
+            razorpayOrderId: paymentResult.razorpay_order_id,
+            razorpayPaymentId: paymentResult.razorpay_payment_id,
+            razorpaySignature: paymentResult.razorpay_signature,
+          },
+          {
+            onSuccess: (finalOrder) => {
+              toast.success("Payment successful!");
+              navigate(`/order-confirmation/${finalOrder?.data?._id}`);
+            },
+            onError: () => toast.error("Payment verification failed"),
+          }
+        );
+      },
+    });
+
+    razor.open();
+  };
 
   // --- Handler for Action Clicks (Cancel OR Return) ---
   const handleActionClick = (action, itemId = null) => {
@@ -160,6 +214,21 @@ const OrderDetailsPage = () => {
                 className="px-4 py-2 bg-white border border-blue-200 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition disabled:opacity-50"
               >
                 Return Order
+              </button>
+            )}
+
+            {/* Retry Payment (if status is initialized) */}
+            {order?.orderStatus === "Initialized" && (
+              <button
+                onClick={handleRetryPayment}
+                disabled={remainingTime === 0}
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md transition disabled:opacity-50"
+              >
+                {remainingTime > 0
+                  ? `Retry Payment (${Math.floor(remainingTime / 60)}:${String(
+                      remainingTime % 60
+                    ).padStart(2, "0")})`
+                  : "Retry Disabled"}
               </button>
             )}
           </div>

@@ -19,32 +19,29 @@ const transactionSchema = new Schema(
     },
 
     amount: {
-      subtotal: {
-        type: Number,
-        required: true,
-        min: [0, "Subtotal cannot be negative"],
+      subtotal: { type: Number, required: true },
+      discount: { type: Number },
+      specialDiscount: { type: Number, default: 0 },
+      couponDiscount: { type: Number, default: null },
+      couponCode: { type: String },
+      referralBonus: { type: Number, default: 0 },
+      couponId: { type: Types.ObjectId, ref: "Coupon" },
+      appliedCategoryOffer: {
+        categoryId: { type: Types.ObjectId, ref: "Category" },
+        minPurchaseAmount: { type: Number },
+        maxRedeemable: { type: Number },
+        discountType: { type: String },
+        discount: { type: Number },
       },
-      discount: {
-        type: Number,
-        // required: true,
-        min: [0, "Discounted price cannot be negative"],
+      appliedCoupon: {
+        code: { type: String },
+        discount: { type: Number },
+        discountType: { type: String },
+        minPurchaseAmount: { type: Number },
+        maxDiscountAmount: { type: Number },
       },
-      specialDiscount: {
-        type: Number,
-      },
-      referralBonus: {
-        type: Number,
-      },
-      deliveryFee: {
-        type: Number,
-        required: true,
-        min: [0, "Delivery fee cannot be negative"],
-      },
-      total: {
-        type: Number,
-        required: true,
-        min: [0, "Total cannot be negative"],
-      },
+      deliveryFee: { type: Number, default: 0 },
+      total: { type: Number, required: true },
     },
 
     type: {

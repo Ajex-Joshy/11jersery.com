@@ -54,7 +54,7 @@ export function evaluateCategoryDiscount(entry) {
 
   let discountAmount = 0;
 
-  if (category.discountType === "percentage") {
+  if (category.discountType === "percent") {
     discountAmount = (totalAmount * (category.discount || 0)) / 100;
     if (category.maxRedeemable)
       discountAmount = Math.min(discountAmount, category.maxRedeemable);

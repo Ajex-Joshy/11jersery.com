@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import Wishlist from "../../models/whislist.model.js";
 import Product from "../../models/product.model.js";
+import { getSignedUrlForKey } from "../admin/service-helpers/s3.service.js";
 
 /**
  * Get the user's wishlist, populated with product details.
@@ -8,14 +9,24 @@ import Product from "../../models/product.model.js";
 export const getWishlist = async (userId) => {
   let wishlist = await Wishlist.findOne({ userId }).populate({
     path: "products",
-    select: "_id title slug price rating imageIds", // Only need basic details
+    select: "_id title slug price rating imageIds",
   });
 
   if (!wishlist) {
-    // Create empty wishlist if it doesn't exist
     wishlist = await Wishlist.create({ userId, products: [] });
   }
 
+  const updatedProducts = [];
+  for (let product of wishlist.products) {
+    const obj = product.toObject();
+    const imageUrl = await getSignedUrlForKey(obj.imageIds[0]);
+    obj.imageUrl = imageUrl;
+    delete obj.imageIds;
+    updatedProducts.push(obj);
+  }
+
+  wishlist = wishlist.toObject();
+  wishlist.products = updatedProducts;
   return wishlist;
 };
 
@@ -49,7 +60,6 @@ export const toggleWishlistItem = async (userId, productId) => {
 
   await wishlist.save();
 
-  // Return populated wishlist so UI updates instantly
   await wishlist.populate({
     path: "products",
     select: "_id title slug price rating imageIds",
@@ -58,12 +68,21 @@ export const toggleWishlistItem = async (userId, productId) => {
   return { wishlist, isAdded };
 };
 
-/**
- * Check if a specific product is in the wishlist (Helper for product page).
- * Can be optimized by sending a list of IDs to frontend.
- */
-export const checkWishlistStatus = async (userId, productId) => {
+export const removeCartItemsFromWishlist = async (items, userId) => {
+  const productIdsSet = new Set();
+  items.forEach((item) => {
+    productIdsSet.add(item.productId.toString());
+  });
   const wishlist = await Wishlist.findOne({ userId });
-  if (!wishlist) return false;
-  return wishlist.products.includes(productId);
+  if (!wishlist) {
+    return { message: "Wishlist not found" };
+  }
+
+  wishlist.products = wishlist.products.filter(
+    (product) => !productIdsSet.has(product._id.toString())
+  );
+
+  await wishlist.save();
+
+  return { wishlist, removed: true };
 };
