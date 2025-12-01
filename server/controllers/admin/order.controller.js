@@ -14,6 +14,10 @@ import {
   cancelOrder,
 } from "../../services/user/order/order-post-actions/cancel-order.service.js";
 import { STATUS_CODES } from "../../utils/constants.js";
+import {
+  processOrderReceived,
+  processItemReceived,
+} from "../../services/admin/order/confirm-return.js";
 
 export const getOrdersController = asyncHandler(async (req, res) => {
   const [ordersData, statsData] = await Promise.all([
@@ -95,6 +99,22 @@ export const processItemReturnController = asyncHandler(async (req, res) => {
     orderId,
     action,
     reason,
+    itemId,
+  });
+  sendResponse(res, { ...result });
+});
+
+export const processOrderReceivedController = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  const result = await processOrderReceived({ orderId });
+
+  sendResponse(res, { ...result });
+});
+
+export const processItemRecievedController = asyncHandler(async (req, res) => {
+  const { orderId, itemId } = req.params;
+  const result = await processItemReceived({
+    orderId,
     itemId,
   });
   sendResponse(res, { ...result });

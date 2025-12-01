@@ -50,3 +50,24 @@ export const ensureReturnable = (item) => {
     );
   }
 };
+
+export const ensureApproveReturnable = (item) => {
+  if (item.status !== "Return Requested") {
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "INVALID_STAGE",
+      "This item cannot be returned"
+    );
+  }
+};
+
+export const ensureReturnApproved = (item) => {
+  console.log(item.status);
+  if (item.status !== "Return Approved") {
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "INVALID_STAGE",
+      "This item cannot be returned"
+    );
+  }
+};

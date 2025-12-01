@@ -3,9 +3,8 @@ import connectDB from "./config/db.js";
 import adminRoutes from "./routes/admin/admin.routes.js";
 import userRoutes from "./routes/user/user.routes.js";
 import { initCronJobs } from "./jobs/index.job.js";
-import { config } from "dotenv";
 import { errorHandler } from "./middlewares/common/error-handler.js";
-config();
+import { env } from "./config/env.js";
 import cors from "cors";
 import logger from "./config/logger.js";
 import { pinoHttp } from "pino-http";
@@ -22,7 +21,7 @@ app.use(
   cors({
     origin: [
       "https://years-applicants-first-guns.trycloudflare.com",
-      "http://localhost:5173",
+      env.FRONTEND_URL,
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
@@ -74,9 +73,7 @@ app.get("/metrics", async (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(process.env.PORT, () =>
-      logger.info("Server started successfully")
-    );
+    app.listen(env.PORT, () => logger.info("Server started successfully"));
   } catch (err) {
     logger.error(err.message);
     process.exit(1);

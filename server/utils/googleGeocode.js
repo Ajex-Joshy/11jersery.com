@@ -1,7 +1,8 @@
 import axios from "axios";
+import { env } from "../config/env.js";
 
 export const geocodeAddress = async (address) => {
-  const apiKey = process.env.GOOGLE_GEOCODING_API_KEY;
+  const apiKey = env.GOOGLE_GEOCODING_API_KEY;
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     address

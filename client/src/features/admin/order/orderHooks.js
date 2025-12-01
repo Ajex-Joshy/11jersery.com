@@ -132,7 +132,6 @@ export const useApproveReturn = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ orderId, itemId }) => {
-      // If itemId is provided, call item endpoint, else order endpoint (if you implemented it)
       const url = itemId
         ? `/admin/orders/${orderId}/items/${itemId}/return/approve`
         : `/admin/orders/${orderId}/return/approve`;
@@ -171,7 +170,9 @@ export const useConfirmReturnReceived = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ orderId, itemId }) => {
-      const url = `/admin/orders/${orderId}/items/${itemId}/return/confirm`;
+      const url = itemId
+        ? `/admin/orders/${orderId}/items/${itemId}/confirm-received`
+        : `/admin/orders/${orderId}/confirm-received`;
       await axiosInstance.patch(url);
     },
     onSuccess: () => {

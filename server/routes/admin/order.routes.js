@@ -5,7 +5,9 @@ import {
   getOrderDetailsController,
   getOrdersController,
   getReturnRequestsController,
+  processItemRecievedController,
   processItemReturnController,
+  processOrderReceivedController,
   processOrderReturnController,
   updateOrderStatusController,
 } from "../../controllers/admin/order.controller.js";
@@ -29,6 +31,13 @@ router.patch(
   processItemReturnController
 );
 
-router.patch("/:orderId/return/:action", processOrderReturnController);
+router.patch("/:orderId/return/:action", processItemReturnController);
+
+router.patch(
+  "/:orderId/items/:itemId/confirm-received",
+  processItemRecievedController
+);
+
+router.patch("/:orderId/confirm-received", processOrderReceivedController);
 
 export default router;

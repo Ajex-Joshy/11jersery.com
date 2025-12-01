@@ -2,9 +2,9 @@ import cron from "node-cron";
 import mongoose from "mongoose";
 import Order from "../models/order.model.js";
 import { restoreAllStock } from "../services/user/order/helper-services/stock.service.js";
+import { env } from "../config/env.js";
 
-// Runs every 10 minutes
-cron.schedule("*/10 * * * *", async () => {
+cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
   console.log(" Cron: Checking for expired Initialized orders...");
 
   const session = await mongoose.startSession();

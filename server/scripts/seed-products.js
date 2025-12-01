@@ -1,64 +1,27 @@
-const teams = [
-  {
-    name: "FC Barcelona",
-    tag: "barcelona",
-    players: ["Pedri", "Lewandowski", "Gavi", "Yamal"],
-  },
-  {
-    name: "Real Madrid",
-    tag: "real-madrid",
-    players: ["Bellingham", "Vinicius Jr", "Modric", "Mbappe"],
-  },
-  {
-    name: "Manchester City",
-    tag: "man-city",
-    players: ["Haaland", "De Bruyne", "Foden", "Rodri"],
-  },
-  {
-    name: "Manchester United",
-    tag: "man-utd",
-    players: ["Rashford", "Fernandes", "Garnacho", "Mainoo"],
-  },
-  {
-    name: "Liverpool",
-    tag: "liverpool",
-    players: ["Salah", "Van Dijk", "Szoboszlai", "Trent"],
-  },
-  {
-    name: "Arsenal",
-    tag: "arsenal",
-    players: ["Saka", "Odegaard", "Rice", "Martinelli"],
-  },
-  {
-    name: "Bayern Munich",
-    tag: "bayern",
-    players: ["Kane", "Musiala", "Kimmich", "Sané"],
-  },
-  {
-    name: "PSG",
-    tag: "psg",
-    players: ["Dembele", "Hakimi", "Vitinha", "Marquinhos"],
-  },
-  {
-    name: "Inter Miami",
-    tag: "inter-miami",
-    players: ["Messi", "Suarez", "Busquets", "Alba"],
-  },
-  {
-    name: "Al Nassr",
-    tag: "al-nassr",
-    players: ["Ronaldo", "Mane", "Laporte", "Otavio"],
-  },
-];
+import connectDB from "../config/db.js";
+import Product from "../models/product.model.js";
+import { teams, types, categoryIds } from "./constants.js";
+import readline from "readline";
 
-const types = ["Home", "Away", "Third", "Retro"];
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
-// --- HELPER FUNCTIONS ---
+const askCount = () =>
+  new Promise((resolve) => {
+    rl.question("How many products do you want to add? ", (answer) => {
+      rl.close();
+      resolve(parseInt(answer, 10));
+    });
+  });
+
+const NO_OF_PRODUCTS_TO_ADD = await askCount();
+
 const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const getRandomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-// --- GENERATOR ---
 const generateProduct = () => {
   const team = getRandom(teams);
   const player = getRandom(team.players);
@@ -93,7 +56,15 @@ const generateProduct = () => {
       list: listPrice,
       sale: listPrice - getRandomInt(50, 150),
     },
-    images: [`${team.tag}-1`, `${team.tag}-2`, `${team.tag}-3`],
+    categoryIds: Array.from(
+      { length: getRandomInt(1, 3) },
+      () => categoryIds[Math.floor(Math.random() * categoryIds.length)]
+    ),
+    imageIds: [
+      `${team.tag}-1.webp`,
+      `${team.tag}-2.webp`,
+      `${team.tag}-3.webp`,
+    ].sort(() => Math.random() - 0.5),
     variants: [
       { size: "XS", stock: getRandomInt(0, 50) },
       { size: "S", stock: getRandomInt(0, 100) },
@@ -125,20 +96,37 @@ const generateProduct = () => {
       average: parseFloat((Math.random() * (5.0 - 3.5) + 3.5).toFixed(1)),
     },
     isListed: Math.random() < 0.8,
-    faqs: [
-      {
-        question: "Is this an official licensed jersey?",
-        answer:
-          "No, this is a high-quality fan version made with premium materials.",
-      },
-      {
-        question: "What are the washing instructions?",
-        answer: "Wash inside out with cold water. Do not tumble dry.",
-      },
-    ],
   };
 
   return product;
 };
 
-const data = generateProduct();
+const productGenerator = (num) => {
+  let products = [];
+  for (let i = 0; i < num; i++) {
+    let prod = generateProduct();
+    products.push(prod);
+  }
+  return products;
+};
+
+const data = productGenerator(NO_OF_PRODUCTS_TO_ADD);
+
+await connectDB();
+
+await Product.insertMany(data);
+
+console.log(`${NO_OF_PRODUCTS_TO_ADD} Products inserted successfully`);
+process.exit(0);
+
+//  faqs: [
+//       {
+//         question: "Is this an official licensed jersey?",
+//         answer:
+//           "No, this is a high-quality fan version made with premium materials.",
+//       },
+//       {
+//         question: "What are the washing instructions?",
+//         answer: "Wash inside out with cold water. Do not tumble dry.",
+//       },
+//     ],

@@ -23,7 +23,6 @@ export const recalculatedOrderAmount = async (order, item) => {
 
   const total = Math.round(order?.price?.total - refundAmount);
   const deliveryFee = total > FREESHIP_MIN ? 0 : DELIVERY_FEE;
-  console.log("refundAmount", refundAmount);
 
   return {
     subtotal,
@@ -33,5 +32,6 @@ export const recalculatedOrderAmount = async (order, item) => {
     total,
     deliveryFee,
     total,
+    refundAmount,
   };
 };

@@ -1,25 +1,13 @@
 import Product from "../../../../../models/product.model.js";
+import { recalculatedOrderAmount } from "./item-refund.js";
 
-async function buildCategoryTotals(items, products, categoryId) {
-  const productById = new Map();
-  products.forEach((p) => {
-    productById.set(p._id.toString(), p);
-  });
-
+async function buildCategoryTotals(items, categoryId) {
   let totalAmount = 0;
 
   for (const item of items) {
-    const prod = productById.get(item.productId.toString());
-    if (!prod) continue;
-
-    const lineAmount =
-      (prod.price?.sale ?? prod.price?.list ?? 0) * item.quantity;
-
-    (prod.categoryIds || []).forEach((cId) => {
-      if (cId.toString() === categoryId.toString()) {
-        totalAmount += lineAmount;
-      }
-    });
+    if (item.categoryIds.includes(categoryId)) {
+      totalAmount += item.salePrice * item.quantity;
+    }
   }
 
   return {
@@ -39,15 +27,12 @@ export const calculateCategoryDiscountRefund = async (order, item) => {
     maxRedeemable,
   } = order?.price?.appliedCategoryOffer;
 
-  const items = order.items.filter((i) => i._id !== item._id);
-  const productIds = items.map((i) => i.productId);
-  const products = await Product.find({ _id: { $in: productIds } });
+  const items = order.items
+    .filter((i) => i._id.toString() !== item._id.toString())
+    .filter((i) => i.status !== "Cancelled");
+  console.log("item length", items.length);
 
-  const { totalAmount } = await buildCategoryTotals(
-    items,
-    products,
-    categoryId
-  );
+  const { totalAmount } = await buildCategoryTotals(items, categoryId);
 
   let newDiscount = 0;
 
@@ -58,28 +43,27 @@ export const calculateCategoryDiscountRefund = async (order, item) => {
       if (maxRedeemable && newDiscount > maxRedeemable) {
         newDiscount = maxRedeemable;
       }
-
-      newDiscount = Math.min(newDiscount, currentDiscount);
     }
   }
 
   if (discountType === "flat") {
     if (totalAmount >= minPurchaseAmount) {
-      newDiscount = currentDiscount;
+      newDiscount = discount;
     } else {
       newDiscount = 0;
     }
   }
+  console.log("totalAmount", totalAmount, "newDiscount", newDiscount);
 
-  if (items.length === 0) {
+  if (items.length === 0 || totalAmount < minPurchaseAmount) {
     newDiscount = 0;
   }
 
-  const refundAmount = Math.max(currentDiscount - newDiscount, 0);
+  const discountDifference = Math.max(currentDiscount - newDiscount, 0);
 
   return {
     recalculatedSpeicialDiscount: Math.round(newDiscount),
-    categoryRefundAmount: Math.round(refundAmount),
+    categoryRefundAmount: Math.round(discountDifference),
   };
 };
 

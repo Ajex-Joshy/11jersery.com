@@ -6,11 +6,13 @@ import {
 import crypto from "crypto";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import logger from "../../../config/logger.js";
+import { env } from "../../../config/env.js";
 
-const bucketName = process.env.AWS_S3_BUCKET_NAME;
-const region = process.env.AWS_S3_REGION;
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const bucketName = env.AWS_S3_BUCKET_NAME;
+const region = env.AWS_S3_REGION;
+const accessKeyId = env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
+const expiresIn = env.S3_EXPIRE_TIMIE;
 
 // 2. Create the S3 Client
 const s3Client = new S3Client({
@@ -53,7 +55,9 @@ export const getSignedUrlForKey = async (key) => {
   });
 
   try {
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    const url = await getSignedUrl(s3Client, command, {
+      expiresIn,
+    });
     return url;
   } catch (error) {
     logger.error(`Error generating signed URL for key ${key}:`, error);

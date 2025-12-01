@@ -37,6 +37,10 @@ export const verifyAndPlaceOnlineOrder = async ({
     console.log(order, order.payment.status);
     order.orderStatus = "Pending";
     order.payment.status = "Paid";
+    order.items = order.items.map((i) => ({
+      ...i,
+      status: "Pending",
+    }));
 
     const transaction = await Transaction.create({
       userId,

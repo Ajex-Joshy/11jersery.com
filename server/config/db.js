@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import logger from "./logger.js";
-
-dotenv.config();
+import { env } from "./env.js";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(env.MONGO_URI, {
       tls: true,
       tlsAllowInvalidCertificates: false,
     });

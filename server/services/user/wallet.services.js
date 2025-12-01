@@ -42,20 +42,21 @@ export const creditWallet = async (
 ) => {
   const user = await User.findById(userId).select("wallet");
   let wallet = user.wallet || 0;
+  console.log(wallet);
 
-  wallet.balance += amount;
-  await wallet.save({ session });
+  wallet += amount;
+  console.log("wallet", "amount", amount);
+  await user.save();
 
   return await walletTransaction.create(
     [
       {
         userId,
-        amount: { total: amount },
+        amount,
         type: "CREDIT",
         reason,
         status: "SUCCESS",
         paymentMethod,
-        paymentId,
       },
     ],
     { session }

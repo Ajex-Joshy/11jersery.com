@@ -1,4 +1,5 @@
 node_modules
 .DS_Store
-.env
+.env.development
+.env.production
 config/jersey-d0a02-firebase-adminsdk-fbsvc-9dd260b2d3.json

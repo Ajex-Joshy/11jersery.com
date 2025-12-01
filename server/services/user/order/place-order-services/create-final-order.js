@@ -32,9 +32,15 @@ export const finalizeOrderCreation = async (
     [
       {
         userId,
-        items,
+        items: items.map((i) => ({
+          ...i,
+          status: paymentMethod === "RAZORPAY" ? "Initialized" : "Pending",
+        })),
         shippingAddress,
-        payment: { method: paymentMethod },
+        payment: {
+          method: paymentMethod,
+          status: transactionStatus === "SUCCESS" ? "Paid" : "Unpaid",
+        },
         orderStatus: paymentMethod === "RAZORPAY" ? "Initialized" : "Pending",
         price: priceData,
         timeline: generateOrderTimeline(),

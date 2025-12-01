@@ -10,6 +10,7 @@ export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
     "Return Rejected",
   ].includes(item.status);
   const canCancel = ["Pending", "Processing"].includes(item.status);
+  console.log(item.status, canCancel);
 
   // Simple status color logic
   const getStatusColor = (s) => {
@@ -58,6 +59,9 @@ export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
         <div className="mt-3 flex flex-wrap justify-between items-center gap-2">
           <div className="text-xs font-medium">
             <span className={getStatusColor(item.status)}>{item.status}</span>
+            {item.status === "Return Rejected" && (
+              <span>{` - ${item.returnReason}`}</span>
+            )}
           </div>
 
           <div className="flex gap-3">

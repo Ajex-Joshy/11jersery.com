@@ -189,6 +189,23 @@ const AdminOrderDetails = () => {
               Placed on {new Date(order.createdAt).toLocaleString("en-IN")}
             </p>
           </div>
+          {/* Approve/Reject Return Buttons (for all items "Return Requested") */}
+          {order.items.every((item) => item.status === "Return Requested") && (
+            <>
+              <button
+                onClick={() => handleActionModal("approve_return", null)}
+                className="px-4 py-2 bg-green-100 border border-green-300 text-green-700 text-sm font-medium rounded-md hover:bg-green-200 transition"
+              >
+                Approve Return
+              </button>
+              <button
+                onClick={() => handleActionModal("reject_return", null)}
+                className="px-4 py-2 bg-red-100 border border-red-300 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 transition"
+              >
+                Reject Return
+              </button>
+            </>
+          )}
         </div>
 
         {/* Actions */}
@@ -257,20 +274,27 @@ const AdminOrderDetails = () => {
                 Items ({order.items.length})
               </h2>
             </div>
-            {order.items.map((item) => (
-              <OrderItem
-                key={item._id}
-                item={item}
-                onCancelItem={(id) => handleCancelClick("item", id)}
-                onApproveReturn={(id) =>
-                  handleActionModal("approve_return", id)
-                }
-                onRejectReturn={(id) => handleActionModal("reject_return", id)}
-                onConfirmReturn={(id) =>
-                  handleActionModal("confirm_return", id)
-                }
-              />
-            ))}
+            {(() => {
+              const allReturnRequested = order.items.every(
+                (item) => item.status === "Return Requested"
+              );
+              return order.items.map((item) => (
+                <OrderItem
+                  key={item._id}
+                  item={item}
+                  onCancelItem={(id) => handleCancelClick("item", id)}
+                  onApproveReturn={(id) =>
+                    handleActionModal("approve_return", id)
+                  }
+                  onRejectReturn={(id) =>
+                    handleActionModal("reject_return", id)
+                  }
+                  onConfirmReturn={(orderId, itemId) =>
+                    handleActionModal("confirm_return", orderId, itemId)
+                  }
+                />
+              ));
+            })()}
           </div>
         </div>
 

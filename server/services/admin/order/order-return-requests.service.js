@@ -2,6 +2,7 @@ import { getPagination, getSortOption } from "../../../utils/helpers.js";
 import Order from "../../../models/order.model.js";
 import createError from "http-errors";
 import {
+  ensureApproveReturnable,
   ensureOrderExists,
   ensureReturnable,
 } from "../../user/order/utils/validations.service.js";
@@ -54,9 +55,6 @@ export const processOrderReturnRequest = async ({
   action,
   reason,
 }) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const order = await Order.findById(orderId);
     ensureOrderExists(order);
@@ -69,47 +67,12 @@ export const processOrderReturnRequest = async ({
     }
 
     for (let item of order.items) {
-      ensureReturnable(item);
+      ensureApproveReturnable(item);
       item.status = targetStatus;
     }
-    if (order.orderStatus === "Return Requested")
-      order.orderStatus = targetStatus;
+    order.orderStatus = targetStatus;
 
-    if (action === "approve") {
-      for (const item of order.items) {
-        item.timeline.returnApprovedAt = new Date();
-        if (item.status === "Return Approved") {
-          await restoreStock(session, item.productId, item.size, item.quantity);
-        }
-      }
-      if (order.payment.method === "COD" && order.payment.status === "Paid") {
-        order.payment.status = "Refund Initiated";
-        const latestTransactionId =
-          order.transactionIds[order.transactionIds.length - 1];
-        await Transaction.findByIdAndUpdate(
-          latestTransactionId,
-          { status: "Refunded" },
-          { session }
-        );
-      }
-
-      const [newTransaction] = await Transaction.create(
-        [
-          {
-            orderId: order._id,
-            userId: order.userId,
-            amount: order.price,
-            type: "DEBIT",
-            status: "PENDING",
-            paymentMethod: "WALLET",
-            reason: "ORDER_REFUND",
-          },
-        ],
-        { session }
-      );
-      order.timeline.returnApprovedAt = new Date();
-      order.transactionIds.push(newTransaction._id);
-    } else {
+    if (order.orderStatus === "Return Rejected") {
       order.returnReason = reason;
       order.timeline.returnRejectedAt = new Date();
       for (let item of order.items) {
@@ -118,25 +81,19 @@ export const processOrderReturnRequest = async ({
     }
 
     await order.save();
-    await session.commitTransaction();
-    session.endSession();
     return order.toObject();
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     throw error;
   }
 };
 
 export const processItemReturnRequest = async ({
+  session,
   orderId,
   action,
   itemId,
   reason,
 }) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const order = await Order.findById(orderId).session(session);
     if (!order) throw createError(404, "Order not found");
@@ -161,7 +118,6 @@ export const processItemReturnRequest = async ({
     item.status = targetStatus;
     if (action === "approve") {
       item.timeline.returnApprovedAt = new Date();
-      await restoreStock(session, item.productId, item.size, item.quantity);
     } else {
       item.returnReason = item.returnReason
         ? `${item.returnReason} | Admin Rejection: ${reason}`
@@ -172,49 +128,10 @@ export const processItemReturnRequest = async ({
     if (order.items.every((i) => i.status === targetStatus)) {
       order.orderStatus = targetStatus;
     }
-
-    // Payment & transaction handling (only on approval)
-    if (action === "approve") {
-      if (order.payment.method === "COD" && order.payment.status === "Paid") {
-        order.payment.status = "Refund Initiated";
-        if (order.transactionIds?.length) {
-          const latestTransactionId =
-            order.transactionIds[order.transactionIds.length - 1];
-          await Transaction.findByIdAndUpdate(
-            latestTransactionId,
-            { status: "Refund" },
-            { session }
-          );
-        }
-      }
-
-      // Create new transaction for wallet refund
-      const [newTransaction] = await Transaction.create(
-        [
-          {
-            orderId: order._id,
-            userId: order.userId,
-            amount: order.price,
-            type: "DEBIT",
-            status: "PENDING",
-            paymentMethod: "WALLET",
-            reason: "ORDER_REFUND_ITEM",
-          },
-        ],
-        { session }
-      );
-      if (!order.transactionIds) order.transactionIds = [];
-      order.transactionIds.push(newTransaction._id);
-    }
-
     await order.save({ session });
-    await session.commitTransaction();
-    session.endSession();
 
     return order.toObject();
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     throw error;
   }
 };

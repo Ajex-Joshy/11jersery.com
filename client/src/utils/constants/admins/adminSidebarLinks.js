@@ -20,7 +20,11 @@ export const sidebarSections = [
       { path: "/admin/customers", icon: FiUsers, label: "Customers" },
       { path: "/admin/coupons", icon: FiTag, label: "Coupons" },
       { path: "/admin/categories", icon: FiGrid, label: "Categories" },
-      { path: "/admin/transactions", icon: FiDollarSign, label: "Transaction" },
+      {
+        path: "/admin/sales-report",
+        icon: FiDollarSign,
+        label: "Sales Report",
+      },
     ],
   },
   {

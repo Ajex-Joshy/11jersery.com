@@ -2,8 +2,7 @@ import logger from "../../config/logger.js";
 import razorpayInstance from "../../config/razorpay.js";
 import { AppError } from "../../utils/helpers.js";
 import crypto from "crypto";
-import { config } from "dotenv";
-config();
+import { env } from "../../config/env.js";
 
 export const createRazorpayOrder = async (
   amount,
@@ -32,7 +31,7 @@ export const createRazorpayOrder = async (
 export const verifyRazorpaySignature = (orderId, paymentId, signature) => {
   const body = orderId + "|" + paymentId;
   const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_TEST_SECRET_KEY)
+    .createHmac("sha256", env.RAZORPAY_TEST_SECRET_KEY)
     .update(body.toString())
     .digest("hex");
 

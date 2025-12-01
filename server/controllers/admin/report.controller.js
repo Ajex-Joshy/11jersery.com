@@ -1,9 +1,7 @@
 import { asyncHandler, sendResponse } from "../../utils/helpers.js";
 import { getSalesReport } from "../../services/admin/report/report.services.js";
-import {
-  generateReportPDF,
-  generateReportExcel,
-} from "../../services/admin/report/report-download.service.js";
+import { generateReportExcel } from "../../services/admin/report/report-excel-download.js";
+import { generateReportPDF } from "../../services/admin/report/report-pdf-download.js";
 
 export const getSalesReportController = asyncHandler(async (req, res) => {
   const result = await getSalesReport(req.query);

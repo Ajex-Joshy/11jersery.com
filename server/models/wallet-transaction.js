@@ -29,7 +29,6 @@ const WalletTransactionSchema = new Schema(
         "Wallet Top-Up",
         "REFERRAL_BONUS",
         "Order Cancelled",
-        "Order Refund",
       ],
       required: true,
     },

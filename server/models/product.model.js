@@ -35,7 +35,7 @@ const productSchema = mongoose.Schema(
     imageIds: [{ type: String }],
     variants: [
       {
-        sku: { type: String, required: true },
+        sku: { type: String },
         size: { type: String },
         stock: { type: Number, default: 0, min: 0 },
       },

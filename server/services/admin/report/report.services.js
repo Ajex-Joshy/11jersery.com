@@ -16,12 +16,15 @@ export const getSalesReport = async (params) => {
 
   // 1. Date Filter
   const matchStage = {
-    status: { $in: ["Delivered", "Completed"] }, // Only count completed sales
-    createdAt: {},
+    orderStatus: { $in: ["Delivered"] },
   };
 
-  if (startDate) matchStage.createdAt.$gte = new Date(startDate);
-  if (endDate) matchStage.createdAt.$lte = new Date(endDate);
+  if (startDate || endDate) {
+    matchStage.createdAt = {};
+    if (startDate) matchStage.createdAt.$gte = new Date(startDate);
+    if (endDate) matchStage.createdAt.$lte = new Date(endDate);
+  }
+  const { skip, pageNumber, pageSize } = getPagination(page, limit, 50);
 
   // If no date provided, default to last 30 days? Or all time?
   // Let's assume validation handles required dates or defaults.
@@ -57,6 +60,7 @@ export const getSalesReport = async (params) => {
         $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
       };
   }
+  console.log(period, dateExpression);
 
   // 3. Aggregation Pipeline
   const pipeline = [
@@ -65,8 +69,10 @@ export const getSalesReport = async (params) => {
       $group: {
         _id: dateExpression,
         totalOrders: { $sum: 1 },
-        totalSales: { $sum: "$pricing.total" }, // Assuming structure from order model
-        totalDiscount: { $sum: "$pricing.discount" },
+        totalSales: { $sum: "$price.total" }, // Assuming structure from order model
+        totalDiscount: { $sum: "$price.discount" },
+        totalSpecialDiscount: { $sum: "$price.specialDiscount" },
+        totalCouponDiscount: { $sum: "$price.couponDiscount" },
         // If coupons are separate from discount field:
         // totalCouponDeduction: { $sum: "$pricing.couponDeduction" }
       },
@@ -78,8 +84,6 @@ export const getSalesReport = async (params) => {
   // We need pagination on the aggregated results, which is tricky with standard .find().
   // We use $facet for pagination within aggregation.
 
-  const { pageNumber, pageSize, skip } = getPagination(page, limit);
-
   const result = await Order.aggregate([
     ...pipeline,
     {
@@ -89,6 +93,7 @@ export const getSalesReport = async (params) => {
       },
     },
   ]);
+  console.log("result", result);
 
   const reportData = result[0].data;
   const totalRecords = result[0].metadata[0] ? result[0].metadata[0].total : 0;
@@ -103,8 +108,11 @@ export const getSalesReport = async (params) => {
       $group: {
         _id: null,
         overallSalesCount: { $sum: 1 },
-        overallOrderAmount: { $sum: "$pricing.total" },
-        overallDiscount: { $sum: "$pricing.discount" },
+        overallOrderAmount: { $sum: "$price.total" },
+        overallDiscount: { $sum: "$price.discount" },
+        overallSpecialDiscount: { $sum: "$price.specialDiscount" },
+        overallCouponDiscount: { $sum: "$price.couponDiscount" },
+        overallReferralBonus: { $sum: "$price.referralBonus" },
       },
     },
   ]);

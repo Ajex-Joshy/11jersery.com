@@ -88,25 +88,51 @@ const Inbox = () => {
       header: "Return Items",
       key: "items",
       render: (order) => {
+        // Check if the entire order is a return request
+
         // Filter items that are involved in the return process
         const returnItems = order.items.filter((i) =>
-          [
-            "Return Requested",
-            "Return Approved",
-            "Returned",
-            "Return Rejected",
-          ].includes(i.status)
+          ["Return Requested"].includes(i.status)
         );
 
         if (
-          returnItems.length === 0 &&
+          returnItems.length === order.items.length &&
           order.orderStatus === "Return Requested"
         ) {
           return (
-            <span className="text-sm text-gray-500">Entire Order Return</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 flex-1">
+                {returnItems.map((item) => (
+                  <div key={item._id} className="flex flex-col">
+                    <span className="font-medium">{item.title}</span>
+                    <span className="text-xs text-gray-500">
+                      Size: {item.size}
+                    </span>
+                    {item.returnReason && (
+                      <span className="text-xs text-orange-600 italic">
+                        Reason: {item.returnReason}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </span>
+              <button
+                onClick={() => handleAction("approve", order._id)}
+                title="Approve Entire Order"
+                className="text-green-600 hover:bg-green-50 p-1 rounded"
+              >
+                <CheckCircle size={16} />
+              </button>
+              <button
+                onClick={() => handleAction("reject", order._id)}
+                title="Reject Entire Order"
+                className="text-red-600 hover:bg-red-50 p-1 rounded"
+              >
+                <XCircle size={16} />
+              </button>
+            </div>
           );
         }
-        console.log("returnItems", returnsPayload);
         return (
           <div className="space-y-2">
             {returnItems.map((item) => (
@@ -126,7 +152,6 @@ const Inbox = () => {
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={item.status} />
                   {/* Action Buttons Per Item */}
                   {item.status === "Return Requested" && (
                     <>

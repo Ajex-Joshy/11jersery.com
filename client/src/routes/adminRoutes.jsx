@@ -4,6 +4,7 @@ import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminLayout from "../layouts/adminLayout";
 import * as Pages from "./adminLazyPages";
 import CouponManagementPage from "../features/admin/coupon/CouponManagementPage";
+import SalesReportPage from "../features/admin/report/SalesReportPage";
 
 const AdminRoutes = () => {
   return (
@@ -35,6 +36,7 @@ const AdminRoutes = () => {
             />
             <Route path="/coupons" element={<CouponManagementPage />} />
             <Route path="/inbox" element={<Pages.Inbox />} />
+            <Route path="/sales-report" element={<SalesReportPage />} />
           </Route>
           <Route path="*" element={<Pages.Admin404 />} />
         </Route>

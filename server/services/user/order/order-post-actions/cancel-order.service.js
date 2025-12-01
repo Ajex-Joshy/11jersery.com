@@ -9,6 +9,7 @@ import {
 import { markAsCanceled } from "./item-actions.service.js";
 import Transaction from "../../../../models/order-transaction.model.js";
 import { recalculatedOrderAmount } from "../refund/item/item-refund.js";
+import { creditWallet, debitWallet } from "../../wallet.services.js";
 
 export const cancelOrder = async (userId, orderId, reason) => {
   const session = await mongoose.startSession();
@@ -28,6 +29,18 @@ export const cancelOrder = async (userId, orderId, reason) => {
     }
     if (order.payment.method === "COD" && order.payment.status === "Pending") {
       order.payment.status = "Unpaid";
+    }
+    if (order.payment.status === "Paid") {
+      await creditWallet(session, userId, order.price.total, "Order Refund");
+      const latestTransactionId =
+        order.transactionIds[order.transactionIds.length - 1];
+      order.payment.status = "Refunded";
+      await Transaction.findByIdAndUpdate(
+        latestTransactionId,
+        { status: "Refunded" },
+        { session }
+      );
+    } else {
       const latestTransactionId =
         order.transactionIds[order.transactionIds.length - 1];
       await Transaction.findByIdAndUpdate(
@@ -68,15 +81,8 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
       referralBonus,
       total,
       deliveryFee,
+      refundAmount,
     } = await recalculatedOrderAmount(order, item);
-    console.log(
-      subtotal,
-      specialDiscount,
-      couponDiscount,
-      referralBonus,
-      total,
-      deliveryFee
-    );
 
     await restoreStock(session, item.productId, item.size, item.quantity);
     markAsCanceled(item, reason);
@@ -90,49 +96,43 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
     order.price.referralBonus = referralBonus;
     order.price.total = total + deliveryFee;
 
-    if (order.payment.method === "COD" && order.payment.status === "Pending") {
-      const latestTransactionId =
-        order.transactionIds[order.transactionIds.length - 1];
+    if (order.payment.status === "Paid") {
+      await creditWallet(session, userId, refundAmount, "Order Refund");
+    }
+    console.log("order", order, order.payment.paymentMethod);
+    const [newTransaction] = await Transaction.create(
+      [
+        {
+          orderId: order._id,
+          userId: order.userId,
+          amount: order.price,
+          type: "CREDIT",
+          status: order.payment.status === "Paid" ? "REFUNDED" : "UNPAID",
+          paymentMethod: order.payment.method,
+          reason: "RECALCULATED_ORDER_PAYMENT",
+        },
+      ],
+      { session }
+    );
+
+    order.transactionIds.push(newTransaction._id);
+    const paymentStatus =
+      order.payment.status === "Paid" ? "Refunded" : "Unpaid";
+    const allCancelled = order.items.every((i) => i.status === "Cancelled");
+    if (allCancelled) {
+      order.orderStatus = "Cancelled";
+      let firstTransaction = await Transaction.findById(
+        order.transactionIds[0]
+      );
+      order.price = firstTransaction.amount;
+      order.payment.status = paymentStatus;
       await Transaction.findByIdAndUpdate(
-        latestTransactionId,
-        { status: "CANCELLED" },
+        newTransaction._id,
+        { status: paymentStatus },
         { session }
       );
-
-      const [newTransaction] = await Transaction.create(
-        [
-          {
-            orderId: order._id,
-            userId: order.userId,
-            amount: order.price.total,
-            type: "CREDIT",
-            status: "PENDING",
-            paymentMethod: "COD",
-            reason: "RECALCULATED_ORDER_PAYMENT",
-          },
-        ],
-        { session }
-      );
-
-      order.transactionIds.push(newTransaction._id);
-
-      const allCancelled = order.items.every((i) => i.status === "Cancelled");
-      if (allCancelled) {
-        order.orderStatus = "Cancelled";
-        let firstTransaction = await Transaction.findById(
-          order.transactionIds[0]
-        );
-        order.price = firstTransaction.amount;
-        order.payment.status = "Unpaid";
-        await Transaction.findByIdAndUpdate(
-          newTransaction._id,
-          { status: "Unpaid" },
-          { session }
-        );
-      }
     }
 
-    console.log("price", order.price);
     order.markModified("price");
     await order.save({ session });
 
