@@ -5,6 +5,17 @@ import { couponSchema } from "../couponSchema.js";
 import { Loader2 } from "lucide-react";
 import { FormInput } from "../../../../components/common/FormComponents";
 
+const formatDateTimeLocal = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 const CouponForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
   const {
     register,
@@ -14,19 +25,28 @@ const CouponForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(couponSchema),
-    defaultValues: initialData || {
-      code: "",
-      description: "",
-      discountType: "FIXED",
-      discountValue: "",
-      minPurchaseAmount: 0,
-      maxDiscountAmount: "",
-      usageLimit: "",
-      perUserLimit: 1,
-      startDate: new Date().toISOString().split("T")[0], // Today YYYY-MM-DD
-      expiryDate: "",
-      isActive: true,
-    },
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          discountValue: initialData.discountValue / 100,
+          minPurchaseAmount: initialData.minPurchaseAmount / 100,
+          maxDiscountAmount: initialData.maxDiscountAmount / 100,
+          startDate: formatDateTimeLocal(initialData.startDate),
+          expiryDate: formatDateTimeLocal(initialData.expiryDate),
+        }
+      : {
+          code: "",
+          description: "",
+          discountType: "FIXED",
+          discountValue: "",
+          minPurchaseAmount: 0,
+          maxDiscountAmount: "",
+          usageLimit: "",
+          perUserLimit: 1,
+          startDate: formatDateTimeLocal(new Date()), // Today with time
+          expiryDate: "",
+          isActive: true,
+        },
   });
 
   const discountType = watch("discountType");
@@ -116,16 +136,16 @@ const CouponForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormInput
-          label="Start Date"
+          label="Start Date & Time"
           id="startDate"
-          type="date"
+          type="datetime-local"
           {...register("startDate")}
           error={errors.startDate?.message}
         />
         <FormInput
-          label="Expiry Date"
+          label="Expiry Date & Time"
           id="expiryDate"
-          type="date"
+          type="datetime-local"
           {...register("expiryDate")}
           error={errors.expiryDate?.message}
         />
@@ -153,6 +173,7 @@ const CouponForm = ({ initialData, onSubmit, isLoading, onCancel }) => {
           </button>
         </div>
       </div>
+
       <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"

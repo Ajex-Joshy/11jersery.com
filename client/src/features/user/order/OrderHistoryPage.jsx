@@ -7,6 +7,7 @@ import {
 } from "../../../components/common/StateDisplays";
 import Pagination from "../../../components/common/Pagination";
 import InvoiceDownloadButton from "../../../components/user/Buttons";
+import { formatRupee } from "../../../utils/currency";
 
 // --- Helper: Order Status Badge ---
 const OrderStatusBadge = ({ status }) => {
@@ -103,7 +104,7 @@ const OrderHistoryCard = ({ order }) => {
           <p className="text-sm text-gray-500">
             Total Amount:{" "}
             <span className="text-black font-bold">
-              ₹{order.price.total.toLocaleString()}
+              {formatRupee(order?.price?.total)}
             </span>
           </p>
         </div>

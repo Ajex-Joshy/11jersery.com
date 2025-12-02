@@ -1,6 +1,7 @@
 import createError from "http-errors";
 import Coupon from "../../models/coupon.model.js";
 import { getPagination, getSortOption } from "../../utils/helpers.js";
+import { toPaise } from "../../utils/currency.js";
 
 export const createCoupon = async (couponData) => {
   const existingCoupon = await Coupon.findOne({ code: couponData.code });
@@ -10,6 +11,16 @@ export const createCoupon = async (couponData) => {
 
   if (new Date(couponData.startDate) >= new Date(couponData.expiryDate)) {
     throw createError(400, "Expiry date must be after start date");
+  }
+
+  if (couponData.discountValue) {
+    couponData.discountValue = toPaise(couponData.discountValue);
+  }
+  if (couponData.minPurchaseAmount) {
+    couponData.minPurchaseAmount = toPaise(couponData.minPurchaseAmount);
+  }
+  if (couponData.maxDiscountAmount) {
+    couponData.maxDiscountAmount = toPaise(couponData.maxDiscountAmount);
   }
 
   return await Coupon.create(couponData);
@@ -73,6 +84,17 @@ export const updateCoupon = async (couponId, updateData) => {
   if (updateData.code && updateData.code !== coupon.code) {
     const duplicate = await Coupon.findOne({ code: updateData.code });
     if (duplicate) throw createError(409, "Coupon code already exists");
+  }
+
+  if (updateData.discountValue) {
+    updateData.discountValue = toPaise(updateData.discountValue);
+  }
+
+  if (updateData.maxDiscountAmount) {
+    updateData.maxDiscountAmount = toPaise(updateData.maxDiscountAmount);
+  }
+  if (updateData.minPurchaseAmount) {
+    updateData.minPurchaseAmount = toPaise(updateData.minPurchaseAmount);
   }
 
   const updatedCoupon = await Coupon.findByIdAndUpdate(

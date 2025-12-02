@@ -62,7 +62,6 @@ export const ensureApproveReturnable = (item) => {
 };
 
 export const ensureReturnApproved = (item) => {
-  console.log(item.status);
   if (item.status !== "Return Approved") {
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,

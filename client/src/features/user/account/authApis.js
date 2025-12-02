@@ -42,3 +42,8 @@ export const changePassword = async (passwordData) => {
   );
   return data;
 };
+
+export const logout = async () => {
+  const { data } = await axiosInstance.post("/auth/logout");
+  return data;
+};

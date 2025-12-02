@@ -23,12 +23,14 @@ export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,
       "MIN_PURCHASE_REQUIRED",
-      `Cart total must be at least ₹${coupon.minPurchaseAmount} to use ${couponCode}`
+      `Cart total must be at least ₹${
+        coupon.minPurchaseAmount / 100
+      } to use ${couponCode}`
     );
   }
 
   let couponDiscount = 0;
-  if (coupon.discountType === "FLAT") {
+  if (coupon.discountType === "FIXED") {
     couponDiscount = coupon.discountValue;
   } else if (coupon.discountType === "PERCENTAGE") {
     couponDiscount = (subtotal * coupon.discountValue) / 100;
@@ -40,7 +42,6 @@ export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
       );
     }
   }
-
   return {
     couponDiscount,
     appliedCoupon: {

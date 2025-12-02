@@ -3,6 +3,7 @@ import User from "../../models/user.model.js";
 import { AppError } from "../../utils/helpers.js";
 import logger from "../../config/logger.js";
 import { STATUS_CODES } from "../../utils/constants.js";
+import { isTokenBlackListed } from "../../services/user/auth/token.service.js";
 
 export const authenticateUser = async (req, res, next) => {
   try {
@@ -16,6 +17,14 @@ export const authenticateUser = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
+    const isBlacklisted = await isTokenBlackListed(token);
+    if (isBlacklisted) {
+      throw new AppError(
+        STATUS_CODES.UNAUTHORIZED,
+        "TOKEN_INVALIDATED",
+        "Token is invalidated . Please login again."
+      );
+    }
     let decoded;
     try {
       decoded = verifyToken(token);
@@ -33,7 +42,11 @@ export const authenticateUser = async (req, res, next) => {
         "INVALID_TOKEN",
         "Token invalid or expired"
       );
-    const user = await User.findById(decoded?.user?._id);
+    const user = await User.findOne({
+      _id: decoded?.user?._id,
+      isBlocked: false,
+      isDeleted: false,
+    });
     if (!user)
       throw new AppError(
         STATUS_CODES.NOT_FOUND,

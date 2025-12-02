@@ -23,8 +23,11 @@ export const applyCoupon = async (userId, couponCode) => {
     );
 
   // 2. Validation Checks
-  const now = new Date();
-  if (now < coupon.startDate || now > coupon.expiryDate) {
+  const nowTime = new Date().getTime();
+  const startTime = new Date(coupon.startDate).getTime();
+  const expiryTime = new Date(coupon.expiryDate).getTime();
+
+  if (nowTime < startTime || nowTime > expiryTime) {
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,
       "COUPON_EXPIRED",
@@ -53,7 +56,9 @@ export const applyCoupon = async (userId, couponCode) => {
     throw new AppError(
       STATUS_CODES.BAD_REQUEST,
       "MIN_PURCHASE_REQUIRED",
-      `Cart total must be at least ₹${coupon.minPurchaseAmount} to use this coupon`
+      `Cart total must be at least ₹${
+        coupon.minPurchaseAmount / 100
+      } to use this coupon`
     );
   }
 

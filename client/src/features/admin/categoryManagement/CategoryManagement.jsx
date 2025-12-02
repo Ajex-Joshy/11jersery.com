@@ -14,11 +14,13 @@ import {
   ActionIconButtons,
 } from "../../../components/admin/UiElements.jsx";
 import ConfirmationModal from "../../../components/common/ConfirmationModal.jsx";
+import { formatRupee } from "../../../utils/currency.js";
 
 const DiscoverCard = ({ data }) => (
   <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
     <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-      {data?.imageId ? (
+      {console.log(data.imageUrl)}
+      {data?.imageUrl ? (
         <img
           src={data.imageUrl}
           alt={data.title}
@@ -133,10 +135,10 @@ const CategoryManagement = () => {
             return (
               <div className="text-sm">
                 <span className="font-semibold text-gray-800">
-                  ₹{item.discount.toLocaleString()} Off
+                  {formatRupee(item?.discount)} Off
                 </span>
                 <span className="block text-xs text-gray-500">
-                  Min: ₹{item.minPurchaseAmount?.toLocaleString() || 0}
+                  Min: {formatRupee(item?.minPurchaseAmount)}
                 </span>
               </div>
             );
@@ -147,7 +149,7 @@ const CategoryManagement = () => {
                   {item.discount}% Off
                 </span>
                 <span className="block text-xs text-gray-500">
-                  Max: ₹{item.maxRedeemable?.toLocaleString() || 0}
+                  Max: {formatRupee(item?.maxRedeemable)}
                 </span>
               </div>
             );

@@ -1,9 +1,5 @@
 import Order from "../../models/order.model.js";
 
-/**
- * Generates stats for the Admin Dashboard.
- * @returns {Promise<object>} The dashboard data.
- */
 export const getDashboardStats = async () => {
   // 1. Date Ranges for Comparison (Progress)
   const now = new Date();
@@ -13,7 +9,7 @@ export const getDashboardStats = async () => {
 
   // 2. Top Selling Products (Top 10)
   const bestSellingProducts = await Order.aggregate([
-    { $match: { status: { $nin: ["Cancelled", "Returned"] } } }, // Exclude cancelled/returned
+    { $match: { status: { $nin: ["Cancelled", "Returned"] } } },
     { $unwind: "$items" },
     {
       $group: {
@@ -31,25 +27,15 @@ export const getDashboardStats = async () => {
   ]);
 
   // 3. Top Selling Categories (Top 10)
-  // This is trickier because Order Items usually store product snapshots, not category IDs.
-  // We need to lookup the Product to find its Category(s).
+
   const bestSellingCategories = await Order.aggregate([
     { $match: { status: { $nin: ["Cancelled", "Returned"] } } },
     { $unwind: "$items" },
-    {
-      $lookup: {
-        from: "products",
-        localField: "items.productId",
-        foreignField: "_id",
-        as: "productInfo",
-      },
-    },
-    { $unwind: "$productInfo" },
-    { $unwind: "$productInfo.categoryIds" }, // A product can have multiple categories
+    { $unwind: "$items.categoryIds" },
     {
       $lookup: {
         from: "categories",
-        localField: "productInfo.categoryIds",
+        localField: "items.categoryIds",
         foreignField: "_id",
         as: "categoryInfo",
       },
@@ -75,12 +61,12 @@ export const getDashboardStats = async () => {
         $group: {
           _id: null,
           sales: { $sum: 1 }, // Order count
-          revenue: { $sum: "$pricing.total" },
+          revenue: { $sum: "$price.total" },
           cancelled: {
-            $sum: { $cond: [{ $eq: ["$status", "Cancelled"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$orderStatus", "Cancelled"] }, 1, 0] },
           },
           returned: {
-            $sum: { $cond: [{ $eq: ["$status", "Returned"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$orderStatus", "Returned"] }, 1, 0] },
           },
         },
       },
@@ -94,7 +80,7 @@ export const getDashboardStats = async () => {
         $group: {
           _id: null,
           sales: { $sum: 1 },
-          revenue: { $sum: "$pricing.total" },
+          revenue: { $sum: "$price.total" },
         },
       },
     ]),
@@ -106,10 +92,10 @@ export const getDashboardStats = async () => {
           totalSales: { $sum: 1 }, // Total Orders
           totalRevenue: { $sum: "$price.total" },
           totalCancelled: {
-            $sum: { $cond: [{ $eq: ["$status", "Cancelled"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$orderStatus", "Cancelled"] }, 1, 0] },
           },
           totalReturned: {
-            $sum: { $cond: [{ $eq: ["$status", "Returned"] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$orderStatus", "Returned"] }, 1, 0] },
           },
         },
       },

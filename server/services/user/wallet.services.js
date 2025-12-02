@@ -10,7 +10,7 @@ export const checkWalletBalance = async (userId, amount) => {
   return wallet;
 };
 
-export const debitWallet = async (session, userId, amount, orderId, reason) => {
+export const debitWallet = async (session, userId, amount, reason, orderId) => {
   const user = await User.findById(userId).select("wallet");
   let wallet = user.wallet || 0;
 
@@ -18,7 +18,7 @@ export const debitWallet = async (session, userId, amount, orderId, reason) => {
     throw new Error("Insufficient balance in wallet");
 
   user.wallet -= amount;
-  await walletTransaction.create(
+  const transaction = await walletTransaction.create(
     [
       {
         userId,
@@ -26,11 +26,13 @@ export const debitWallet = async (session, userId, amount, orderId, reason) => {
         type: "DEBIT",
         reason,
         status: "SUCCESS",
+        orderId,
       },
     ],
     { session }
   );
   await user.save({ session });
+  return transaction;
 };
 
 export const creditWallet = async (
@@ -38,14 +40,11 @@ export const creditWallet = async (
   userId,
   amount,
   reason,
+  orderId,
   paymentMethod
 ) => {
   const user = await User.findById(userId).select("wallet");
-  let wallet = user.wallet || 0;
-  console.log(wallet);
-
-  wallet += amount;
-  console.log("wallet", "amount", amount);
+  user.wallet += amount;
   await user.save();
 
   return await walletTransaction.create(
@@ -57,6 +56,7 @@ export const creditWallet = async (
         reason,
         status: "SUCCESS",
         paymentMethod,
+        orderId,
       },
     ],
     { session }

@@ -8,6 +8,7 @@ import DynamicTable from "../../../components/admin/DynamicTable";
 import { Eye } from "lucide-react";
 import { orderStatusOptions } from "../../../utils/constants.js";
 import { ErrorDisplay } from "../../../components/common/StateDisplays.jsx";
+import { formatRupee } from "../../../utils/currency.js";
 
 const OrderManagement = () => {
   const navigate = useNavigate();
@@ -83,7 +84,9 @@ const OrderManagement = () => {
       key: "totalAmount",
       sortable: true,
       render: (item) => (
-        <span className="font-bold text-gray-900">₹{item.price}</span>
+        <span className="font-bold text-gray-900">
+          {formatRupee(item?.price)}
+        </span>
       ),
     },
     {

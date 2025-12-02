@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { openAuthModal } from "../features/user/account/authSlice";
+import ChatWidget from "../features/user/chat/components/ChatWidget";
 
 const UserLayout = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const UserLayout = () => {
       </main>
       <Footer />
       <AuthModal />
+      <ChatWidget />
       <Toaster position="top-right" />
     </div>
   );

@@ -21,7 +21,7 @@ export const recalculatedOrderAmount = async (order, item) => {
     couponRefundAmount -
     referralRefundAmount;
 
-  const total = Math.round(order?.price?.total - refundAmount);
+  const total = order?.price?.total - refundAmount;
   const deliveryFee = total > FREESHIP_MIN ? 0 : DELIVERY_FEE;
 
   return {

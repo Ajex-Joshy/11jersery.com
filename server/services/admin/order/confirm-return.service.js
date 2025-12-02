@@ -43,7 +43,8 @@ export const processOrderReceived = async ({ orderId }) => {
       session,
       order.userId,
       order.price.total,
-      "Order Refund"
+      "Order Refund",
+      order.orderId
     );
     order.payment.status = "Refunded";
     order.orderStatus = "Returned";
@@ -62,6 +63,10 @@ export const processOrderReceived = async ({ orderId }) => {
       ],
       { session }
     );
+
+    let firstTransaction = await Transaction.findById(order.transactionIds[0]);
+    order.price = firstTransaction.amount;
+
     order.timeline.returnApprovedAt = new Date();
     order.transactionIds.push(newTransaction._id);
 
@@ -95,9 +100,6 @@ export const processItemReceived = async ({ orderId, itemId }) => {
     item.timeline.returnApprovedAt = new Date();
     await restoreStock(session, item.productId, item.size, item.quantity);
 
-    if (order.items.every((i) => i.status === "Returned")) {
-      order.orderStatus = "Returned";
-    }
     const {
       subtotal,
       specialDiscount,
@@ -117,7 +119,13 @@ export const processItemReceived = async ({ orderId, itemId }) => {
     order.price.referralBonus = referralBonus;
     order.price.total = total + deliveryFee;
 
-    await creditWallet(session, order.userId, refundAmount, "Order Refund");
+    await creditWallet(
+      session,
+      order.userId,
+      refundAmount,
+      "Order Refund",
+      order.orderId
+    );
     const latestTransactionId =
       order.transactionIds[order.transactionIds.length - 1];
     await Transaction.findByIdAndUpdate(
@@ -142,6 +150,21 @@ export const processItemReceived = async ({ orderId, itemId }) => {
     );
     if (!order.transactionIds) order.transactionIds = [];
     order.transactionIds.push(newTransaction._id);
+
+    const allReturned = order.items.every((i) => i.status === "Returned");
+    if (allReturned) {
+      order.orderStatus = "Returned";
+      let firstTransaction = await Transaction.findById(
+        order.transactionIds[0]
+      );
+      order.price = firstTransaction.amount;
+      order.payment.status = "Refunded";
+      await Transaction.findByIdAndUpdate(
+        newTransaction._id,
+        { status: "Refunded" },
+        { session }
+      );
+    }
 
     order.markModified("price");
     await order.save({ session });

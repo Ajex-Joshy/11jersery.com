@@ -10,6 +10,7 @@ import {
 } from "../../../components/common/StateDisplays";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
+import { formatRupee } from "../../../utils/currency";
 
 const SalesReportPage = () => {
   // 1. Initialize URL state management
@@ -78,32 +79,38 @@ const SalesReportPage = () => {
       header: "Total Sales",
       key: "totalSales",
       render: (item) => (
-        <span className="font-bold text-gray-900">₹{item.totalSales}</span>
+        <span className="font-bold text-gray-900">
+          {formatRupee(item.totalSales)}
+        </span>
       ),
     },
     {
       header: "Total Discount",
       key: "totalDiscount",
       render: (item) => (
-        <span className="text-orange-600">₹{item.totalDiscount}</span>
+        <span className="text-orange-600">
+          {formatRupee(item.totalDiscount)}
+        </span>
       ),
     },
     {
       header: "Total Special Discount",
       key: "specialDiscount",
       render: (item) => (
-        <span className="text-orange-600">₹{item.totalSpecialDiscount}</span>
+        <span className="text-orange-600">
+          {formatRupee(item.totalSpecialDiscount)}
+        </span>
       ),
     },
     {
       header: "Total Coupon Discount",
       key: "couponDiscount",
       render: (item) => (
-        <span className="text-orange-600">₹{item.totalCouponDiscount}</span>
+        <span className="text-orange-600">
+          {formatRupee(item.totalCouponDiscount)}
+        </span>
       ),
     },
-
-    // Add Coupon deduction column if your backend supports it
   ];
 
   if (isLoading) return <LoadingSpinner text="Generating report..." />;

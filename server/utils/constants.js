@@ -20,6 +20,6 @@ export const STATUS_CODES = {
 
 export const MAX_QUANTITY_PER_ORDER = 20;
 export const REFERRAL_BONUS_PERCENT = 10;
-export const MAX_REFERRAL_BONUS = 100;
-export const DELIVERY_FEE = 80;
-export const FREESHIP_MIN = 500;
+export const MAX_REFERRAL_BONUS = 10000;
+export const DELIVERY_FEE = 8000;
+export const FREESHIP_MIN = 50000;

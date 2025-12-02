@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { formatRupee } from "../../../../utils/currency";
 
 export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
   const isCancelled = [
@@ -52,7 +53,7 @@ export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
             </p>
           </div>
           <p className="font-medium text-gray-900">
-            ₹{item.salePrice.toLocaleString()}
+            {formatRupee(item.salePrice)}
           </p>
         </div>
 

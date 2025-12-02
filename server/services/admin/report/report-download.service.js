@@ -240,8 +240,7 @@ export const generateReportPDF = async (params, res) => {
 
     doc.end();
   } catch (error) {
-    console.error("Error generating PDF report:", error);
-    res.status(500).send("Failed to generate PDF report.");
+    throw error;
   }
 };
 
@@ -383,7 +382,6 @@ export const generateReportExcel = async (params, res) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    console.error("Error generating Excel report:", error);
-    res.status(500).send("Failed to generate Excel report.");
+    throw error;
   }
 };

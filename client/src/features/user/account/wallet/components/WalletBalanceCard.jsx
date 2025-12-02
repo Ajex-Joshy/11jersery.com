@@ -1,5 +1,6 @@
 import React from "react";
 import { Wallet, Plus } from "lucide-react";
+import { formatRupee } from "../../../../../utils/currency";
 
 const WalletBalanceCard = ({ balance }) => {
   return (
@@ -12,9 +13,7 @@ const WalletBalanceCard = ({ balance }) => {
           <p className="text-sm text-gray-400 font-medium mb-1">
             Available Balance
           </p>
-          <h2 className="text-3xl font-bold">
-            ₹{balance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-          </h2>
+          <h2 className="text-3xl font-bold">{formatRupee(balance)}</h2>
         </div>
       </div>
 

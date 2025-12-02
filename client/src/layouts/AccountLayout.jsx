@@ -19,10 +19,11 @@ const navLinks = [
   { name: "Wishlist", href: "wishlist", icon: Heart },
   { name: "Addresses", href: "/account/addresses", icon: MapPin },
   { name: "Wallet", href: "wallet", icon: Wallet },
-  { name: "My Coupons", href: "coupons", icon: Ticket },
+  // { name: "My Coupons", href: "coupons", icon: Ticket },
   { name: "Account Settings", href: "settings", icon: Settings },
 ];
 import AccountNavLink from "./components/user/AccountNavLink";
+import { useLogout } from "../features/user/account/authHooks";
 
 /**
  * The main AccountLayout component with sidebar and content outlet.
@@ -30,10 +31,11 @@ import AccountNavLink from "./components/user/AccountNavLink";
 const AccountLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { mutate: logoutUser } = useLogout();
 
   const handleLogout = () => {
+    logoutUser();
     dispatch(logOut());
-
     navigate("/");
   };
 

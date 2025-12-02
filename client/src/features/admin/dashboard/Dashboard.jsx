@@ -83,7 +83,13 @@ const Dashboard = () => {
           icon={Users} // Or XCircle
           colorClass="bg-red-50 text-red-600"
         />
-        {/* Add one more card if needed */}
+        <SummaryCard
+          title="Returned Orders"
+          value={stats.monthly?.returned || 0}
+          trend={-5} // Negative is good here usually, but trend logic might differ
+          icon={TrendingUp}
+          colorClass="bg-yellow-50 text-yellow-600"
+        />
       </div>
 
       {/* --- Main Chart Section --- */}

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { S3_URL } from "../../../../utils/constants";
 import StarRating from "../../../../components/common/StarRating";
+import { formatRupee } from "../../../../utils/currency";
 
 const ProductCard = ({ product }) => {
   // --- 2. Calculate discount ---
@@ -54,11 +55,11 @@ const ProductCard = ({ product }) => {
         <div className="flex items-center gap-2 mt-auto pt-2">
           {" "}
           <span className="text-lg font-bold text-gray-900">
-            ₹{salePrice.toLocaleString()}
+            {formatRupee(salePrice)}
           </span>
           {hasDiscount && (
             <span className="text-sm text-gray-500 line-through">
-              ₹{listPrice.toLocaleString()}
+              {formatRupee(listPrice)}
             </span>
           )}
           {hasDiscount && (

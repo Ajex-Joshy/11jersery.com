@@ -17,7 +17,7 @@ import { STATUS_CODES } from "../../utils/constants.js";
 import {
   processOrderReceived,
   processItemReceived,
-} from "../../services/admin/order/confirm-return.js";
+} from "../../services/admin/order/confirm-return.service.js";
 
 export const getOrdersController = asyncHandler(async (req, res) => {
   const [ordersData, statsData] = await Promise.all([

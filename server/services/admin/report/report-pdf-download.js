@@ -1,19 +1,12 @@
 import { getSalesReport } from "./report.services.js";
 import PDFDocument from "pdfkit";
+import { formatCurrency } from "../../../utils/currency.js";
 
 const COMPANY_NAME = "11jersey.com";
 const PRIMARY_COLOR = "#2c3e50"; // Dark Slate Blue
 const ACCENT_COLOR = "#34495e";
 const HEADER_BG_COLOR = "#f3f4f6";
 const BORDER_COLOR = "#e5e7eb";
-
-/**
- * Helper: Format currency
- */
-const formatCurrency = (amount) =>
-  typeof amount === "number"
-    ? `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
-    : "-";
 
 /**
  * Helper: Format Date
@@ -239,7 +232,6 @@ export const generateReportPDF = async (params, res) => {
 
     doc.end();
   } catch (error) {
-    console.error("Error generating PDF report:", error);
-    res.status(500).send("Failed to generate PDF report.");
+    throw error;
   }
 };

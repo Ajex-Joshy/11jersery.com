@@ -140,9 +140,12 @@ export const generateInvoice = async (userId, orderId, res) => {
         .fontSize(8)
         .text(desc, descriptionX, y + 12) // Size below title
         .fontSize(10)
-        .text(item.quantity.toString(), quantityX, y)
-        .text(`Rs. ${item.listPrice}`, priceX, y)
-        .text(`Rs. ${item.salePrice * item.quantity}`, totalX, y);
+        .text(`Rs. ${(item.listPrice / 100).toLocaleString()}`, priceX, y)
+        .text(
+          `Rs. ${((item.salePrice * item.quantity) / 100).toLocaleString()}`,
+          totalX,
+          y
+        );
 
       y += 40; // Row height
 
@@ -172,48 +175,81 @@ export const generateInvoice = async (userId, orderId, res) => {
       .fillColor(primaryColor)
       .text("Subtotal:", summaryLabelX, summaryTop + 10)
       .text(
-        `Rs. ${order.price.subtotal.toLocaleString()}`,
+        `Rs. ${(order.price.subtotal / 100).toLocaleString()}`,
         summaryValueX,
         summaryTop + 10
       );
 
-    const discountValue = order.price.subtotal - order.price.discountedPrice;
+    const discountValue = order.price.discount;
+    const specialDiscount = order.price.specialDiscount || 0;
+    const couponDiscount = order.price.couponDiscount || 0;
+    const referralBonus = order.price.referralBonus || 0;
     if (discountValue > 0) {
       doc
         .text("Discount:", summaryLabelX, summaryTop + 25)
         .text(
-          `- Rs. ${discountValue.toLocaleString()}`,
+          `- Rs. ${(discountValue / 100).toLocaleString()}`,
           summaryValueX,
           summaryTop + 25
         );
     }
 
+    if (specialDiscount > 0) {
+      doc
+        .text("Special Discount:", summaryLabelX, summaryTop + 40)
+        .text(
+          `- Rs. ${(specialDiscount / 100).toLocaleString()}`,
+          summaryValueX,
+          summaryTop + 40
+        );
+    }
+
+    if (couponDiscount > 0) {
+      doc
+        .text("Coupon Discount:", summaryLabelX, summaryTop + 55)
+        .text(
+          `- Rs. ${(couponDiscount / 100).toLocaleString()}`,
+          summaryValueX,
+          summaryTop + 55
+        );
+    }
+
+    if (referralBonus > 0) {
+      doc
+        .text("Referral Bonus:", summaryLabelX, summaryTop + 70)
+        .text(
+          `- Rs. ${(referralBonus / 100).toLocaleString()}`,
+          summaryValueX,
+          summaryTop + 70
+        );
+    }
+
     doc
-      .text("Delivery Fee:", summaryLabelX, summaryTop + 40)
+      .text("Delivery Fee:", summaryLabelX, summaryTop + 85)
       .text(
         order.price.deliveryFee === 0
           ? "Free"
-          : `Rs. ${order.price.deliveryFee.toLocaleString()}`,
+          : `Rs. ${(order.price.deliveryFee / 100).toLocaleString()}`,
         summaryValueX,
-        summaryTop + 40
+        summaryTop + 85
       );
 
     doc
       .strokeColor(lineColor)
       .lineWidth(1)
-      .moveTo(350, summaryTop + 60)
-      .lineTo(550, summaryTop + 60)
+      .moveTo(350, summaryTop + 105)
+      .lineTo(550, summaryTop + 105)
       .stroke();
 
     doc
       .fontSize(12)
       .fillColor(primaryColor)
       .font("Helvetica-Bold") // Use standard bold font
-      .text("Total:", summaryLabelX, summaryTop + 70)
+      .text("Total:", summaryLabelX, summaryTop + 115)
       .text(
-        `Rs. ${order.price.total.toLocaleString()}`,
+        `Rs. ${(order.price.total / 100).toLocaleString()}`,
         summaryValueX,
-        summaryTop + 70
+        summaryTop + 115
       );
 
     // --- Footer ---

@@ -1,7 +1,9 @@
 import connectDB from "../config/db.js";
+import logger from "../config/logger.js";
 import Product from "../models/product.model.js";
 import { teams, types, categoryIds } from "./constants.js";
 import readline from "readline";
+import { toPaise } from "../utils/currency.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -42,6 +44,7 @@ const generateProduct = () => {
   const shortDescription = `Cheer for ${team.name} in style with the official ${player} ${type} Jersey. Lightweight, breathable, and made for ultimate comfort.`;
 
   const listPrice = getRandomInt(499, 899);
+  const discount = getRandomInt(50, 150);
 
   const product = {
     title: title,
@@ -53,8 +56,8 @@ const generateProduct = () => {
     description: description,
     shortDescription: shortDescription,
     price: {
-      list: listPrice,
-      sale: listPrice - getRandomInt(50, 150),
+      list: toPaise(listPrice),
+      sale: toPaise(Math.max(listPrice - discount, 1)),
     },
     categoryIds: Array.from(
       { length: getRandomInt(1, 3) },
@@ -116,7 +119,7 @@ await connectDB();
 
 await Product.insertMany(data);
 
-console.log(`${NO_OF_PRODUCTS_TO_ADD} Products inserted successfully`);
+logger.info(`${NO_OF_PRODUCTS_TO_ADD} Products inserted successfully`);
 process.exit(0);
 
 //  faqs: [

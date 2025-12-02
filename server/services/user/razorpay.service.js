@@ -11,7 +11,7 @@ export const createRazorpayOrder = async (
 ) => {
   try {
     const options = {
-      amount: amount * 100,
+      amount: amount,
       currency,
       receipt: `receipt_${Date.now()}`,
       notes,

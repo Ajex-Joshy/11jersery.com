@@ -17,6 +17,7 @@ import CouponForm from "./components/CouponForm.jsx";
 import { useTableParams } from "../../../hooks/useTableParams";
 import DynamicTable from "../../../components/admin/DynamicTable";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
+import { formatRupee } from "../../../utils/currency.js";
 
 const CouponManagementPage = () => {
   const { queryParams, uiState, handlers } = useTableParams({
@@ -75,10 +76,10 @@ const CouponManagementPage = () => {
         <span>
           {item.discountType === "PERCENTAGE"
             ? `${item.discountValue}%`
-            : `₹${item.discountValue}`}
+            : `${formatRupee(item.discountValue)}`}
           {item.discountType === "PERCENTAGE" && item.maxDiscountAmount && (
             <span className="text-xs text-gray-500 block">
-              Max: ₹{item.maxDiscountAmount}
+              Max: {formatRupee(item.maxDiscountAmount)}
             </span>
           )}
         </span>
@@ -87,7 +88,7 @@ const CouponManagementPage = () => {
     {
       header: "Min Purchase",
       key: "minPurchaseAmount",
-      render: (item) => `₹${item.minPurchaseAmount}`,
+      render: (item) => `${formatRupee(item.minPurchaseAmount)}`,
     },
     {
       header: "Usage",

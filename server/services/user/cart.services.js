@@ -34,7 +34,6 @@ export const addItem = async (userId, { productId, size, quantity }) => {
     isDeleted: false,
     isListed: true,
   });
-  console.log("productId", productId, product);
   if (!product || !product.isListed || product.isDeleted) {
     throw createError(404, "Product not found or is no longer available.");
   }

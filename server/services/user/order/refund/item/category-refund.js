@@ -30,7 +30,6 @@ export const calculateCategoryDiscountRefund = async (order, item) => {
   const items = order.items
     .filter((i) => i._id.toString() !== item._id.toString())
     .filter((i) => i.status !== "Cancelled");
-  console.log("item length", items.length);
 
   const { totalAmount } = await buildCategoryTotals(items, categoryId);
 
@@ -53,7 +52,6 @@ export const calculateCategoryDiscountRefund = async (order, item) => {
       newDiscount = 0;
     }
   }
-  console.log("totalAmount", totalAmount, "newDiscount", newDiscount);
 
   if (items.length === 0 || totalAmount < minPurchaseAmount) {
     newDiscount = 0;

@@ -60,7 +60,6 @@ export const getSalesReport = async (params) => {
         $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
       };
   }
-  console.log(period, dateExpression);
 
   // 3. Aggregation Pipeline
   const pipeline = [
@@ -93,7 +92,6 @@ export const getSalesReport = async (params) => {
       },
     },
   ]);
-  console.log("result", result);
 
   const reportData = result[0].data;
   const totalRecords = result[0].metadata[0] ? result[0].metadata[0].total : 0;

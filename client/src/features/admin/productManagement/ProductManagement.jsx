@@ -15,6 +15,7 @@ import {
 import ConfirmationModal from "../../../components/common/ConfirmationModal.jsx";
 import StockVariantsDisplay from "../../../components/admin/StockVariantsDisplay.jsx";
 import { Plus } from "lucide-react";
+import { formatRupee } from "../../../utils/currency.js";
 
 const ProductImage = ({ imageUrl, title }) => (
   <img
@@ -143,7 +144,7 @@ const ProductList = () => {
       sortable: true,
       render: (item) => (
         <span className="text-gray-800 font-semibold">
-          ₹{item.price?.sale?.toLocaleString() || "N/A"}
+          {formatRupee(item?.price?.sale)}
         </span>
       ),
     },

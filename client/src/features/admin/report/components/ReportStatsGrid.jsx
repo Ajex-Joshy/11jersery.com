@@ -1,5 +1,6 @@
 import React from "react";
 import { IndianRupee, ShoppingBag, Tag, TrendingUp } from "lucide-react";
+import { formatRupee } from "../../../../utils/currency";
 
 const StatCard = ({ title, value, icon: Icon, color }) => (
   <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
@@ -20,7 +21,7 @@ const ReportStatsGrid = ({ summary }) => {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <StatCard
         title="Total Revenue"
-        value={`₹${summary.overallOrderAmount?.toLocaleString()}`}
+        value={formatRupee(summary.overallOrderAmount)}
         icon={IndianRupee}
         color="bg-green-50 text-green-600"
       />
@@ -33,25 +34,25 @@ const ReportStatsGrid = ({ summary }) => {
 
       <StatCard
         title="Discount Savings"
-        value={`₹${summary.overallDiscount?.toLocaleString()}`}
+        value={formatRupee(summary.overallDiscount)}
         icon={Tag}
         color="bg-orange-50 text-orange-600"
       />
       <StatCard
         title="Special Discount"
-        value={`₹${summary.overallSpecialDiscount?.toLocaleString()}`}
+        value={formatRupee(summary.overallSpecialDiscount)}
         icon={TrendingUp}
         color="bg-purple-50 text-purple-600"
       />
       <StatCard
         title="Coupon Discount"
-        value={`₹${summary.overallCouponDiscount?.toLocaleString()}`}
+        value={formatRupee(summary.overallCouponDiscount)}
         icon={TrendingUp}
         color="bg-yellow-50 text-yellow-600"
       />
       <StatCard
         title="Referral Bonus"
-        value={`₹${summary.overallReferralBonus?.toLocaleString()}`}
+        value={formatRupee(summary.overallReferralBonus)}
         icon={TrendingUp}
         color="bg-pink-50 text-pink-600"
       />

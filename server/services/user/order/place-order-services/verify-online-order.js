@@ -25,7 +25,6 @@ export const verifyAndPlaceOnlineOrder = async ({
     const order = await Order.findOne({
       "payment.razorpayOrderId": razorpayOrderId,
     });
-    console.log(order);
 
     if (!order) {
       throw new AppError(
@@ -34,7 +33,6 @@ export const verifyAndPlaceOnlineOrder = async ({
         "Could not process order"
       );
     }
-    console.log(order, order.payment.status);
     order.orderStatus = "Pending";
     order.payment.status = "Paid";
     order.items = order.items.map((i) => ({

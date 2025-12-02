@@ -12,6 +12,7 @@ import {
   validateObjectId,
 } from "../../utils/product.utils.js";
 import { buildCategoryStockPipeline } from "./service-helpers/query-helpers.js";
+import { toPaise } from "../../utils/currency.js";
 
 export const createCategory = async (categoryData) => {
   const slug = await checkSlugUniqueness(
@@ -33,15 +34,18 @@ export const createCategory = async (categoryData) => {
     maxRedeemable: 0,
   };
 
+  // Convert monetary values to paise if provided
   if (categoryData.discountType && categoryData.discount > 0) {
     finalData.discountType = categoryData.discountType;
-    finalData.discount = categoryData.discount;
+    finalData.discount = toPaise(categoryData.discount);
 
     if (categoryData.discountType === "flat") {
-      finalData.minPurchaseAmount = categoryData.minPurchaseAmount ?? 0;
+      finalData.minPurchaseAmount = toPaise(
+        categoryData.minPurchaseAmount ?? 0
+      );
       finalData.maxRedeemable = 0;
     } else if (categoryData.discountType === "percent") {
-      finalData.maxRedeemable = categoryData.maxRedeemable ?? 0;
+      finalData.maxRedeemable = toPaise(categoryData.maxRedeemable ?? 0);
       finalData.minPurchaseAmount = 0;
     }
   }

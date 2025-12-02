@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { Trash2, Loader2 } from "lucide-react";
 import QuantitySpinner from "./QuantitySpinner";
+import { formatRupee } from "../../../../utils/currency";
 
 const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
   if (!item) {
@@ -52,7 +53,7 @@ const CartItem = ({ item, onIncrement, onDecrement, onRemove, isMutating }) => {
           <p className="text-sm text-gray-500">Size: {item.size}</p>
         </div>
         <span className="text-md font-bold text-gray-800 mt-2 sm:mt-0">
-          ₹{item.salePrice}
+          {formatRupee(item?.salePrice)}
         </span>
       </div>
 

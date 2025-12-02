@@ -1,5 +1,7 @@
 import Product from "../../../../models/product.model.js";
 import {
+  DELIVERY_FEE,
+  FREESHIP_MIN,
   MAX_REFERRAL_BONUS,
   REFERRAL_BONUS_PERCENT,
 } from "../../../../utils/constants.js";
@@ -65,7 +67,8 @@ export const calculateOrderPrice = async (cart) => {
     );
     finalPrice -= referralBonus;
   }
-  const deliveryFee = finalPrice < 500 && finalPrice > 0 ? 80 : 0;
+  const deliveryFee =
+    finalPrice < FREESHIP_MIN && finalPrice > 0 ? DELIVERY_FEE : 0;
 
   return {
     subtotal,

@@ -28,7 +28,6 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       state.user = null;
-      toast.success("Logged out successfully.");
     },
     openAuthModal: (state, action) => {
       state.isAuthModalOpen = true;

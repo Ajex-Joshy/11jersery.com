@@ -2,9 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 // Callback for opening login modal
-let openLoginModalCallback = null;
-export const setOpenLoginModal = (callback) => {
-  openLoginModalCallback = callback;
+let isSessionExpiredHandled = false;
+
+let clearUserStoreCallback = null;
+export const setClearUserStore = (callback) => {
+  clearUserStoreCallback = callback;
 };
 
 // Main Axios instance
@@ -59,10 +61,11 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (err) {
         localStorage.removeItem("token");
-        toast.error("Session expired. Please log in again.");
+        if (!isSessionExpiredHandled) {
+          isSessionExpiredHandled = true;
+          toast.error("Session expired. Please log in again.");
 
-        if (openLoginModalCallback) {
-          openLoginModalCallback();
+          if (clearUserStoreCallback) clearUserStoreCallback();
         }
 
         return Promise.reject(err);

@@ -20,6 +20,7 @@ import OrderTimeline from "../../user/order/components/OrderTimeline";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
 import FeeWarningModal from "../../user/order/components/FeeWarningModal";
 import OrderItem from "./components/orderItem";
+import { formatRupee } from "../../../utils/currency";
 
 const AdminOrderDetails = () => {
   const { orderId } = useParams();
@@ -327,7 +328,7 @@ const AdminOrderDetails = () => {
               <p className="flex justify-between">
                 <span>Phone:</span>{" "}
                 <span className="font-medium text-gray-900">
-                  {order.shippingAddress?.phone}
+                  {order.shippingAddress?.phoneNumber}
                 </span>
               </p>
             </div>
@@ -378,7 +379,7 @@ const AdminOrderDetails = () => {
               </div>
               <div className="pt-3 border-t border-gray-100 flex justify-between font-bold text-base text-gray-900">
                 <span>Total Amount</span>
-                <span>₹{order.price?.total?.toLocaleString()}</span>
+                <span>{formatRupee(order?.price?.total)}</span>
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ import StarRating from "../../../../components/common/StarRating";
 import { useAddItemToCart, useCart } from "../../cart/cartHooks";
 import { MAX_QUANTITY_PER_ORDER } from "../../../../utils/constants";
 import { useToggleWishlist, useWishlist } from "../../wishlist/wishlistHooks";
+import { formatRupee } from "../../../../utils/currency";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
@@ -142,11 +143,11 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-baseline gap-2">
           <span className="text-3xl font-bold text-gray-900">
-            ₹{price.sale.toLocaleString()}
+            {formatRupee(price.sale)}
           </span>
           {hasDiscount && (
             <span className="text-lg text-gray-400 line-through">
-              ₹{price.list.toLocaleString()}
+              {formatRupee(price.list)}
             </span>
           )}
           {hasDiscount && (

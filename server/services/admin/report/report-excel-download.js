@@ -1,36 +1,13 @@
 import { getSalesReport } from "./report.services.js";
 import ExcelJS from "exceljs";
+import { formatCurrency } from "../../../utils/currency.js";
 
 const COMPANY_NAME = "11jersey.com";
-const BORDER_COLOR = "#e5e7eb";
 
-/**
- * Helper: Format currency
- */
-const formatCurrency = (amount) =>
-  typeof amount === "number"
-    ? `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
-    : "-";
-
-/**
- * Helper: Format Date
- */
 const formatDate = (dateStr) => {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
   return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString("en-IN");
-};
-
-/**
- * Helper: Draw a horizontal line in PDF
- */
-const drawLine = (doc, y) => {
-  doc
-    .strokeColor(BORDER_COLOR)
-    .lineWidth(1)
-    .moveTo(50, y)
-    .lineTo(550, y)
-    .stroke();
 };
 
 /**
@@ -97,10 +74,10 @@ export const generateReportExcel = async (params, res) => {
 
     const summaryData = [
       ["Total Orders", summary.overallSalesCount],
-      ["Total Revenue", summary.overallOrderAmount],
-      ["Total Discount", summary.overallDiscount],
-      ["Special Discount", summary.overallSpecialDiscount],
-      ["Coupon Discount", summary.overallCouponDiscount],
+      ["Total Revenue", formatCurrency(summary.overallOrderAmount)],
+      ["Total Discount", formatCurrency(summary.overallDiscount)],
+      ["Special Discount", formatCurrency(summary.overallSpecialDiscount)],
+      ["Coupon Discount", formatCurrency(summary.overallCouponDiscount)],
     ];
 
     summaryData.forEach((row) => {
@@ -131,9 +108,9 @@ export const generateReportExcel = async (params, res) => {
       const dataRow = worksheet.addRow([
         formatDate(row._id),
         row.totalOrders,
-        row.totalSales,
-        row.totalDiscount,
-        netSales,
+        formatCurrency(row.totalSales),
+        formatCurrency(row.totalDiscount),
+        formatCurrency(netSales),
       ]);
 
       // Alignments & Borders
@@ -171,7 +148,6 @@ export const generateReportExcel = async (params, res) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    console.error("Error generating Excel report:", error);
-    res.status(500).send("Failed to generate Excel report.");
+    throw error;
   }
 };

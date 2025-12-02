@@ -12,6 +12,7 @@ import {
 } from "../../utils/product.utils.js";
 import { updateFaqs } from "./service-helpers/query-helpers.js";
 import { uploadFileToS3 } from "./service-helpers/s3.service.js";
+import { toPaise } from "../../utils/currency.js";
 
 export async function addProduct(productDataString, faqsDataString, files) {
   const productInfo = productDataString;
@@ -36,8 +37,8 @@ export async function addProduct(productDataString, faqsDataString, files) {
     description: productInfo.description,
     shortDescription: productInfo.shortDescription,
     price: {
-      list: productInfo.price.list,
-      sale: productInfo.price.sale,
+      list: toPaise(productInfo.price.list),
+      sale: toPaise(productInfo.price.sale),
     },
     variants: variantsWithSku,
     categoryIds: productInfo.categoryIds,
@@ -103,6 +104,14 @@ export const updateProductById = async (
   }
   // Remove coverImageIndex from the data to be saved in DB
   delete productUpdateData.coverImageIndex;
+
+  // Convert price fields to paise if present
+  if (productUpdateData.price) {
+    if (productUpdateData.price.list != null)
+      productUpdateData.price.list = toPaise(productUpdateData.price.list);
+    if (productUpdateData.price.sale != null)
+      productUpdateData.price.sale = toPaise(productUpdateData.price.sale);
+  }
 
   // 3. Handle Slug Update (if title changed)
   if (

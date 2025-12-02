@@ -9,7 +9,7 @@ export const calculateCouponRefundAmount = (order, item) => {
 
   let recalculatedDiscount = 0;
 
-  if (discountType === "FLAT") {
+  if (discountType === "FIXED") {
     if (remainingTotal >= minPurchaseAmount) {
       recalculatedDiscount = discount;
     } else {
@@ -28,6 +28,22 @@ export const calculateCouponRefundAmount = (order, item) => {
       recalculatedDiscount = 0;
     }
   }
+  console.log(
+    "discount:",
+    discount,
+    "discountType:",
+    discountType,
+    "minPurchaseAmount:",
+    minPurchaseAmount,
+    "maxDiscountAmount:",
+    maxDiscountAmount,
+    "recalculatedDiscount:",
+    recalculatedDiscount,
+    "originalDiscount:",
+    originalDiscount,
+    "couponRefundAmount:",
+    Math.round(originalDiscount - recalculatedDiscount)
+  );
 
   return {
     recalculatedCouponDiscount: recalculatedDiscount,

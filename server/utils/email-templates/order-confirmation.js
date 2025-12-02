@@ -2,7 +2,7 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-  }).format(amount);
+  }).format(amount / 100);
 };
 
 export const orderConfirmationEmailTemplate = (order) => {
@@ -79,14 +79,53 @@ export const orderConfirmationEmailTemplate = (order) => {
               order.price.subtotal
             )}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="color: #555;">Discount</span>
-            <span style="color: #0A8A32; font-weight: 600;">
-              - ${formatCurrency(
-                order.price.subtotal - order.price.discountedPrice
-              )}
-            </span>
-          </div>
+          ${
+            order.price.discount > 0
+              ? `
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+  <span style="color: #555;">Discount</span>
+  <span style="color: #0A8A32; font-weight: 600;">- ${formatCurrency(
+    order.price.discount
+  )}</span>
+</div>`
+              : ""
+          }
+
+${
+  order.price.specialDiscount > 0
+    ? `
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+  <span style="color: #555;">Special Discount</span>
+  <span style="color: #0A8A32; font-weight: 600;">- ${formatCurrency(
+    order.price.specialDiscount
+  )}</span>
+</div>`
+    : ""
+}
+
+${
+  order.price.couponDiscount > 0
+    ? `
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+  <span style="color: #555;">Coupon Discount</span>
+  <span style="color: #0A8A32; font-weight: 600;">- ${formatCurrency(
+    order.price.couponDiscount
+  )}</span>
+</div>`
+    : ""
+}
+
+${
+  order.price.referralBonus > 0
+    ? `
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+  <span style="color: #555;">Referral Bonus</span>
+  <span style="color: #0A8A32; font-weight: 600;">- ${formatCurrency(
+    order.price.referralBonus
+  )}</span>
+</div>`
+    : ""
+}
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
             <span style="color: #555;">Delivery</span>
             <span style="font-weight: 600;">

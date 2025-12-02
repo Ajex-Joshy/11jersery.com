@@ -88,7 +88,6 @@ export const confirmEmailChange = async (userId, details) => {
   }
 
   const { otp, newEmail } = JSON.parse(data);
-  console.log(data);
 
   if (otp !== details.otp) {
     throw new AppError(

@@ -9,7 +9,7 @@ import {
 import { markAsCanceled } from "./item-actions.service.js";
 import Transaction from "../../../../models/order-transaction.model.js";
 import { recalculatedOrderAmount } from "../refund/item/item-refund.js";
-import { creditWallet, debitWallet } from "../../wallet.services.js";
+import { creditWallet } from "../../wallet.services.js";
 
 export const cancelOrder = async (userId, orderId, reason) => {
   const session = await mongoose.startSession();
@@ -31,7 +31,13 @@ export const cancelOrder = async (userId, orderId, reason) => {
       order.payment.status = "Unpaid";
     }
     if (order.payment.status === "Paid") {
-      await creditWallet(session, userId, order.price.total, "Order Refund");
+      await creditWallet(
+        session,
+        userId,
+        order.price.total,
+        "Order Refund",
+        order.orderId
+      );
       const latestTransactionId =
         order.transactionIds[order.transactionIds.length - 1];
       order.payment.status = "Refunded";
@@ -97,9 +103,14 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
     order.price.total = total + deliveryFee;
 
     if (order.payment.status === "Paid") {
-      await creditWallet(session, userId, refundAmount, "Order Refund");
+      await creditWallet(
+        session,
+        userId,
+        refundAmount,
+        "Order Refund",
+        order.orderId
+      );
     }
-    console.log("order", order, order.payment.paymentMethod);
     const [newTransaction] = await Transaction.create(
       [
         {

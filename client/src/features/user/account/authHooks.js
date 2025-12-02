@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { loginUser, signupUser } from "./authApis";
+import { loginUser, logout, signupUser } from "./authApis";
 import { openAuthModal, setUser } from "./authSlice";
 import { requestPasswordReset, resetPassword } from "./authApis";
 import { useNavigate } from "react-router-dom";
@@ -46,6 +46,21 @@ export const useSignup = () => {
       toast.error(
         error.response?.data?.error.message ||
           "Signup failed. Please try again."
+      );
+    },
+  });
+};
+
+export const useLogout = () => {
+  return useMutation({
+    mutationFn: logout,
+    onSuccess: (data) => {
+      toast.success(data.message || "Logout successfully");
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.error.message ||
+          "Logout failed. Please try again."
       );
     },
   });

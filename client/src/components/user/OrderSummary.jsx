@@ -8,6 +8,7 @@ import {
   useApplyCoupon,
   useRemoveCoupon,
 } from "../../features/user/cart/couponHooks";
+import { formatRupee } from "../../utils/currency.js";
 
 /**
  * Reusable component for showing order totals.
@@ -39,20 +40,47 @@ export const OrderSummary = ({ isCheckoutPage }) => {
   } = useCart();
 
   const cart = cartPayload?.data;
-  console.log("cart", cart);
 
   const {
-    subtotal,
-    total,
-    deliveryFee,
-    discount,
-    specialDiscount,
-    couponDiscount,
-    referralBonus,
+    subtotal: rawSubtotal,
+    total: rawTotal,
+    deliveryFee: rawDeliveryFee,
+    discount: rawDiscount,
+    specialDiscount: rawSpecialDiscount,
+    couponDiscount: rawCouponDiscount,
+    referralBonus: rawReferralBonus,
   } = cart || {};
+
+  const subtotal = formatRupee(rawSubtotal);
+  const total = formatRupee(rawTotal);
+  const deliveryFee = formatRupee(rawDeliveryFee);
+  const discount = formatRupee(rawDiscount);
+  const specialDiscount = formatRupee(rawSpecialDiscount);
+  const couponDiscount = formatRupee(rawCouponDiscount);
+  const referralBonus = formatRupee(rawReferralBonus);
 
   if (isCartLoading) return <LoadingSpinner text="Loading checkout..." />;
   if (isError) return <ErrorDisplay error={error} />;
+
+  const discountItems = [
+    { label: "Discount", value: rawDiscount, formatted: discount },
+    {
+      label: "Special Discount",
+      value: rawSpecialDiscount,
+      formatted: specialDiscount,
+    },
+    {
+      label: "Coupon Discount",
+      value: rawCouponDiscount,
+      formatted: couponDiscount,
+    },
+    {
+      label: "Referral Bonus",
+      value: rawReferralBonus,
+      formatted: referralBonus,
+    },
+  ];
+
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 sticky top-24">
       <h2 className="text-xl font-semibold mb-6 border-b pb-4">
@@ -62,51 +90,25 @@ export const OrderSummary = ({ isCheckoutPage }) => {
       <div className="space-y-3 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">Subtotal</span>
-          <span className="font-medium text-gray-900">
-            ₹{subtotal.toLocaleString()}
-          </span>
+          <span className="font-medium text-gray-900">{subtotal}</span>
         </div>
 
-        {discount > 0 && (
-          <div className="flex justify-between">
-            <span className="text-green-600">Discount</span>
-            <span className="font-medium text-green-600">
-              - ₹{discount.toLocaleString()}
-            </span>
-          </div>
-        )}
-
-        {specialDiscount > 0 && (
-          <div className="flex justify-between">
-            <span className="text-green-600">Special Discount</span>
-            <span className="font-medium text-green-600">
-              - ₹{specialDiscount.toLocaleString()}
-            </span>
-          </div>
-        )}
-        {couponDiscount > 0 && (
-          <div className="flex justify-between">
-            <span className="text-green-600">Coupon Discount</span>
-            <span className="font-medium text-green-600">
-              - ₹{couponDiscount.toLocaleString()}
-            </span>
-          </div>
-        )}
-        {referralBonus > 0 && (
-          <div className="flex justify-between">
-            <span className="text-green-600">Referral Bonus</span>
-            <span className="font-medium text-green-600">
-              - ₹{referralBonus.toLocaleString()}
-            </span>
-          </div>
+        {discountItems.map(
+          (item) =>
+            item.value > 0 && (
+              <div key={item.label} className="flex justify-between">
+                <span className="text-green-600">{item.label}</span>
+                <span className="font-medium text-green-600">
+                  - {item.formatted}
+                </span>
+              </div>
+            )
         )}
 
         <div className="flex justify-between">
           <span className="text-gray-600">Delivery Fee</span>
           <span className="font-medium text-gray-900">
-            {typeof deliveryFee === "number"
-              ? `₹${deliveryFee.toLocaleString()}`
-              : deliveryFee}
+            {rawDeliveryFee === 0 ? "Free" : deliveryFee}
           </span>
         </div>
       </div>
@@ -114,9 +116,7 @@ export const OrderSummary = ({ isCheckoutPage }) => {
       <div className="border-t border-gray-200 mt-4 pt-4">
         <div className="flex justify-between items-center">
           <span className="text-lg font-bold text-gray-900">Total</span>
-          <span className="text-lg font-bold text-gray-900">
-            {console.log("total", total)}₹{total.toLocaleString()}
-          </span>
+          <span className="text-lg font-bold text-gray-900">{total}</span>
         </div>
       </div>
 

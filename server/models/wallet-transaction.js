@@ -8,7 +8,9 @@ const WalletTransactionSchema = new Schema(
       required: true,
       index: true,
     },
-
+    orderId: {
+      type: String,
+    },
     amount: {
       type: Number,
       required: true,

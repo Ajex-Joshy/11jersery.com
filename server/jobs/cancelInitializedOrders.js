@@ -3,9 +3,10 @@ import mongoose from "mongoose";
 import Order from "../models/order.model.js";
 import { restoreAllStock } from "../services/user/order/helper-services/stock.service.js";
 import { env } from "../config/env.js";
+import logger from "../config/logger.js";
 
 cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
-  console.log(" Cron: Checking for expired Initialized orders...");
+  logger.info(" Cron: Checking for expired Initialized orders...");
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -19,13 +20,13 @@ cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
     }).session(session);
 
     if (!expiredOrders.length) {
-      console.log("✔ No expired Initialized orders found.");
+      logger.info("✔ No expired Initialized orders found.");
       await session.commitTransaction();
       session.endSession();
       return;
     }
 
-    console.log(` Expired orders found: ${expiredOrders.length}`);
+    logger.info(` Expired orders found: ${expiredOrders.length}`);
 
     for (const order of expiredOrders) {
       // restore stock
@@ -43,13 +44,13 @@ cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
         }
       ).session(session);
 
-      console.log(`🛑 Order Cancelled & Stock Restored: ${order._id}`);
+      logger.info(`🛑 Order Cancelled & Stock Restored: ${order._id}`);
     }
 
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
-    console.error(" Cron job failed:", error);
+    logger.error(" Cron job failed:", error);
     await session.abortTransaction();
     session.endSession();
   }

@@ -1,14 +1,17 @@
-import {
-  forgotPassword,
-  refreshAcessToken,
-  resetPassword,
-  signupUser,
-} from "../../services/user/auth.services.js";
 import { AppError, sendResponse } from "../../utils/helpers.js";
-import { loginUser } from "../../services/user/auth.services.js";
 import { asyncHandler } from "../../utils/helpers.js";
 import { setRefreshToken } from "../../utils/jwt.js";
 import { STATUS_CODES } from "../../utils/constants.js";
+import {
+  signupUser,
+  loginUser,
+  logoutUser,
+} from "../../services/user/auth/auth.services.js";
+import { refreshAcessToken } from "../../services/user/auth/token.service.js";
+import {
+  forgotPassword,
+  resetPassword,
+} from "../../services/user/auth/password.services.js";
 
 export const userSignupController = asyncHandler(async (req, res) => {
   if (!req.body.firebaseToken) {
@@ -48,13 +51,6 @@ export const forgotPasswordController = asyncHandler(async (req, res) => {
   res.status(STATUS_CODES.OK).send(result);
 });
 
-export const verifyOtpController = asyncHandler(async (req, res) => {
-  const { email, otp } = req.body;
-
-  const result = await verifyOtp(email, otp);
-  res.status(STATUS_CODES.OK).send(result);
-});
-
 export const resetPasswordController = asyncHandler(async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
@@ -68,4 +64,28 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
 
   const result = await resetPassword(token, password);
   res.status(STATUS_CODES.OK).send(result);
+});
+
+export const logoutController = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new AppError(
+      STATUS_CODES.UNAUTHORIZED,
+      "UNAUTHORIZED",
+      "User not authenticated."
+    );
+  }
+
+  const authHeader = req.headers.authorization;
+  const accessToken = authHeader?.split(" ")[1];
+
+  const result = await logoutUser(userId, accessToken);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+
+  sendResponse(res, result, STATUS_CODES.OK);
 });

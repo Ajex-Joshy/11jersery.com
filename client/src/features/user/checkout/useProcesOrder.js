@@ -81,6 +81,13 @@ export const useProcessOrder = () => {
               currency,
               order_id: razorpayOrderId,
               name: "11jersey.com",
+              modal: {
+                ondismiss: () => {
+                  setIsProcessing(false);
+                  toast.error("Payment cancelled");
+                  navigate("/account/orders");
+                },
+              },
               handler: (paymentResult) => {
                 console.log("paymentResult", paymentResult);
                 razorpayVerifyMutation(
@@ -99,6 +106,13 @@ export const useProcessOrder = () => {
                   }
                 );
               },
+            });
+            razor.on("payment.failed", function (response) {
+              setIsProcessing(false);
+              toast.error(
+                response.error.description || "Payment failed, please try again"
+              );
+              // do not navigate, only show toast on failure
             });
             razor.open();
             setIsProcessing(false);

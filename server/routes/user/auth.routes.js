@@ -1,11 +1,11 @@
 import express from "express";
 import {
   forgotPasswordController,
+  logoutController,
   refreshAcessTokenController,
   resetPasswordController,
   userLoginController,
   userSignupController,
-  verifyOtpController,
 } from "../../controllers/user/auth.controller.js";
 import { otpLimiter } from "../../utils/otp.utils.js";
 
@@ -17,6 +17,7 @@ import {
   resetPasswordSchema,
 } from "../../validators/user/auth-validators.js";
 import { loginSchema } from "../../validators/common/login-schema.js";
+import { authenticateUser } from "../../middlewares/user/authenticate-user.js";
 
 const router = express.Router();
 
@@ -26,18 +27,13 @@ router.post("/login", validate(loginSchema), userLoginController);
 
 router.post("/refresh-token", refreshAcessTokenController);
 
+router.post("/logout", authenticateUser, logoutController);
+
 router.post(
   "/forgot-password",
   validate(forgotPasswordSchema),
   otpLimiter,
   forgotPasswordController
-);
-
-router.post(
-  "/verify-otp",
-  validate(verifyOtpSchema),
-  otpLimiter,
-  verifyOtpController
 );
 
 router.post(

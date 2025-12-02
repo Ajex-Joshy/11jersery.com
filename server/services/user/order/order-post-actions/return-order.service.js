@@ -24,11 +24,7 @@ export const requestReturnOrder = async (userId, orderId, reason) => {
       requestItemReturn(item, reason);
     });
 
-    if (order.items.every((item) => item.status === "Return Requested")) {
-      order.orderStatus = "Return Requested";
-    } else {
-      order.orderStatus = order.orderStatus;
-    }
+    order.orderStatus = "Return Requested";
     order.timeline.returnRequestedAt = new Date();
 
     await order.save({ session });
@@ -69,6 +65,7 @@ export const requestReturnItem = async (userId, orderId, itemId, reason) => {
 
     if (order.items.every((i) => i.status === "Return Requested")) {
       order.orderStatus = "Return Requested";
+      order.timeline.returnRequestedAt = new Date(Date.now());
     }
 
     await order.save({ session });
