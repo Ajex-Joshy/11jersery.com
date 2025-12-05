@@ -10,7 +10,7 @@ import {
 } from "../../controllers/user/address.controller.js";
 
 import {
-  validateAddressWithGoogle,
+  // validateAddressWithGoogle,
   validateCreateAddress,
   validateEditAddress,
 } from "../../validators/user/address.validators.js";
@@ -21,7 +21,7 @@ router.use(authenticateUser);
 router.post(
   "/",
   validateCreateAddress,
-  validateAddressWithGoogle,
+  // validateAddressWithGoogle,
   addAddressController
 );
 

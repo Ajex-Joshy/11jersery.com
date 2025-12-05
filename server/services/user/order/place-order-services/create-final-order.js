@@ -3,6 +3,7 @@ import Order from "../../../../models/order.model.js";
 import { generateOrderTimeline } from "./utils/generate-order-timeline.js";
 import Transaction from "../../../../models/order-transaction.model.js";
 import Address from "../../../../models/address.model.js";
+import updateCouponUsage from "./utils/coupon-action.js";
 
 export const finalizeOrderCreation = async (
   session,
@@ -65,6 +66,9 @@ export const finalizeOrderCreation = async (
     ],
     { session }
   );
+  if (priceData.couponDiscount > 0) {
+    await updateCouponUsage(priceData.couponCode, 1);
+  }
 
   order.transactionIds.push(transaction._id);
   const orderDetails = await order.save({ session });

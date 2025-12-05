@@ -1,0 +1,146 @@
+[
+  {
+    "category": "General",
+    "question": "What is 11Jersey.com?",
+    "answer": "11Jersey.com is a premier online store based in India specializing in premium quality custom sports jerseys, shorts, and athletic apparel.",
+    "tags": ["about", "company info"]
+  },
+  {
+    "category": "General",
+    "question": "Do you have a physical store I can visit?",
+    "answer": "Currently, we operate exclusively online to serve customers across India. All orders must be placed through our website.",
+    "tags": ["physical store", "location"]
+  },
+  {
+    "category": "Product & Quality",
+    "question": "What kind of fabric do you use for the jerseys?",
+    "answer": "We use high-quality, breathable, and moisture-wicking polyester fabric designed for athletic performance and comfort.",
+    "tags": ["fabric", "quality", "material"]
+  },
+  {
+    "category": "Product & Quality",
+    "question": "How do I care for my printed jersey?",
+    "answer": "To ensure longevity, machine wash cold inside out. Do not iron directly on the print. We are not responsible for damage caused by improper washing or ironing.",
+    "tags": ["care instructions", "wash", "iron"]
+  },
+  {
+    "category": "Product & Sizing",
+    "question": "How do I know which size to choose?",
+    "answer": "Please refer to the size chart available on each product page. If you are unsure between two sizes, choose the bigger size.",
+    "tags": ["size guide", "fit", "measurement"]
+  },
+  {
+    "category": "Product & Sizing",
+    "question": "Do you offer kids sizes?",
+    "answer": "Yes, we offer sizes for kids, youth, and adults depending on stock availability.",
+    "tags": ["kids", "youth", "size availability"]
+  },
+  {
+    "category": "Customization",
+    "question": "Can I customize any jersey on the site?",
+    "answer": "Yes! Most jerseys allow customization including name, number, and team logos.",
+    "tags": ["custom jersey", "name", "number"]
+  },
+  {
+    "category": "Customization",
+    "question": "Can I change the size or name after placing a custom order?",
+    "answer": "Changes can only be made within 2 hours after placing the order. After printing begins, changes are not possible.",
+    "tags": ["custom edit", "custom change"]
+  },
+  {
+    "category": "Customization",
+    "question": "Are there restrictions on what I can print?",
+    "answer": "We do not print content that is offensive or violates intellectual property. By placing a custom order, you confirm that you have the rights to the material.",
+    "tags": ["print restrictions", "legal", "custom rules"]
+  },
+  {
+    "category": "Order & Delivery",
+    "question": "How long does delivery take?",
+    "answer": "Standard delivery takes 5–7 business days for metro cities and 7–12 business days for other regions. Customized jerseys require 10–15 business days for production before shipping.",
+    "tags": ["delivery time", "shipping timeline"]
+  },
+  {
+    "category": "Order & Delivery",
+    "question": "How can I track my order?",
+    "answer": "A tracking link will be shared via SMS and email once the order is shipped.",
+    "tags": ["tracking", "order tracking", "track link"]
+  },
+  {
+    "category": "Order & Delivery",
+    "question": "Do you ship internationally?",
+    "answer": "Currently, we only ship within India.",
+    "tags": ["international shipping", "India"]
+  },
+  {
+    "category": "Order & Delivery",
+    "question": "Do you offer free shipping?",
+    "answer": "Yes, free shipping is available for orders above ₹999. Orders below ₹999 have a shipping fee of ₹79.",
+    "tags": ["free shipping", "shipping fees"]
+  },
+  {
+    "category": "Order & Delivery",
+    "question": "My order is delayed. What should I do?",
+    "answer": "Delays may occur due to weather, logistics issues, or strikes. Please check tracking or contact support if required.",
+    "tags": ["delayed order", "tracking issue"]
+  },
+  {
+    "category": "Cancellation",
+    "question": "Can I cancel my order?",
+    "answer": "Orders can be cancelled before shipping. Customized jerseys cannot be cancelled once printing begins.",
+    "tags": ["cancel order", "order cancellation"]
+  },
+  {
+    "category": "Return & Exchange",
+    "question": "What is your return policy?",
+    "answer": "Returns are accepted within 7 days if unused, unwashed, undamaged, and packed with original tags. Customized jerseys are non-returnable.",
+    "tags": ["return", "return eligibility"]
+  },
+  {
+    "category": "Return & Exchange",
+    "question": "Can I return a customized jersey?",
+    "answer": "Customized jerseys with name/number/logo printing are non-returnable unless defective or incorrect.",
+    "tags": ["custom return", "non returnable"]
+  },
+  {
+    "category": "Return & Exchange",
+    "question": "How do I request a return?",
+    "answer": "Contact customer support with order details and an unboxing video. Pickup will be scheduled after approval.",
+    "tags": ["return request", "pickup"]
+  },
+  {
+    "category": "Refund",
+    "question": "How long does it take to receive a refund?",
+    "answer": "Refunds are processed within 5–7 business days after QC approval.",
+    "tags": ["refund time", "refund process"]
+  },
+  {
+    "category": "Refund",
+    "question": "Is refund available for COD orders?",
+    "answer": "Yes. Refunds will be sent via bank transfer or UPI.",
+    "tags": ["cod refund", "bank transfer"]
+  },
+  {
+    "category": "Payment",
+    "question": "What payment methods are available?",
+    "answer": "UPI, Debit/Credit Cards, Net Banking, Wallets, and COD (for selected locations).",
+    "tags": ["payment options", "methods"]
+  },
+  {
+    "category": "Payment",
+    "question": "Is Cash on Delivery available?",
+    "answer": "Yes, available for selected pin codes. Additional COD fees may apply.",
+    "tags": ["COD", "cash on delivery"]
+  },
+  {
+    "category": "Offers & Bulk Orders",
+    "question": "Do you offer discounts for team orders?",
+    "answer": "Yes, we provide special pricing for bulk orders (10+ jerseys). Contact customer support.",
+    "tags": ["bulk order", "team order", "discount"]
+  },
+  {
+    "category": "Support",
+    "question": "How can I contact support?",
+    "answer": "Email us at support@11jersey.com or WhatsApp via the number on our website. Available Mon–Sat, 10 AM – 6 PM.",
+    "tags": ["contact", "customer support"]
+  }
+]

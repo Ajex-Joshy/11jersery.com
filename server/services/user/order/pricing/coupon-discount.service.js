@@ -2,6 +2,7 @@ import Coupon from "../../../../models/coupon.model.js";
 import { STATUS_CODES } from "../../../../utils/constants.js";
 import { AppError } from "../../../../utils/helpers.js";
 import { clearCoupon } from "../../cart.services.js";
+import Order from "../../../../models/order.model.js";
 
 export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
   if (!couponCode)
@@ -26,6 +27,18 @@ export const applyCouponDiscount = async (subtotal, couponCode, userId) => {
       `Cart total must be at least ₹${
         coupon.minPurchaseAmount / 100
       } to use ${couponCode}`
+    );
+  }
+  const couponUsedCount = await Order.countDocuments({
+    userId,
+    "price.couponCode": couponCode,
+  });
+  if (couponUsedCount > coupon.perUserLimit) {
+    await clearCoupon(userId);
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "LIMIT_EXCEED",
+      `you can avail this coupon only ${coupon.perUserLimit} time`
     );
   }
 

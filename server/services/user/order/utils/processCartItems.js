@@ -1,4 +1,3 @@
-import Category from "../../../../models/category.model.js";
 import Product from "../../../../models/product.model.js";
 import { getSignedUrlForKey } from "../../../admin/service-helpers/s3.service.js";
 
@@ -14,18 +13,6 @@ export const processCartItems = async (cart) => {
     isDeleted: false,
   });
   const productMap = new Map(products.map((p) => [p._id.toString(), p]));
-
-  // Fetch categories
-  const allCategoryIds = [
-    ...new Set(
-      products.flatMap((p) => p.categoryIds?.map((c) => c.toString()) || [])
-    ),
-  ];
-
-  const categories = await Category.find({
-    _id: { $in: allCategoryIds },
-    isDeleted: false,
-  });
 
   const processedItems = [];
 

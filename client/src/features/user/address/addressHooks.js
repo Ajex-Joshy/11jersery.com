@@ -17,11 +17,13 @@ export const useAddresses = () => {
   });
 };
 
-export const useGetAddressById = (id) => {
+export const useGetAddressById = (id, options = {}) => {
   return useQuery({
     queryKey: ["address", id],
     queryFn: () => getAddressById(id),
+    enabled: !!id && id !== "new" && options.enabled,
     staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
 };
 

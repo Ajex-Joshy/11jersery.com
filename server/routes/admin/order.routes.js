@@ -31,7 +31,7 @@ router.patch(
   processItemReturnController
 );
 
-router.patch("/:orderId/return/:action", processItemReturnController);
+router.patch("/:orderId/return/:action", processOrderReturnController);
 
 router.patch(
   "/:orderId/items/:itemId/confirm-received",

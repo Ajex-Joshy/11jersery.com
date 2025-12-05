@@ -207,6 +207,16 @@ const AdminOrderDetails = () => {
               </button>
             </>
           )}
+          {order.items.every((item) => item.status === "Return Approved") && (
+            <>
+              <button
+                onClick={() => handleActionModal("confirm_return", null)}
+                className="px-4 py-2 bg-green-100 border border-green-300 text-green-700 text-sm font-medium rounded-md hover:bg-green-200 transition"
+              >
+                Confirm Received
+              </button>
+            </>
+          )}
         </div>
 
         {/* Actions */}
@@ -276,9 +286,6 @@ const AdminOrderDetails = () => {
               </h2>
             </div>
             {(() => {
-              const allReturnRequested = order.items.every(
-                (item) => item.status === "Return Requested"
-              );
               return order.items.map((item) => (
                 <OrderItem
                   key={item._id}

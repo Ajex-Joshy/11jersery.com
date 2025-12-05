@@ -52,10 +52,10 @@ export const teams = [
 ];
 
 export const categoryIds = [
-  "690190a1b6e9e80e886ba193",
-  "69019119b6e9e80e886ba19a",
-  "6901925d68ea3c216c871d31",
-  "69031e726bdd95be704d36b9",
+  "692ffaa3d46d922db75223a8",
+  "692ffabdd46d922db75223b3",
+  "692ffad0d46d922db75223b7",
+  "692ffaebd46d922db75223bb",
 ];
 
 export const types = ["Home", "Away", "Third", "Retro"];

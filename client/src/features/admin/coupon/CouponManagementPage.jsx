@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Ticket,
-  ToggleRight,
-  ToggleLeft,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Ticket } from "lucide-react";
 import {
   useCoupons,
   useCreateCoupon,
@@ -26,12 +19,7 @@ const CouponManagementPage = () => {
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null }); // type: 'create', 'edit', 'delete'
 
   // Hooks
-  const {
-    data: couponsPayload,
-    isLoading,
-    isError,
-    error,
-  } = useCoupons(queryParams);
+  const { data: couponsPayload, isLoading, error } = useCoupons(queryParams);
   const { mutate: createCoupon, isLoading: isCreating } = useCreateCoupon();
   const { mutate: updateCoupon, isLoading: isUpdating } = useUpdateCoupon();
   const { mutate: deleteCoupon, isLoading: isDeleting } = useDeleteCoupon();
@@ -199,7 +187,7 @@ const CouponManagementPage = () => {
         error={error}
         searchValue={uiState.searchTerm}
         onSearchChange={handlers.onSearchChange}
-        status={uiState.status} // You can reuse this for 'active/inactive' filter logic
+        status={uiState.status}
         onStatusChange={handlers.onStatusChange}
         limit={uiState.limit}
         onLimitChange={handlers.onLimitChange}

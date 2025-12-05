@@ -1,6 +1,3 @@
-import Product from "../../../../../models/product.model.js";
-import { recalculatedOrderAmount } from "./item-refund.js";
-
 async function buildCategoryTotals(items, categoryId) {
   let totalAmount = 0;
 

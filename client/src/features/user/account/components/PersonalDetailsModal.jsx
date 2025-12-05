@@ -118,16 +118,45 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
   const onSubmit = (data) => {
     const changedFields = {};
 
+    // Validate name lengths
+    if (!data.firstName?.trim() || data.firstName.trim().length < 2) {
+      toast.error("First name must be at least 2 characters.");
+      return;
+    }
+    if (!data.lastName?.trim() || data.lastName.trim().length < 2) {
+      toast.error("Last name must be at least 2 characters.");
+      return;
+    }
+
+    // Validate max lengths
+    if (data.firstName.trim().length > 25) {
+      toast.error("First name cannot exceed 25 characters.");
+      return;
+    }
+    if (data.lastName.trim().length > 25) {
+      toast.error("Last name cannot exceed 25 characters.");
+      return;
+    }
+
     if (data.firstName !== user.firstName)
       changedFields.firstName = data.firstName;
     if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
-    // if (data.email !== user.email) {
-    //   if (!otpVerified) {
-    //     toast.error("Please verify your new email before saving.");
-    //     return;
-    //   }
-    //   changedFields.email = data.email;
-    // }
+    if (data.email !== user.email) {
+      if (!otpVerified) {
+        toast.error("Please verify your new email before saving.");
+        return;
+      }
+      if (!data.email?.trim()) {
+        toast.error("Email is required.");
+        return;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(data.email)) {
+        toast.error("Invalid email format.");
+        return;
+      }
+      changedFields.email = data.email;
+    }
 
     if (Object.keys(changedFields).length > 0) {
       mutate(changedFields, {

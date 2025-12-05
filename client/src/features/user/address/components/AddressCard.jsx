@@ -17,6 +17,7 @@ const AddressCard = ({ address, onDelete }) => {
   };
 
   const handleCancel = () => {
+    console.log("modal", isModalOpen);
     setIsModalOpen(false);
   };
 
@@ -78,7 +79,7 @@ const AddressCard = ({ address, onDelete }) => {
         confirmButtonText="Delete"
         confirmButtonVariant="danger"
         onConfirm={handleConfirmDelete}
-        onCancel={handleCancel}
+        onClose={handleCancel}
       />
     </>
   );

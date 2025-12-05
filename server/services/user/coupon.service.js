@@ -2,6 +2,7 @@ import Cart from "../../models/cart.model.js";
 import Coupon from "../../models/coupon.model.js";
 import { AppError } from "../../utils/helpers.js";
 import { STATUS_CODES } from "../../utils/constants.js";
+import Order from "../../models/order.model.js";
 
 export const applyCoupon = async (userId, couponCode) => {
   const cart = await Cart.findOne({ userId });
@@ -32,6 +33,17 @@ export const applyCoupon = async (userId, couponCode) => {
       STATUS_CODES.BAD_REQUEST,
       "COUPON_EXPIRED",
       "Coupon is expired"
+    );
+  }
+  const couponUsedCount = await Order.countDocuments({
+    userId,
+    "price.couponCode": couponCode,
+  });
+  if (couponUsedCount > coupon.perUserLimit) {
+    throw new AppError(
+      STATUS_CODES.BAD_REQUEST,
+      "LIMIT_EXCEED",
+      `you can avail this coupon only ${coupon.perUserLimit} time`
     );
   }
 

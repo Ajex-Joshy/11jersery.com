@@ -131,7 +131,6 @@ export const generateReportPDF = async (params, res) => {
     y += 80;
 
     // --- Table Configuration ---
-    const tableTop = y;
     const itemHeight = 25;
     const columns = [
       { label: "Date", property: "_id", width: 100, align: "left" },

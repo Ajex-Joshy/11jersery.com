@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { formatRupee } from "../../../../utils/currency";
 
 const SalesOverviewChart = ({ data, filter, onFilterChange }) => {
   // Transform API data for Recharts if necessary
@@ -68,7 +69,7 @@ const SalesOverviewChart = ({ data, filter, onFilterChange }) => {
                 border: "1px solid #E5E7EB",
                 boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
               }}
-              formatter={(value) => [`₹${value.toLocaleString()}`, "Revenue"]}
+              formatter={(value) => [`${formatRupee(value)}`, "Revenue"]}
             />
             <Area
               type="monotone"

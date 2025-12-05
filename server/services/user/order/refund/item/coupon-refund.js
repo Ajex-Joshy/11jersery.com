@@ -28,22 +28,6 @@ export const calculateCouponRefundAmount = (order, item) => {
       recalculatedDiscount = 0;
     }
   }
-  console.log(
-    "discount:",
-    discount,
-    "discountType:",
-    discountType,
-    "minPurchaseAmount:",
-    minPurchaseAmount,
-    "maxDiscountAmount:",
-    maxDiscountAmount,
-    "recalculatedDiscount:",
-    recalculatedDiscount,
-    "originalDiscount:",
-    originalDiscount,
-    "couponRefundAmount:",
-    Math.round(originalDiscount - recalculatedDiscount)
-  );
 
   return {
     recalculatedCouponDiscount: recalculatedDiscount,

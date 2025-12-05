@@ -10,7 +10,7 @@ export const initOnlineOrder = async (userId, shippingAddressId) =>
     const razorpayOrder = await createRazorpayOrder(priceData.total);
     const { id, currency } = razorpayOrder;
 
-    const { orderDetails, items } = await finalizeOrderCreation(session, {
+    await finalizeOrderCreation(session, {
       userId,
       items: processedItems,
       shippingAddressId,

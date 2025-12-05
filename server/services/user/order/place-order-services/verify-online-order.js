@@ -6,11 +6,7 @@ import { STATUS_CODES } from "../../../../utils/constants.js";
 import Transaction from "../../../../models/order-transaction.model.js";
 import { postProcessOrder } from "./utils/post-process-order.service.js";
 
-export const verifyAndPlaceOnlineOrder = async ({
-  userId,
-  shippingAddressId,
-  paymentDetails,
-}) =>
+export const verifyAndPlaceOnlineOrder = async ({ userId, paymentDetails }) =>
   withTransaction(async (session) => {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } =
       paymentDetails;
@@ -22,9 +18,11 @@ export const verifyAndPlaceOnlineOrder = async ({
     );
     if (!isValid) throw new Error("Invalid Payment Signature");
 
-    const order = await Order.findOne({
-      "payment.razorpayOrderId": razorpayOrderId,
-    });
+    const order = await Order.findOne(
+      { "payment.razorpayOrderId": razorpayOrderId },
+      null,
+      { session }
+    );
 
     if (!order) {
       throw new AppError(
@@ -33,6 +31,7 @@ export const verifyAndPlaceOnlineOrder = async ({
         "Could not process order"
       );
     }
+
     order.orderStatus = "Pending";
     order.payment.status = "Paid";
     order.items = order.items.map((i) => ({
@@ -40,20 +39,25 @@ export const verifyAndPlaceOnlineOrder = async ({
       status: "Pending",
     }));
 
-    const transaction = await Transaction.create({
-      userId,
-      orderId: order._id,
-      amount: order.price,
-      type: "CREDIT",
-      reason: "ORDER_PAYMENT",
-      status: "SUCCESS",
-      paymentMethod: "RAZORPAY",
-    });
+    const transaction = await Transaction.create(
+      [
+        {
+          userId,
+          orderId: order._id,
+          amount: order.price,
+          type: "CREDIT",
+          reason: "ORDER_PAYMENT",
+          status: "SUCCESS",
+          paymentMethod: "RAZORPAY",
+        },
+      ],
+      { session }
+    );
 
-    order.transactionIds.push(transaction._id);
+    order.transactionIds.push(transaction[0]._id);
 
-    const updateOrder = await order.save();
+    const updatedOrder = await order.save({ session });
     await postProcessOrder(userId, order, order.price, order.items);
 
-    return updateOrder;
+    return updatedOrder;
   });

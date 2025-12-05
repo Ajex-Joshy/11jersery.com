@@ -8,10 +8,12 @@ export const useApplyCoupon = () => {
   return useMutation({
     mutationFn: applyCouponCode,
     onSuccess: (data) => {
+      console.log("data", data);
       toast.success("Coupon applied!");
       queryClient.invalidateQueries([CART_KEY]);
     },
     onError: (err) => {
+      console.log("err", err);
       const msg = err?.response?.data?.error?.message || "Invalid Coupon";
       toast.error(msg);
     },
@@ -22,7 +24,7 @@ export const useRemoveCoupon = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: removeCouponCode,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Coupon removed");
       queryClient.invalidateQueries([CART_KEY]);
     },

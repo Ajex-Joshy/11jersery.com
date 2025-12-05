@@ -1,6 +1,6 @@
 import categoryModel from "../../../../models/category.model.js";
 
-export async function buildCategoryTotals(items, products, Category) {
+export async function buildCategoryTotals(items, products) {
   const categoryIdSet = new Set();
   const productById = new Map();
 

@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Trash2, ShoppingCart, Loader2 } from "lucide-react";
-import { S3_URL } from "../../../../utils/constants";
-import { useAddItemToCart } from "../../cart/cartHooks"; // Reusing your cart hook!
+// import { useAddItemToCart } from "../../cart/cartHooks";
+import { formatRupee } from "../../../../utils/currency";
 
 const WishlistProductCard = ({ product, onRemove, isRemoving }) => {
-  const { mutate: addToCart, isLoading: isAdding } = useAddItemToCart();
+  // const { mutate: addToCart, isLoading: isAdding } = useAddItemToCart();
 
-  const handleAddToCart = () => {};
+  // const handleAddToCart = () => {};
 
   return (
     <div className="group flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
@@ -44,11 +44,11 @@ const WishlistProductCard = ({ product, onRemove, isRemoving }) => {
 
         <div className="mt-2 mb-4 flex items-baseline gap-2">
           <span className="text-lg font-bold text-gray-900">
-            ₹{product.price?.sale?.toLocaleString()}
+            {formatRupee(product.price?.sale)}
           </span>
           {product.price?.sale < product.price?.list && (
             <span className="text-sm text-gray-500 line-through">
-              ₹{product.price?.list?.toLocaleString()}
+              {formatRupee(product.price?.list)}
             </span>
           )}
         </div>

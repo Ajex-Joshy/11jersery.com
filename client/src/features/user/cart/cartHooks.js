@@ -19,6 +19,13 @@ export const useCart = () => {
     queryKey: [CART_KEY],
     queryFn: () => getCart(),
     staleTime: 1000 * 60 * 5,
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message ||
+          err?.message ||
+          "Failed to fetch cart"
+      );
+    },
   });
 };
 

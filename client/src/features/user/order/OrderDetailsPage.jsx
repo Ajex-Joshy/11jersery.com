@@ -15,7 +15,7 @@ import { useOrderDetails, useRazorpayVerify } from "./orderHooks";
 import PriceSummary from "./components/PriceSummary";
 import AddressCard from "./components/AddressCard";
 import { loadRazorpayScript } from "../../../utils/loadRazorpay";
-const loaded = await loadRazorpayScript();
+const _loaded = await loadRazorpayScript();
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();

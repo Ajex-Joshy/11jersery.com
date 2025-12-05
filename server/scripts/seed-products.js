@@ -2,23 +2,10 @@ import connectDB from "../config/db.js";
 import logger from "../config/logger.js";
 import Product from "../models/product.model.js";
 import { teams, types, categoryIds } from "./constants.js";
-import readline from "readline";
+
 import { toPaise } from "../utils/currency.js";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-const askCount = () =>
-  new Promise((resolve) => {
-    rl.question("How many products do you want to add? ", (answer) => {
-      rl.close();
-      resolve(parseInt(answer, 10));
-    });
-  });
-
-const NO_OF_PRODUCTS_TO_ADD = await askCount();
+const NO_OF_PRODUCTS_TO_ADD = 20;
 
 const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const getRandomInt = (min, max) =>

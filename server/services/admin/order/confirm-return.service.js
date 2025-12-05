@@ -10,6 +10,7 @@ import Transaction from "../../../models/order-transaction.model.js";
 import { creditWallet } from "../../user/wallet.services.js";
 import { recalculatedOrderAmount } from "../../user/order/refund/item/item-refund.js";
 import mongoose from "mongoose";
+import updateCouponUsage from "../../user/order/place-order-services/utils/coupon-action.js";
 
 export const processOrderReceived = async ({ orderId }) => {
   const session = await mongoose.startSession();
@@ -69,6 +70,9 @@ export const processOrderReceived = async ({ orderId }) => {
 
     order.timeline.returnApprovedAt = new Date();
     order.transactionIds.push(newTransaction._id);
+    if (order.price.couponDiscount > 0) {
+      await updateCouponUsage(priceData.couponCode, -1);
+    }
 
     await order.save();
     await session.commitTransaction();
@@ -164,6 +168,9 @@ export const processItemReceived = async ({ orderId, itemId }) => {
         { status: "Refunded" },
         { session }
       );
+      if (order.price.couponDiscount > 0) {
+        await updateCouponUsage(order.price .couponCode, -1);
+      }
     }
 
     order.markModified("price");

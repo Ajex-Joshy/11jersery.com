@@ -28,7 +28,7 @@ export const signupUser = async (userData) => {
     );
 
   // Firebase verification
-  const decodedToken = await verifyFirebaseToken(firebaseToken, phone);
+  await verifyFirebaseToken(firebaseToken, phone);
 
   // Handle referral
   const referrer = await handleReferral(email, referralCode);

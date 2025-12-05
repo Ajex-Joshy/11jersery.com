@@ -13,7 +13,6 @@ import { validate } from "../../middlewares/common/validate.js";
 import {
   signupSchema,
   forgotPasswordSchema,
-  verifyOtpSchema,
   resetPasswordSchema,
 } from "../../validators/user/auth-validators.js";
 import { loginSchema } from "../../validators/common/login-schema.js";

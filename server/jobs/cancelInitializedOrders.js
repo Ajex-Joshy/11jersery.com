@@ -4,6 +4,7 @@ import Order from "../models/order.model.js";
 import { restoreAllStock } from "../services/user/order/helper-services/stock.service.js";
 import { env } from "../config/env.js";
 import logger from "../config/logger.js";
+import updateCouponUsage from "../services/user/order/place-order-services/utils/coupon-action.js";
 
 cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
   logger.info(" Cron: Checking for expired Initialized orders...");
@@ -43,6 +44,9 @@ cron.schedule(env.CANCEL_INITIALISED_ORDERS_CRON_EXP, async () => {
           },
         }
       ).session(session);
+      if (order.price.couponDiscount > 0) {
+        await updateCouponUsage(order.price.couponCode, -1);
+      }
 
       logger.info(`🛑 Order Cancelled & Stock Restored: ${order._id}`);
     }

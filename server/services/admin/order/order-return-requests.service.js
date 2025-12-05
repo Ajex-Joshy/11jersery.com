@@ -4,11 +4,7 @@ import createError from "http-errors";
 import {
   ensureApproveReturnable,
   ensureOrderExists,
-  ensureReturnable,
 } from "../../user/order/utils/validations.service.js";
-import { restoreStock } from "../../user/order/helper-services/stock.service.js";
-import Transaction from "../../../models/order-transaction.model.js";
-import mongoose from "mongoose";
 
 export const getReturnRequests = async (queryParams) => {
   const {

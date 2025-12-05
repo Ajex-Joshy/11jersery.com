@@ -10,6 +10,7 @@ import { markAsCanceled } from "./item-actions.service.js";
 import Transaction from "../../../../models/order-transaction.model.js";
 import { recalculatedOrderAmount } from "../refund/item/item-refund.js";
 import { creditWallet } from "../../wallet.services.js";
+import updateCouponUsage from "../place-order-services/utils/coupon-action.js";
 
 export const cancelOrder = async (userId, orderId, reason) => {
   const session = await mongoose.startSession();
@@ -59,6 +60,10 @@ export const cancelOrder = async (userId, orderId, reason) => {
     let firstTransaction = await Transaction.findById(order.transactionIds[0]);
     order.price = firstTransaction.amount;
     await order.save({ session });
+
+    if (order.price.couponDiscount > 0) {
+      await updateCouponUsage(order.price.couponCode, -1);
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -142,6 +147,9 @@ export const cancelItem = async (userId, orderId, itemId, reason) => {
         { status: paymentStatus },
         { session }
       );
+      if (order.price.couponDiscount > 0) {
+        await updateCouponUsage(priceData.couponCode, -1);
+      }
     }
 
     order.markModified("price");

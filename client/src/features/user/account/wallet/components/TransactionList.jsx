@@ -1,5 +1,4 @@
 import React from "react";
-import { ArrowDownLeft, ArrowUpRight, Clock } from "lucide-react";
 import TransactionItem from "./TransactionItem";
 
 const TransactionList = ({ transactions }) => {

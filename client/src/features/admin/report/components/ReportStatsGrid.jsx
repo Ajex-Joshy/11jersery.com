@@ -2,6 +2,7 @@ import React from "react";
 import { IndianRupee, ShoppingBag, Tag, TrendingUp } from "lucide-react";
 import { formatRupee } from "../../../../utils/currency";
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ title, value, icon: Icon, color }) => (
   <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
     <div>

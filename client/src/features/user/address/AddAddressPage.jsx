@@ -18,12 +18,14 @@ const AddAddressPage = () => {
   const { mutate: addAddress, isLoading: isAdding } = useAddAddress();
   const { mutate: updateAddress, isLoading: isUpdating } = useUpdateAddress();
 
-  const shouldFetch = Boolean(addressId && addressId !== "new");
+  const isEditMode = Boolean(addressId && addressId !== "new");
 
   const { data: addressData, isLoading: isFetching } = useGetAddressById(
     addressId,
-    { enabled: shouldFetch }
+    { enabled: isEditMode }
   );
+
+  // const addressData = {};
 
   const {
     register,
@@ -56,7 +58,7 @@ const AddAddressPage = () => {
   }, [addressData, reset]);
 
   const onSubmit = (data) => {
-    if (addressId) {
+    if (isEditMode) {
       console.log("id", addressId);
       updateAddress(
         { addressId, data },

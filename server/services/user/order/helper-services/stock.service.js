@@ -1,8 +1,5 @@
 import Product from "../../../../models/product.model.js";
-import {
-  MAX_QUANTITY_PER_ORDER,
-  STATUS_CODES,
-} from "../../../../utils/constants.js";
+import { STATUS_CODES } from "../../../../utils/constants.js";
 import { AppError } from "../../../../utils/helpers.js";
 
 export const restoreStock = async (session, productId, size, quantity) => {

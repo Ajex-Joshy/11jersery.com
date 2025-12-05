@@ -8,7 +8,8 @@ import {
 } from "../order/orderHooks";
 import { useState } from "react";
 import { loadRazorpayScript } from "../../../utils/loadRazorpay";
-const loaded = await loadRazorpayScript();
+const _loaded = await loadRazorpayScript();
+import { env } from "../../../utils/env.js";
 
 export const useProcessOrder = () => {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ export const useProcessOrder = () => {
             const { amount, currency, razorpayOrderId } = razorOrder.data;
             console.log(amount, currency, razorpayOrderId);
             const razor = new window.Razorpay({
-              key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+              key: env.VITE_RAZORPAY_KEY_ID,
               amount,
               currency,
               order_id: razorpayOrderId,

@@ -17,7 +17,7 @@ export const useToggleWishlist = () => {
 
   return useMutation({
     mutationFn: toggleWishlist,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Jersey added to wishlist");
       // Invalidate to refetch the list immediately
       queryClient.invalidateQueries({ queryKey: [WISHLIST_KEY] });

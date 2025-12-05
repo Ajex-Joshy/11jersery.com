@@ -138,6 +138,3 @@ export const deleteAuctionByID = async (auctionId) => {
     );
   }
 };
-
-
-export const getAuctions = (queryParams) => {}
