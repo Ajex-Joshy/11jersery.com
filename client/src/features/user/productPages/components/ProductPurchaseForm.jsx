@@ -53,6 +53,7 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   // 2. LOCAL ONLY: Update state without API calls
   const handleQuantityChange = (amount) => {
     if (!selectedSize) {
+      toast.dismiss();
       toast.error("Please select a size.");
       return;
     }
@@ -61,6 +62,7 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
       const newQty = prevQty + amount;
 
       if (newQty > MAX_QUANTITY_PER_ORDER) {
+        toast.dismiss();
         toast.error("Maximum quantity per order is 20");
         return prevQty;
       }

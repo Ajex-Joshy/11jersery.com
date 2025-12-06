@@ -14,6 +14,9 @@ import {
   httpRequestDurationMicroseconds,
 } from "./config/metrics.js";
 import cookieParser from "cookie-parser";
+import http from "http";
+import { Server } from "socket.io";
+import { initializeSocket } from "./socket/socketHandler.js";
 
 const app = express();
 
@@ -33,7 +36,7 @@ const httpLogger = pinoHttp({
 });
 
 app.use(express.json());
-app.use(httpLogger);
+// app.use(httpLogger);
 
 app.use((req, res, next) => {
   // Start a timer for request duration
@@ -58,6 +61,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+initializeSocket(io);
+
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/", userRoutes);
 app.use(errorHandler);
@@ -73,7 +88,7 @@ app.get("/metrics", async (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(env.PORT, () => logger.info("Server started successfully"));
+    server.listen(env.PORT, () => logger.info("Server started successfully"));
   } catch (err) {
     logger.error(err.message);
     process.exit(1);

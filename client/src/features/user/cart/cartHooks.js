@@ -71,6 +71,7 @@ export const useIncrementItem = () =>
       const item = updated.data.items.find((i) => i._id === itemId);
       if (item) {
         if (item.quantity >= MAX_QUANTITY_PER_ORDER) {
+          toast.dismiss();
           toast.error("Maximum quantity per order is 20");
           return cart;
         }

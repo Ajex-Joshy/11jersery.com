@@ -6,6 +6,7 @@ import StarRating from "../../../../components/common/StarRating";
 import { formatRupee } from "../../../../utils/currency";
 
 const ProductCard = ({ product }) => {
+  console.log("product card", product);
   // --- 2. Calculate discount ---
   const listPrice = product.price.list;
   const salePrice = product.price.sale;
@@ -25,9 +26,8 @@ const ProductCard = ({ product }) => {
     >
       {/* Image container with background */}
       <div className="aspect-square overflow-hidden bg-gray-100 rounded-t-xl">
-        {" "}
         <img
-          src={product?.imageUrls[0]}
+          src={product?.imageUrls?.[0] || product?.imageUrl}
           alt={product.title}
           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 mix-blend-multiply" // Use object-contain and mix-blend
           onError={(e) => {
