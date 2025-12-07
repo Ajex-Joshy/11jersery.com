@@ -21,8 +21,6 @@ export const productAgentNode = async (state) => {
   if (response.tool_calls && response.tool_calls.length > 0) {
     const toolCall = response.tool_calls[0];
 
-    console.log(`Executing tool: ${toolCall.name}`);
-
     const rawToolOutput = await productSearchTool.invoke(toolCall);
 
     let outputString = "";
@@ -60,7 +58,6 @@ export const productAgentNode = async (state) => {
         products: productsArray,
       },
     };
-    console.log("final", response, toolMessage, llmFinal);
 
     return { messages: [response, toolMessage, llmFinal] };
   }

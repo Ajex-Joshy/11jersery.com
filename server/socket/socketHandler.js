@@ -17,10 +17,8 @@ export const initializeSocket = (io) => {
 
     socket.on("send_message", async (data) => {
       const { message } = data;
-      console.log("socket.user", socket.user);
       try {
         socket.to(personalRoom).emit("typing", { author: "AI_Agent" });
-        console.log("uid", socket.user.userId);
 
         const response = await processWithLangGraph(
           socket.user.userId,
@@ -32,20 +30,21 @@ export const initializeSocket = (io) => {
           author: "AI_Agent",
           message: response.text,
           type: response.responseType,
-          products: response.data,
+          data: response.data,
           time: new Date().toISOString(),
         };
         console.log("msg", aiMessageData);
         io.to(personalRoom).emit("stop_typing");
         io.to(personalRoom).emit("receive_message", aiMessageData);
-        // await saveToDb(socket.user.userId, message, 'Human');
-        // await saveToDb(socket.user.userId, aiResponseText, 'AI');
+        //  saveToDb(socket.user.userId, message, 'Human');
+        //  saveToDb(socket.user.userId, aiResponseText, 'AI');
       } catch (err) {
         console.error("LangGraph Error:", err);
         socket.emit("error", {
           message: "The AI agent is currently unavailable.",
         });
-        socket.emit("stop_typing");
+      } finally {
+        io.to(personalRoom).emit("stop_typing");
       }
     });
 

@@ -28,8 +28,7 @@ export const generalAgentNode = async (state) => {
   try {
     const prompt = [new SystemMessage(GENERAL_SYSTEM_PROMPT), ...messages];
 
-    const response = await llm.invoke(prompt);
-
+    const response = await llm.invoke(prompt, { maxRetries: 1 });
     return {
       messages: [response],
     };

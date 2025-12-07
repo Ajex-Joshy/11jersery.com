@@ -5,7 +5,7 @@ import {
 import { env } from "../../config/env.js";
 
 export const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash-lite",
+  model: "gemini-2.5-flash",
   apiKey: env.GEMINI_API_KEY,
 });
 

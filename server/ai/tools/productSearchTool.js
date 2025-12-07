@@ -20,8 +20,6 @@ export const productSearchTool = tool(
 
       const productIds = semanticResults.map((doc) => doc.metadata.productId);
 
-      await connectDB();
-
       const productDetails = await Product.find({
         _id: { $in: productIds },
         isDeleted: false,

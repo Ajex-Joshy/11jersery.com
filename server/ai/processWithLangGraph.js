@@ -1,88 +1,120 @@
+import { fi } from "zod/v4/locales";
 import { getSignedUrlForKey } from "../services/admin/service-helpers/s3.service.js";
 import { getGraph } from "./graph/graph.js";
 import { HumanMessage } from "@langchain/core/messages";
 
+// Helper: Fix IDs and Sign URLs for Products
+const sanitizeProducts = async (products) => {
+  if (!Array.isArray(products)) return [];
+
+  return Promise.all(
+    products.map(async (p) => {
+      // Handle MongoDB _id
+      let id = p._id;
+      if (typeof id === "object" && id !== null) id = id.toString();
+
+      // Handle Signed URLs (Your existing logic)
+      const imageUrl =
+        p.imageIds && p.imageIds.length > 0
+          ? await getSignedUrlForKey(p.imageIds[0])
+          : null;
+
+      // Clean up internal fields
+      const { imageIds, ...rest } = p;
+
+      return {
+        ...rest,
+        _id: id,
+        price: p.price || { list: 0, sale: 0 },
+        imageUrl,
+      };
+    })
+  );
+};
+
+// Helper: Fix IDs for Orders (Simple pass-through for now)
+const sanitizeOrders = async (orders) => {
+  if (!Array.isArray(orders)) return [];
+
+  return orders.map((o) => {
+    // Ensure ID is string if it came from Mongo
+    let id = o._id || o.id;
+    if (typeof id === "object" && id !== null) id = id.toString();
+
+    return {
+      ...o,
+      _id: id,
+      // You could add date formatting here if needed
+      // date: new Date(o.date).toLocaleDateString()
+    };
+  });
+};
+
 export const processWithLangGraph = async (userId, userMessage) => {
-  console.log("userId from processgraph", userId);
   const inputs = {
     messages: [new HumanMessage(userMessage)],
   };
 
-  const config = { configurable: { thread_id: userId } };
-  console.log("id", config.configurable.thread_id);
-  const graph = await getGraph();
+  // 1. SECURITY & MEMORY CONTEXT
+  // We pass 'userId' twice:
+  // - thread_id: for LangGraph memory (conversation history)
+  // - userId: explicitly for the Tools to access securely (e.g. Order Tool)
+  const config = {
+    configurable: {
+      thread_id: userId,
+      userId: userId,
+    },
+  };
 
+  const graph = await getGraph();
   const result = await graph.invoke(inputs, config);
 
-  // Extract the last AI message
+  // 2. EXTRACT RESPONSE
   const lastMessage = result.messages[result.messages.length - 1];
+  const aiText = lastMessage.content;
 
-  const toolMessage = result.messages
-    .slice()
-    .reverse()
-    .find((msg) => msg.name === "product_search"); // removed instanceof check to be safer
+  // 3. CHECK FOR CLIENT PAYLOAD (The Senior Pattern)
+  // We established this in the Agent Node to attach data to 'response_metadata'
+  const payload = lastMessage.response_metadata?.client_payload;
 
-  let products = null;
+  let finalData = null;
   let responseType = "text";
 
-  if (toolMessage) {
-    responseType = "product_list";
+  if (payload) {
+    responseType = payload.responseType; // e.g., "product_list" or "order_list"
+    let rawData = payload.products || payload.orders || [];
 
-    // --- EXTRACTION LOGIC ---
-    let rawData = toolMessage.content;
+    if (rawData && !Array.isArray(rawData) && rawData.content) {
+      rawData = rawData.content;
+    }
 
-    // A. Parse the string content
     if (typeof rawData === "string") {
       try {
         rawData = JSON.parse(rawData);
       } catch (e) {
-        console.error("Parsing failed", e);
         rawData = [];
       }
     }
 
-    // B. HANDLE THE NESTING (Fix for your specific log issue)
-    // Your log shows the content is a serialized object with "kwargs.content"
-    if (rawData && rawData.kwargs && Array.isArray(rawData.kwargs.content)) {
-      rawData = rawData.kwargs.content;
-    }
-    // Or sometimes it might be in rawData.content directly (if structure changes)
-    else if (rawData && Array.isArray(rawData.content)) {
-      rawData = rawData.content;
-    }
+    // 4. SWITCH: POST-PROCESS DATA BASED ON TYPE
+    // This keeps logic clean. Products need signed URLs; Orders might need date formatting.
+    switch (responseType) {
+      case "product_list":
+        finalData = await sanitizeProducts(rawData);
+        break;
 
-    // C. SANITIZE DATA (Convert Buffer IDs to Strings)
-    if (Array.isArray(rawData)) {
-      products = await Promise.all(
-        rawData.map(async (p) => {
-          // Handle MongoDB _id if it's an object/buffer
-          let id = p._id;
-          if (typeof id === "object" && id !== null) {
-            id = id.toString();
-          }
+      case "order_list":
+        finalData = await sanitizeOrders(rawData);
+        break;
 
-          const imageUrl =
-            p.imageIds && p.imageIds.length > 0
-              ? await getSignedUrlForKey(p.imageIds[0])
-              : null;
-
-          delete p.imageIds;
-
-          return {
-            ...p,
-            _id: id,
-            price: p.price || { list: 0, sale: 0 },
-            imageUrl,
-          };
-        })
-      );
+      default:
+        finalData = rawData;
     }
   }
-  console.log("products", products);
 
   return {
     responseType: responseType,
-    text: lastMessage.content,
-    data: products,
+    text: aiText,
+    data: finalData,
   };
 };

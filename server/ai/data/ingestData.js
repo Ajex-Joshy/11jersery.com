@@ -97,7 +97,6 @@ const ingestAll = async () => {
     logger.info(" Ingestion Complete!");
     process.exit(0);
   } catch (error) {
-    console.log(error);
     logger.error(" Ingestion Failed:", error);
     process.exit(1);
   }

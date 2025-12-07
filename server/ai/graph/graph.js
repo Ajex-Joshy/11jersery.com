@@ -34,7 +34,6 @@ export const getGraph = async () => {
   if (compiledGraph) return compiledGraph;
 
   const checkpointer = await getCheckpointer();
-  console.log("Using checkpointer:", checkpointer);
   compiledGraph = workflow.compile(checkpointer);
   return compiledGraph;
 };

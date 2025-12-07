@@ -3,9 +3,18 @@ import { socket } from "../../../socket/socket.js";
 import { getSocketIdentity } from "../../../socket/socketIdentity.js";
 
 export const useChat = (user) => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      author: "AI_Agent",
+      message:
+        "Welcome to 11Jersey.com!, How can I help you today? Browse products, track an order, or ask for support. ",
+      type: "text",
+      time: Date.now(),
+    },
+  ]);
   const [isConnected, setIsConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  console.log(messages);
 
   useEffect(() => {
     if (!user) return;
