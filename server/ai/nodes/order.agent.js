@@ -34,7 +34,7 @@ export const orderAgent = async (state) => {
           data: JSON.parse(rawOutput),
         };
       } catch (error) {
-        console.error("Order tool error:", error);
+        logger.error("Order tool error:", error);
         return {
           message: new ToolMessage({
             tool_call_id: toolCall.id,

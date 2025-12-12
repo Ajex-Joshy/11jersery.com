@@ -1,10 +1,8 @@
 import { tool } from "@langchain/core/tools";
 import logger from "../../config/logger.js";
-import vectorStore from "../config/vectorStore.js";
+import vectorStore from "../config/vector-store.js";
 import z from "zod";
 import Product from "../../models/product.model.js";
-import { flattenProduct } from "../utils/flattenProduct.js";
-import connectDB from "../../config/db.js";
 
 export const productSearchTool = tool(
   async ({ query }) => {

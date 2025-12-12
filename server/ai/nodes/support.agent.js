@@ -1,6 +1,6 @@
 import { SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { llm } from "../config/model.js";
-import { policySearchTool } from "../tools/policySearchTool.js";
+import { policySearchTool } from "../tools/policy-search.tool.js";
 
 const SUPPORT_PROMPT = `You are the Customer Support Specialist.
 - Use the 'lookup_policy_info' tool to check return windows, shipping info, or terms.

@@ -23,3 +23,4 @@ export const REFERRAL_BONUS_PERCENT = 10;
 export const MAX_REFERRAL_BONUS = 10000;
 export const DELIVERY_FEE = 8000;
 export const FREESHIP_MIN = 50000;
+export const MAX_COD_AMOUNT = 100000;

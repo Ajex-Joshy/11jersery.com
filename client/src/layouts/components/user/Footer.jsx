@@ -7,25 +7,9 @@ const Footer = () => {
       <div className="bg-black text-white py-6 rounded-lg my-12 w-[80%] px-14 mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Get exclusive access, new <br /> arrivals, and limited editions
+            Get exclusive access to new arrivals <br /> and limited‑edition
+            drops by following our social handles.
           </h2>
-
-          <form className="w-full max-w-md">
-            <div className="relative bg-white rounded-4xl">
-              <Mail
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="w-full p-3 pl-10 rounded-full"
-              />
-            </div>
-            <button className="w-full bg-white text-black px-6 py-3 rounded-full mt-3 font-semibold">
-              Join the Club
-            </button>
-          </form>
         </div>
       </div>
 

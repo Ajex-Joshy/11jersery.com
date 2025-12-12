@@ -9,10 +9,17 @@ import ProductInfoTabs from "./components/ProductInfoTabs";
 import ProductCarousel from "./components/ProductCarousel";
 import SizeGuideModal from "./components/SizeGuideModal";
 import ProductPageSkeleton from "./components/ProductPageSkeleton";
+import { useProductReviews } from "./reviewHooks";
 
 const ProductDetailsPage = () => {
   const { slug } = useParams(); // Get slug from URL
   const { data, isLoading, isError, error } = useProductPageData(slug);
+
+  const { data: reviewData } = useProductReviews(
+    data?.detailsData?.product?._id,
+    1,
+    5
+  );
 
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const openSizeModal = () => setIsSizeModalOpen(true);
@@ -33,9 +40,11 @@ const ProductDetailsPage = () => {
 
   // Deconstruct the data
   const product = data?.detailsData?.product;
-  const reviews = data?.detailsData?.reviews;
   const otherProducts = data?.detailsData?.otherProducts;
   const faqs = data?.faqsData;
+
+  const reviews = reviewData?.reviews || [];
+  console.log("reviews", reviewData);
 
   if (!product) {
     return (

@@ -1,6 +1,7 @@
 import { SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { llm } from "../config/model.js";
-import { productSearchTool } from "../tools/productSearchTool.js";
+import { productSearchTool } from "../tools/product-search.tool.js";
+import logger from "../../config/logger.js";
 
 const SYSTEM_PROMPT = `You are a Product Recommendation and Support Assistant for 11Jersey.
 - Use the 'productSearchTool' to search products by title, team, league, or player.
@@ -35,7 +36,7 @@ export const productAgentNode = async (state) => {
         productsArray = JSON.parse(rawToolOutput);
       }
     } catch (error) {
-      console.error("Error parsing tool output:", error);
+      logger.error("Error parsing tool output:", error);
       outputString = String(rawToolOutput);
     }
     const toolMessage = new ToolMessage({

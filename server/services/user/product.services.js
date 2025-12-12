@@ -24,7 +24,7 @@ export const getProductDetailsService = async (productSlug) => {
   }
   const productsWithSignedUrls = await enrichProductWithSignedUrls(product);
 
-  const reviews = await Review.find({ productId: product._id })
+  const reviews = await Review.find({ productId: product._id }) // keep review logic same (reviews not changed to array)
     .select("_id rating userName place comment createdAt productId")
     .sort({ createdAt: -1 })
     .lean();
@@ -60,7 +60,7 @@ export const getProductFaqs = async (slug) => {
       `Product with slug "${slug}" not found`
     );
   }
-  const faqs = await Faq.find({ productId: product._id });
+  const faqs = await Faq.find({ productIds: { $in: [product._id] } });
   return faqs;
 };
 

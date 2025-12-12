@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import ChatProductCard from "./ChatProductCard";
 
-const MessageList = ({ messages, currentUser, isTyping }) => {
+const MessageList = ({ messages, isTyping }) => {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -11,7 +11,8 @@ const MessageList = ({ messages, currentUser, isTyping }) => {
   return (
     <div className="flex-1 overflow-y-auto p-4 ">
       {messages.map((msg, index) => {
-        const isMe = msg.author === currentUser;
+        const isMe = msg.author !== "AI_Agent";
+
         const isSequence =
           index > 0 && messages[index - 1].author === msg.author;
 
@@ -22,23 +23,6 @@ const MessageList = ({ messages, currentUser, isTyping }) => {
               isMe ? "justify-end" : "justify-start"
             } ${isSequence ? "mt-0.5" : "mt-4"}`}
           >
-            {/* 1. Avatar (Left Side) */}
-            {!isMe && (
-              <div className="w-7 h-7 flex-shrink-0 mb-1">
-                {!isSequence && (
-                  <div className="w-7 h-7 bg-gray-300 rounded-full overflow-hidden border border-gray-100">
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${
-                        msg.author ?? "you"
-                      }&background=random&color=fff`}
-                      alt="avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* 2. CONTENT WRAPPER (This fixes the layout) */}
             {/* We stack the text and the carousel vertically inside this wrapper */}
             <div
@@ -85,14 +69,16 @@ const MessageList = ({ messages, currentUser, isTyping }) => {
 
       {/* Typing Indicator */}
       {isTyping && (
-        <div className="flex items-end gap-2 mt-2">
-          <div className="w-7 h-7 bg-gray-300 rounded-full overflow-hidden border border-gray-100 mb-1">
-            <div className="w-full h-full bg-gray-400" />
-          </div>
-          <div className="bg-[#efefef] px-4 py-3 rounded-3xl rounded-tl-lg flex items-center space-x-1 w-16 h-10">
-            <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></div>
+        <div
+          className="flex items-end gap-3 mt-4 mb-2"
+          role="status"
+          aria-label="Agent is typing"
+        >
+          {/* Typing Bubble */}
+          <div className="relative flex items-center h-10 px-5 py-3 space-x-1.5 bg-gray-100 rounded-2xl rounded-tl-none border border-gray-100/50">
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
           </div>
         </div>
       )}

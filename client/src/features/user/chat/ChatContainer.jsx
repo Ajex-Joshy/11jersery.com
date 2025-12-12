@@ -7,8 +7,7 @@ import { selectCurrentUser } from "../account/authSlice.js";
 
 const ChatContainer = () => {
   const user = useSelector(selectCurrentUser);
-  const { messages, sendMessage, isConnected, isTyping, sendTyping } =
-    useChat(user);
+  const { messages, sendMessage, isTyping, sendTyping } = useChat(user);
 
   return (
     <div className="flex flex-col rounded-2xl h-[600px] w-full max-w-md border border-gray-200  shadow-xl bg-gray-50 ">

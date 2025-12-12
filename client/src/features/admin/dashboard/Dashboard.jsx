@@ -9,8 +9,10 @@ import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
+import { formatRupee } from "../../../utils/currency";
 
 // Helper for Summary Cards
+// eslint-disable-next-line no-unused-vars
 const SummaryCard = ({ title, value, trend, icon: Icon, colorClass }) => (
   <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
     <div className="flex justify-between items-start mb-4">
@@ -44,7 +46,7 @@ const Dashboard = () => {
   const [chartPeriod, setChartPeriod] = useState("daily");
 
   // 3. Fetch Chart Data (using the Report hook!)
-  const { data: reportPayload, isLoading: isChartLoading } = useSalesReport({
+  const { data: reportPayload } = useSalesReport({
     period: chartPeriod,
     limit: 1000, // Get enough points for the chart
   });
@@ -64,7 +66,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <SummaryCard
           title="Total Revenue"
-          value={`₹${stats.monthly?.currentRevenue?.toLocaleString() || 0}`}
+          value={`${formatRupee(stats.monthly?.currentRevenue)}`}
           trend={stats.monthly?.growthPercentage || 0}
           icon={Wallet}
           colorClass="bg-green-50 text-green-600"

@@ -197,7 +197,7 @@ export const getProducts = async (queryParams) => {
     products: productsWithSignedUrls,
     pagination: {
       totalProducts,
-      currentpage: pageNumber,
+      currentPage: pageNumber,
       totalPages: Math.ceil(totalProducts / pageSize),
       limit: pageSize,
     },

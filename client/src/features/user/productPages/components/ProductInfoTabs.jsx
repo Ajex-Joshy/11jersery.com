@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import StarRating from "../../../../components/common/StarRating";
 import AccordionItem from "./AccordionItem";
+import ReviewModal from "./ReviewModal";
+import { useDeleteReview } from "../reviewHooks";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../account/authSlice";
+import ConfirmationModal from "../../../../components/common/ConfirmationModal";
+import { Trash } from "lucide-react";
 
 // --- Tab: Product Details ---
 const ProductDetailsTab = ({ product }) => (
@@ -36,46 +42,88 @@ ProductDetailsTab.propTypes = {
 };
 
 // --- Tab: Product Reviews ---
-const ProductReviewsTab = ({ reviews = [] }) => (
-  <div className="max-w-2xl mx-auto space-y-6">
-    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-      <h3 className="text-xl font-semibold">All Reviews ({reviews.length})</h3>
-      <div className="flex gap-2 items-center">
-        <span className="text-sm text-gray-500">Sort:</span>
-        <select className="border border-gray-300 rounded-md py-1.5 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-black">
-          <option>Latest</option>
-          <option>Highest</option>
-          <option>Lowest</option>
-        </select>
-        <button className="bg-black text-white text-sm px-3 py-1.5 rounded-md hover:bg-gray-800">
-          Write a Review
-        </button>
-      </div>
-    </div>
+const ProductReviewsTab = ({ reviews = [], productId }) => {
+  const [openModal, setOpenModal] = useState(false);
+  const deleteReview = useDeleteReview();
+  const currentUser = useSelector(selectCurrentUser);
 
-    <div className="space-y-6">
-      {reviews.map((review) => (
-        <div key={review._id} className="border-b border-gray-200 pb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-gray-800">
-              {review.userName}
-            </span>
-            <span className="text-xs text-gray-500">- {review.place}</span>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <StarRating rating={review.rating} size={14} />
-            {/* <span className="text-xs text-gray-500">{review.postedOn}</span> */}
-          </div>
-          <p className="text-sm text-gray-600 italic">"{review.comment}"</p>
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState(null);
+
+  const handleDeleteClick = (id) => {
+    setSelectedReviewId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteReview.mutate(selectedReviewId);
+    setConfirmOpen(false);
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <h3 className="text-xl font-semibold">
+          All Reviews ({reviews.length})
+        </h3>
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => setOpenModal(true)}
+            className="bg-black text-white text-sm px-3 py-1.5 rounded-md hover:bg-gray-800"
+          >
+            Write a Review
+          </button>
         </div>
-      ))}
-    </div>
-    <button className="mx-auto block text-sm font-semibold border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100">
-      Load More Reviews
-    </button>
-  </div>
-);
+      </div>
+      <ReviewModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        productId={productId}
+      />
 
+      <div className="space-y-6">
+        {reviews.map((review) => {
+          review.isMine = currentUser?._id === review.userId;
+          return (
+            <div key={review._id} className="border-b border-gray-200 pb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-semibold text-gray-800">
+                  {review.userName}
+                </span>
+                <span className="text-xs text-gray-500">{review.place}</span>
+
+                {review.isMine && (
+                  <button
+                    onClick={() => handleDeleteClick(review._id)}
+                    className="ml-auto"
+                  >
+                    <Trash className="w-4 h-4 text-red-600 hover:text-red-700" />
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <StarRating rating={review.rating} size={14} />
+                {/* <span className="text-xs text-gray-500">{review.postedOn}</span> */}
+              </div>
+              <p className="text-sm text-gray-600 italic">"{review.comment}"</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <ConfirmationModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Review"
+        message="Are you sure you want to delete this review? This action cannot be undone."
+        confirmButtonText="Delete"
+        confirmButtonVariant="danger"
+        isLoading={deleteReview.isPending}
+      />
+    </div>
+  );
+};
 ProductReviewsTab.propTypes = {
   reviews: PropTypes.arrayOf(
     PropTypes.shape({
@@ -124,7 +172,7 @@ const ProductInfoTabs = ({ product, reviews, faqs }) => {
       case "Product Details":
         return <ProductDetailsTab product={product} />;
       case "Rating & Reviews":
-        return <ProductReviewsTab reviews={reviews} />;
+        return <ProductReviewsTab reviews={reviews} productId={product._id} />;
       case "FAQs":
         return <ProductFaqsTab faqs={faqs} />;
       default:

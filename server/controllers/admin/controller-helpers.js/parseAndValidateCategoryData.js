@@ -4,7 +4,7 @@ export const parseAndValidateCategoryData = (dataFromRequest, schema) => {
   let data = { ...dataFromRequest };
 
   if (data.isListed !== undefined) data.isListed = data.isListed === "true";
-  if (data.inHome !== undefined) data.inHome = data.inHome === "true";
+  if (data.inHome !== undefined) data.inHome = data.inHome === true;
   if (data.inCollections !== undefined)
     data.inCollections = data.inCollections === "true";
 
@@ -34,9 +34,7 @@ export const parseAndValidateCategoryData = (dataFromRequest, schema) => {
     data.minPurchaseAmount = data.minPurchaseAmount
       ? Number(data.minPurchaseAmount)
       : 0;
-    data.maxRedeemable = data.maxRedeemable
-      ? Number(data.maxRedeemable)
-      : 0;
+    data.maxRedeemable = data.maxRedeemable ? Number(data.maxRedeemable) : 0;
   }
   if (data.discountType === "") data.discountType = undefined;
 

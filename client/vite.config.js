@@ -9,7 +9,7 @@ export default defineConfig({
     host: true,
     strictPort: true,
     cors: true,
-    allowedHosts: ["years-applicants-first-guns.trycloudflare.com"],
+    allowedHosts: ["pressing-measuring-herself-provide.trycloudflare.com"],
   },
   define: {
     "process.env": {},

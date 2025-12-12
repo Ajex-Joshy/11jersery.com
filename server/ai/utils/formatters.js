@@ -7,6 +7,5 @@ export const normalizeOrderId = (input) => {
 
   const paddedNumber = numericPart.padStart(6, "0");
 
-  // 4. Append prefix
   return `ORD-${paddedNumber}`;
 };

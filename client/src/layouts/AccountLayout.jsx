@@ -43,7 +43,7 @@ const AccountLayout = () => {
     <div className="container ">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 md:gap-12 ">
         {/* --- Sidebar Column --- */}
-        <aside className="lg:col-span-1 bg-stone-200 p-8">
+        <aside className="lg:col-span-1 bg-stone-200 p-8 ">
           <nav className="flex flex-col">
             <ul className="space-y-2">
               {navLinks.map((link) => (

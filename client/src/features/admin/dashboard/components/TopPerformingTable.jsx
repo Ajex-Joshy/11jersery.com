@@ -1,5 +1,6 @@
 import React from "react";
 import { Trophy } from "lucide-react";
+import { formatRupee } from "../../../../utils/currency";
 
 const TopPerformingTable = ({ title, data, type = "product" }) => {
   return (
@@ -31,7 +32,7 @@ const TopPerformingTable = ({ title, data, type = "product" }) => {
                   {/* If product, show revenue. If category, show something else or just count */}
                   {
                     type === "product"
-                      ? `₹${item.totalRevenue?.toLocaleString()}`
+                      ? `${formatRupee(item.totalRevenue)}`
                       : `${Math.round((item.totalSold / 10) * 100) / 10}%` // Fake growth/share calc
                   }
                 </td>

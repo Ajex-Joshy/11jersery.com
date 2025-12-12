@@ -74,12 +74,12 @@ export const saveFaqs = async (faqs, productId, replaceExisting = false) => {
 
   // Delete existing FAQs if replaceExisting is true
   if (replaceExisting) {
-    await Faq.deleteMany({ productId });
+    await Faq.deleteMany({ productIds: productId });
   }
 
   const faqsWithProductId = faqs.map((faq) => ({
     ...faq,
-    productId,
+    productIds: [productId],
   }));
 
   return Faq.insertMany(faqsWithProductId);

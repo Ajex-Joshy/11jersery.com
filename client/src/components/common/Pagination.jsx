@@ -10,7 +10,13 @@ const Pagination = ({ pagination, onPageChange }) => {
     totalOrders,
     limit,
     totalTransactions,
+    totalProducts,
+    totalRecords,
+    totalCategories,
+    totalCoupons,
+    totalRequests,
   } = pagination;
+  console.log("page", pagination);
 
   if (totalPages <= 1) {
     return null;
@@ -22,7 +28,17 @@ const Pagination = ({ pagination, onPageChange }) => {
   };
 
   const startItem = (currentPage - 1) * limit + 1;
-  let totalItem = totalUsers || totalOrders || totalTransactions;
+
+  let totalItem =
+    totalUsers ||
+    totalOrders ||
+    totalTransactions ||
+    totalProducts ||
+    totalRecords ||
+    totalCategories ||
+    totalCoupons ||
+    totalRequests;
+
   const endItem = Math.min(currentPage * limit, totalItem);
   console.log(startItem, totalItem, endItem, totalPages);
 

@@ -24,6 +24,7 @@ const envSchema = z.object({
   VITE_AXIOS_TIMEOUT: z.string().min(1, "VITE_AXIOS_TIMEOUT is required"),
 
   VITE_RAZORPAY_KEY_ID: z.string().min(1, "VITE_RAZORPAY_KEY_ID is required"),
+  VITE_SOCKET_URL: z.string().min(1, "VITE_SOCKET_URL is required"),
 });
 
 export const env = envSchema.parse(import.meta.env);

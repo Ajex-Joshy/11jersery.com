@@ -12,12 +12,13 @@ export const useTableParams = ({
   defaultSortOrder = "desc",
 } = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
 
   // --- Read all values from the URL ---
   const page = Number(searchParams.get("page") || "1");
   const limit = Number(searchParams.get("limit") || "10");
   const status = searchParams.get("status") || "";
-  const searchTerm = searchParams.get("search") || "";
+
   const sortConfig = useMemo(
     () => ({
       field: searchParams.get("sortBy") || defaultSortBy,
@@ -60,6 +61,7 @@ export const useTableParams = ({
   };
 
   const handleSearch = (value) => {
+    // console.log(value);
     updateParams({ search: value, page: "1" });
   };
 

@@ -7,14 +7,13 @@ export const useChat = (user) => {
     {
       author: "AI_Agent",
       message:
-        "Welcome to 11Jersey.com!, How can I help you today? Browse products, track an order, or ask for support. ",
+        "Welcome to 11Jersey.com! How can I help you today? Browse products, track an order, or ask for support.",
       type: "text",
       time: Date.now(),
     },
   ]);
   const [isConnected, setIsConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  console.log(messages);
 
   useEffect(() => {
     if (!user) return;
@@ -25,18 +24,15 @@ export const useChat = (user) => {
 
     const handleReceiveMessage = (newMessage) => {
       setMessages((prev) => [...prev, newMessage]);
+
+      // Stop typing when a response is received
+      setIsTyping(false);
     };
-    const handleTyping = () => setIsTyping(true);
-    const handleStopTyping = () => setIsTyping(false);
 
     socket.on("receive_message", handleReceiveMessage);
-    socket.on("typing", handleTyping);
-    socket.on("stop_typing", handleStopTyping);
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
-      socket.off("typing", handleTyping);
-      socket.off("stop_typing", handleStopTyping);
       socket.disconnect();
       setIsConnected(false);
     };
@@ -45,6 +41,9 @@ export const useChat = (user) => {
   const sendMessage = useCallback(
     (text) => {
       if (!text.trim()) return;
+
+      // Set typing to true automatically when user sends a message
+      setIsTyping(true);
 
       const messageData = {
         userId: user._id,
@@ -65,5 +64,7 @@ export const useChat = (user) => {
     },
     [user._id]
   );
+  console.log("typing", isTyping);
+
   return { messages, sendMessage, isConnected, isTyping, sendTyping };
 };

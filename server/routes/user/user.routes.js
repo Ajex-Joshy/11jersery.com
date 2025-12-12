@@ -11,6 +11,7 @@ import walletRoutes from "./wallet.routes.js";
 import couponRoutes from "./coupon.routes.js";
 import wishlistRouter from "./wishlist.routes.js";
 import chatRouter from "./chat.routes.js";
+import reviewRouter from "./review.routes.js";
 
 const userRouter = express.Router();
 userRouter.get("/landing-page", getLandingPageController);
@@ -24,6 +25,7 @@ userRouter.use("/wallet", walletRoutes);
 userRouter.use("/coupons", couponRoutes);
 userRouter.use("/wishlist", wishlistRouter);
 userRouter.use("/chat", chatRouter);
+userRouter.use("/reviews", reviewRouter);
 
 userRouter.get("/products", getProductsController);
 export default userRouter;

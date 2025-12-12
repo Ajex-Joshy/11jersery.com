@@ -128,7 +128,7 @@ export const getSalesReport = async (params) => {
       totalRecords,
       currentPage: pageNumber,
       totalPages: Math.ceil(totalRecords / pageSize),
-      limit: pageSize,
+      limit: pageSize,ç
     },
   };
 };

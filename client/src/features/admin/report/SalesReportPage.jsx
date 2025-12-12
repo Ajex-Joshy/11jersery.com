@@ -13,8 +13,6 @@ import { useSearchParams } from "react-router-dom";
 import { formatRupee } from "../../../utils/currency";
 
 const SalesReportPage = () => {
-  // 1. Initialize URL state management
-  // We initialize default period to 'daily'
   const [searchParams, setSearchParams] = useSearchParams();
   const urlParams = Object.fromEntries(searchParams.entries());
   // Construct queryParams with defaults + url overrides
@@ -143,13 +141,13 @@ const SalesReportPage = () => {
         limit={queryParams.limit}
         onPageChange={(page) => onCustomFilterChange({ page })}
         onLimitChange={(limit) => onCustomFilterChange({ limit })}
-        // We don't need search/status for this specific table usually, but can keep empty
         searchValue=""
         onSearchChange={() => {}}
         status=""
         onStatusChange={() => {}}
-        sortConfig={{}} // Sorting handled by backend aggregation usually
+        sortConfig={{}}
         onSort={() => {}}
+        showSearch={false}
       />
     </div>
   );

@@ -82,3 +82,4 @@ export const paymentMethods = [
 ];
 
 export const MAX_QUANTITY_PER_ORDER = 20;
+export const MAX_COD_AMOUNT = 100000;

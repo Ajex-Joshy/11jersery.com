@@ -8,7 +8,7 @@ import {
   removeItemFromCart,
   clearCart,
 } from "./cartApis";
-import { cloneCart, recalcTotals } from "./cartUtils";
+import { cloneCart } from "./cartUtils";
 import { useCartOptimisticMutation } from "./useCartOptimisticMutation";
 import { MAX_QUANTITY_PER_ORDER } from "../../../utils/constants";
 
@@ -62,68 +62,51 @@ export const useAddItemToCart = () => {
     },
   });
 };
-export const useIncrementItem = () =>
-  useCartOptimisticMutation(
-    incrementItem,
-    (cart, { itemId }) => {
-      if (!cart) return cart;
-      const updated = cloneCart(cart);
-      const item = updated.data.items.find((i) => i._id === itemId);
-      if (item) {
-        if (item.quantity >= MAX_QUANTITY_PER_ORDER) {
-          toast.dismiss();
-          toast.error("Maximum quantity per order is 20");
-          return cart;
-        }
-        item.quantity += 1;
-      }
-      return recalcTotals(updated);
-    },
-    {
-      onError: (err) => {
-        toast.error(
-          err?.response?.data?.error?.message || "Something went wrong"
-        );
-      },
-    }
-  );
 
-export const useDecrementItem = () =>
-  useCartOptimisticMutation(
-    decrementItem,
-    (cart, { itemId }) => {
-      if (!cart) return cart;
-      const updated = cloneCart(cart);
-      const item = updated.data.items.find((i) => i._id === itemId);
-      if (item && item.quantity > 1) item.quantity -= 1;
-      return recalcTotals(updated);
+export const useIncrementItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: incrementItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries([CART_KEY]);
     },
-    {
-      onError: (err) => {
-        toast.error(
-          err?.response?.data?.error?.message || "Something went wrong"
-        );
-      },
-    }
-  );
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
+    },
+  });
+};
 
-export const useRemoveItemFromCart = () =>
-  useCartOptimisticMutation(
-    removeItemFromCart,
-    (cart, { itemId }) => {
-      if (!cart) return cart;
-      const updated = cloneCart(cart);
-      updated.data.items = updated.data.items.filter((i) => i._id !== itemId);
-      return recalcTotals(updated);
+export const useDecrementItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: decrementItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries([CART_KEY]);
     },
-    {
-      onError: (err) => {
-        toast.error(
-          err?.response?.data?.error?.message || "Something went wrong"
-        );
-      },
-    }
-  );
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
+    },
+  });
+};
+
+export const useRemoveItemFromCart = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: removeItemFromCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries([CART_KEY]);
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error?.message || "Something went wrong"
+      );
+    },
+  });
+};
 
 export const useClearCart = () =>
   useCartOptimisticMutation(

@@ -55,7 +55,7 @@ const SalesOverviewChart = ({ data, filter, onFilterChange }) => {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: "#9CA3AF" }}
-              tickFormatter={(value) => `₹${value}`}
+              tickFormatter={(value) => `₹${value / 100}`}
             />
             <CartesianGrid
               vertical={false}

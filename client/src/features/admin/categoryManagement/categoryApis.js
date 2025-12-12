@@ -37,6 +37,11 @@ export const getCategoryDetails = async (slug) => {
 };
 
 export const updateCategory = async ({ id, formData }) => {
+  console.log("update cat");
+  for (const [key, value] of formData.entries()) {
+    console.log("formData", key, value);
+  }
+
   const { data } = await axiosInstance.patch(
     `/admin/categories/${id}`,
     formData

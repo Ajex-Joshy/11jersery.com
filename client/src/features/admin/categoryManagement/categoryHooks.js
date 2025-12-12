@@ -29,19 +29,10 @@ export const useAddCategory = () => {
 
   return useMutation({
     mutationFn: addCategory,
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast.success("Category added successfully!");
 
-      await queryClient.setQueryData([CATEGORIES_QUERY_KEY], (old) => {
-        if (!old?.data?.categories) return old;
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            categories: [data.data, ...old.data.categories],
-          },
-        };
-      });
+      await queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
 
       navigate("/admin/categories");
     },

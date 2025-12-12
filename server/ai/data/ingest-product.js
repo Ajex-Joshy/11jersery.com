@@ -24,7 +24,8 @@ const ingestProduct = async () => {
       await vectorStore.delete({ filter: { type: "product" } });
     } catch (e) {
       logger.warn(
-        " Delete by filter failed (provider might not support it). Proceeding with Upsert.Stopping process..."
+        " Delete by filter failed (provider might not support it). Proceeding with Upsert.Stopping process...",
+        e
       );
       process.exit(0);
     }

@@ -1,6 +1,6 @@
 import { tool } from "@langchain/core/tools";
 import z from "zod";
-import vectorStore from "../config/vectorStore.js";
+import vectorStore from "../config/vector-store.js";
 
 export const policySearchTool = tool(
   async ({ query }) => {

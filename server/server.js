@@ -23,7 +23,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://years-applicants-first-guns.trycloudflare.com",
+      "https://pressing-measuring-herself-provide.trycloudflare.com",
       env.FRONTEND_URL,
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
@@ -35,8 +35,8 @@ const httpLogger = pinoHttp({
   logger,
 });
 
-app.use(express.json());
-// app.use(httpLogger);
+app.use(express.json({ limit: "10kb" }));
+app.use(httpLogger);
 
 app.use((req, res, next) => {
   // Start a timer for request duration

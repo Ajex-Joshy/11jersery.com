@@ -42,7 +42,7 @@ const PaymentPage = () => {
       toast.error("Please select a payment method");
       return;
     }
-    processOrder(selectedMethod, selectedAddressId);
+    processOrder(selectedMethod, selectedAddressId, cartPayload.data.total);
   };
 
   // Determine button text based on selected method

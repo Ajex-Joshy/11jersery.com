@@ -138,25 +138,35 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
       return;
     }
 
-    if (data.firstName !== user.firstName)
+    if (data.firstName !== user.firstName) {
       changedFields.firstName = data.firstName;
-    if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
-    if (data.email !== user.email) {
-      if (!otpVerified) {
-        toast.error("Please verify your new email before saving.");
-        return;
-      }
-      if (!data.email?.trim()) {
-        toast.error("Email is required.");
-        return;
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email)) {
-        toast.error("Invalid email format.");
-        return;
-      }
-      changedFields.email = data.email;
+      console.log(data.firstName, user.firstName, changedFields);
     }
+
+    if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
+    {
+      console.log("data", data);
+      console.log(data.email, user.email);
+    }
+    if (data.email) {
+      if (data.email !== user.email) {
+        if (!otpVerified) {
+          toast.error("Please verify your new email before saving.");
+          return;
+        }
+        if (!data.email?.trim()) {
+          toast.error("Email is required.");
+          return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email)) {
+          toast.error("Invalid email format.");
+          return;
+        }
+        changedFields.email = data.email;
+      }
+    }
+    console.log("changedFields", changedFields);
 
     if (Object.keys(changedFields).length > 0) {
       mutate(changedFields, {

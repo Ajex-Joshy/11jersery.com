@@ -10,6 +10,8 @@ import { useState } from "react";
 import { loadRazorpayScript } from "../../../utils/loadRazorpay";
 const _loaded = await loadRazorpayScript();
 import { env } from "../../../utils/env.js";
+import { formatRupee } from "../../../utils/currency.js";
+import { MAX_COD_AMOUNT } from "../../../utils/constants.js";
 
 export const useProcessOrder = () => {
   const navigate = useNavigate();
@@ -20,7 +22,9 @@ export const useProcessOrder = () => {
   const { mutate: razorpayOrderMutation } = useRazorpayOrder();
   const { mutate: razorpayVerifyMutation } = useRazorpayVerify();
 
-  const processOrder = (method, selectedAddressId) => {
+  const processOrder = (method, selectedAddressId, total) => {
+    console.log("total", total);
+
     if (!method) {
       toast.error("Please select a payment method");
       return;
@@ -30,6 +34,13 @@ export const useProcessOrder = () => {
 
     // COD
     if (method === "cod") {
+      if (total > MAX_COD_AMOUNT) {
+        toast.error(
+          `Cannot process COD for order above ${formatRupee(MAX_COD_AMOUNT)}`
+        );
+        setIsProcessing(false);
+        return null;
+      }
       return codMutation(
         { shippingAddressId: selectedAddressId },
         {

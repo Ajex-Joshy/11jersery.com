@@ -15,7 +15,6 @@ export const getDashboardStats = async () => {
       $group: {
         _id: "$items.productId",
         title: { $first: "$items.title" },
-        // image: { $first: "$items.image" }, // Include if you want images
         totalSold: { $sum: "$items.quantity" },
         totalRevenue: {
           $sum: { $multiply: ["$items.salePrice", "$items.quantity"] },
@@ -25,8 +24,6 @@ export const getDashboardStats = async () => {
     { $sort: { totalSold: -1 } },
     { $limit: 10 },
   ]);
-
-  // 3. Top Selling Categories (Top 10)
 
   const bestSellingCategories = await Order.aggregate([
     { $match: { status: { $nin: ["Cancelled", "Returned"] } } },

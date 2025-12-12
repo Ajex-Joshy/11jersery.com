@@ -77,6 +77,16 @@ export const updateCategory = async (categoryId, updateData) => {
   const categoryWithSignedUrls = await enrichCategoryWithSignedUrl(
     updatedCategory
   );
+  if (updateData.discountType && updateData.discount) {
+    updateData.discount = toPaise(updateData.discount);
+    if (updateData.discountType === "flat") {
+      updateData.minPurchaseAmount = toPaise(updateData.minPurchaseAmount ?? 0);
+      updateData.maxRedeemable = 0;
+    } else if (updateData.discountType === "percent") {
+      updateData.maxRedeemable = toPaise(updateData.maxRedeemable ?? 0);
+      updateData.minPurchaseAmount = 0;
+    }
+  }
 
   if (!updatedCategory) {
     throw new AppError(

@@ -16,12 +16,14 @@ const faqSchema = new mongoose.Schema(
       minlength: 5,
       maxlength: 2000,
     },
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true,
-      index: true,
-    },
+    productIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+        index: true,
+      },
+    ],
   },
   { timestamps: true }
 );

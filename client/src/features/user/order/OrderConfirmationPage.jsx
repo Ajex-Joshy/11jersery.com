@@ -18,6 +18,7 @@ import Confetti from "react-confetti";
 import InvoiceDownloadButton from "../../../components/user/Buttons";
 import PriceSummary from "./components/PriceSummary";
 import AddressCard from "./components/AddressCard";
+import { formatRupee } from "../../../utils/currency";
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
@@ -134,7 +135,7 @@ const OrderConfirmationPage = () => {
                       </p>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">
-                          ₹{item?.salePrice}
+                          {formatRupee(item?.salePrice)}
                         </span>
                       </div>
                     </div>

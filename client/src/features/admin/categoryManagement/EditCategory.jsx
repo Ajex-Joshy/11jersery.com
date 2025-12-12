@@ -58,13 +58,12 @@ const EditCategory = () => {
   const discountType = watch("discountType");
 
   // --- Populate form when data loads ---
-  // --- Populate form when data loads ---
-  console.log("categoryDetailsData", categoryDetailsData);
   useEffect(() => {
     if (categoryDetailsData?.data) {
       const category = categoryDetailsData.data;
       const hasOffer =
         category.discount > 0 && category.discountType ? true : false;
+      console.log("cat data", categoryDetailsData.data);
 
       reset({
         title: category.title,
@@ -245,9 +244,7 @@ const EditCategory = () => {
       navigate("/admin/categories"); // Navigate back if no changes
       return;
     }
-    console.log(originalData);
-    console.log("original", originalData);
-    console.log("data", data);
+
     for (const [key, value] of formData.entries()) {
       console.log("formData", key, value);
     }

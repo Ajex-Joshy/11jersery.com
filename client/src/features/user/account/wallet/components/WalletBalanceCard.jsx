@@ -17,10 +17,10 @@ const WalletBalanceCard = ({ balance }) => {
         </div>
       </div>
 
-      <button className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition shadow-md active:scale-95 transform duration-100">
+      {/* <button className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition shadow-md active:scale-95 transform duration-100">
         <Plus size={18} />
         Add Money
-      </button>
+      </button> */}
     </div>
   );
 };

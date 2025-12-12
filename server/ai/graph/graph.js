@@ -1,16 +1,10 @@
-import { StateGraph, START, END, MemorySaver } from "@langchain/langgraph";
+import { StateGraph, START, END } from "@langchain/langgraph";
 import { GraphAnnotation } from "./state.js";
-import { supervisorNode } from "../nodes/supervisorNode.js";
-import { generalAgentNode } from "../nodes/generalAgentNode.js";
-import { productAgentNode } from "../nodes/productAgentNode.js";
-import { supportAgentNode } from "../nodes/supportAgentNode.js";
-// import redisClient from "../../config/redis-client.js";
-import { RedisSaver } from "@langchain/langgraph-checkpoint-redis";
+import { supervisorNode } from "../nodes/supervisor.agent.js";
+import { generalAgentNode } from "../nodes/ general.agent.js";
+import { productAgentNode } from "../nodes/product.agent.js";
+import { supportAgentNode } from "../nodes/support.agent.js";
 import { getCheckpointer } from "../config/checkpointer.js";
-
-// const checkpointer = new RedisSaver({ client: redisClient }); // for production
-
-// const checkpointer = new MemorySaver();
 
 const workflow = new StateGraph(GraphAnnotation)
   .addNode("supervisor", supervisorNode)

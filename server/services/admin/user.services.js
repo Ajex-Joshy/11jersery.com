@@ -28,28 +28,32 @@ export const getUsers = async (queryParams) => {
     sortOrder = "desc",
   } = queryParams;
 
-  const query = buildUserQuery({ status, search });
+  // const query = buildUserQuery({ status, search });
 
-  const sort = getSortOption(sortBy, sortOrder);
-  const { pageNumber, pageSize, skip } = getPagination(page, limit);
+  // const sort = getSortOption(sortBy, sortOrder);
+  // const { pageNumber, pageSize, skip } = getPagination(page, limit);
 
-  const [result, totalUsers] = await Promise.all([
-    User.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(pageSize)
-      .select("_id firstName lastName email phone isBlocked status"),
-    User.countDocuments(query),
-  ]);
+  // const [result, totalUsers] = await Promise.all([
+  //   User.find(query)
+  //     .sort(sort)
+  //     .skip(skip)
+  //     .limit(pageSize)
+  //     .select("_id firstName lastName email phone isBlocked status"),
+  //   User.countDocuments(query),
+  // ]);
+
+  const allUsers = await User.find({ isDeleted: false }).select(
+    "_id firstName lastName email phone isBlocked status"
+  );
 
   return {
-    users: result,
-    pagination: {
-      totalUsers,
-      currentPage: pageNumber,
-      totalPages: Math.ceil(totalUsers / pageSize),
-      limit: pageSize,
-    },
+    users: allUsers,
+    // pagination: {
+    //   totalUsers,
+    //   currentPage: pageNumber,
+    //   totalPages: Math.ceil(totalUsers / pageSize),
+    //   limit: pageSize,
+    // },
   };
 };
 

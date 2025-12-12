@@ -1,4 +1,5 @@
-import { processWithLangGraph } from "../ai/processWithLangGraph.js";
+import { processWithLangGraph } from "../ai/langgraph-process.js";
+import logger from "../config/logger.js";
 
 export const initializeSocket = (io) => {
   io.use((socket, next) => {
@@ -13,7 +14,7 @@ export const initializeSocket = (io) => {
   io.on("connection", (socket) => {
     const personalRoom = `room_${socket.user.userId}`;
     socket.join(personalRoom);
-    console.log(`joined room ${personalRoom}`);
+    logger.info(`joined room ${personalRoom}`);
 
     socket.on("send_message", async (data) => {
       const { message } = data;
@@ -33,13 +34,13 @@ export const initializeSocket = (io) => {
           data: response.data,
           time: new Date().toISOString(),
         };
-        console.log("msg", aiMessageData);
+        // console.log("msg", aiMessageData);
         io.to(personalRoom).emit("stop_typing");
         io.to(personalRoom).emit("receive_message", aiMessageData);
         //  saveToDb(socket.user.userId, message, 'Human');
         //  saveToDb(socket.user.userId, aiResponseText, 'AI');
       } catch (err) {
-        console.error("LangGraph Error:", err);
+        logger.error("LangGraph Error:", err);
         socket.emit("error", {
           message: "The AI agent is currently unavailable.",
         });
@@ -48,18 +49,9 @@ export const initializeSocket = (io) => {
       }
     });
 
-    // 3. Typing Indicators
-    socket.on("typing", (roomId) => {
-      socket.to(roomId).emit("typing");
-    });
-
-    socket.on("stop_typing", (roomId) => {
-      socket.to(roomId).emit("stop_typing");
-    });
-
     // 4. Disconnect
     socket.on("disconnect", () => {
-      console.log("User Disconnected", socket.id);
+      logger.info("User Disconnected", socket.id);
     });
   });
 };
