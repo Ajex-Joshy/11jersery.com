@@ -1,1 +1,0 @@
-const r=()=>new Promise(t=>{const o=document.createElement("script");o.src="https://checkout.razorpay.com/v1/checkout.js",o.onload=()=>t(!0),o.onerror=()=>t(!1),document.body.appendChild(o)});export{r as l};
