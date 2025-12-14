@@ -22,10 +22,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "https://pressing-measuring-herself-provide.trycloudflare.com",
-      env.FRONTEND_URL,
-    ],
+    origin: [env.FRONTEND_URL],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
