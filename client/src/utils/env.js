@@ -19,7 +19,6 @@ const envSchema = z.object({
     .string()
     .min(1, "VITE_FIREBASE_MEASUREMENT_ID is required"),
 
-  VITE_TUNNEL_URL: z.string().min(1, "VITE_TUNNEL_URL is required"),
   VITE_BASE_URL: z.string().min(1, "VITE_BASE_URL is required"),
   VITE_AXIOS_TIMEOUT: z.string().min(1, "VITE_AXIOS_TIMEOUT is required"),
 
