@@ -16,8 +16,7 @@
     "start": "NODE_ENV=development nodemon --exec 'npm run lint && node server.js'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "ingest": "node ai/data/ingest-data.js",
-    "prepare": "husky"
+    "ingest": "node ai/data/ingest-data.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.917.0",
@@ -71,13 +70,10 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
     "@eslint/js": "^9.38.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.4.0",
-    "husky": "^9.1.7",
     "nodemon": "^3.1.11",
     "pino-pretty": "^13.1.2"
   }

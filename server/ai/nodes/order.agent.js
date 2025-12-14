@@ -1,6 +1,6 @@
 import { ToolMessage, SystemMessage } from "@langchain/core/messages";
 import { llm } from "../config/model.js";
-import { orderLookupTool } from "../tools/orderLoopupTool.js";
+import { orderLookupTool } from "../tools/order-lookup.tool.js";
 
 const SYSTEM_PROMPT = `You are an Order Support Assistant.
 - If the user asks about a specific order (e.g., "Where is order #123?"), use the tool with that ID.

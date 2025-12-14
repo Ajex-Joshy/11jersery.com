@@ -41,9 +41,9 @@ const envSchema = z.object({
   WEBHOOK_SECRET: z.string().min(1, "WEBHOOK_SECRET is required"),
   FRONTEND_URL: z.string().min(1, "FRONTEND_URL is required"),
 
-  DEATIVATE_USER_CRON_EXP: z
+  DEACTIVATE_USER_CRON_EXP: z
     .string()
-    .min(1, "DEATIVATE_USER_CRON_EXP is required"),
+    .min(1, "DEACTIVATE_USER_CRON_EXP is required"),
 
   JWT_REFRESH_TOKEN_EXPIRE: z
     .string()

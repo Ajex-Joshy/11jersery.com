@@ -74,19 +74,6 @@ services:
     depends_on:
       - mongo
 
-  client:
-    build: ./client
-    container_name: 11jersey.com_client
-    ports:
-      - "5173:5173"
-    env_file:
-      - ./client/.env.development
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-    depends_on:
-      - server
-
 volumes:
   mongo-data:
   redis-data:
