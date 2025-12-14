@@ -61,6 +61,10 @@ const envSchema = z.object({
   PINECONE_ENV: z.string().min(1, "PINECONE_ENV is required"),
   PINECONE_INDEX: z.string().min(1, "PINECONE_INDEX is required"),
 
+  FIREBASE_PROJECT_ID: z.string().min(1, "FIREBASE_PROJECT_ID is required"),
+  FIREBASE_CLIENT_EMAIL: z.string().min(1, "PINECONE_ENV is required"),
+  FIREBASE_PRIVATE_KEY: z.string().min(1, "PINECONE_INDEX is required"),
+
   REDIS_HOST: z.string().min(1, "REDIS_HOST is required"),
   REDIS_PORT: z.string().min(1, "REDIS_PORT is required"),
 
