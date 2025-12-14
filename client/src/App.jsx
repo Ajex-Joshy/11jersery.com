@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import UserRoutes from "./routes/UserRoutes";
-import AdminRoutes from "./routes/AdminRoutes";
+import UserRoutes from "./routes/UserRoutes.jsx";
+import AdminRoutes from "./routes/AdminRoutes.jsx";
 import { useDispatch } from "react-redux";
 // import { useEffect } from "react";
 // import { checkAuth } from "./features/user/account/authSlice";
