@@ -24,7 +24,6 @@ const ProductDetailsPage = () => {
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const openSizeModal = () => setIsSizeModalOpen(true);
   const closeSizeModal = () => setIsSizeModalOpen(false);
-  console.log(isSizeModalOpen);
 
   if (isLoading) {
     return <ProductPageSkeleton />;
@@ -44,7 +43,6 @@ const ProductDetailsPage = () => {
   const faqs = data?.faqsData;
 
   const reviews = reviewData?.reviews || [];
-  console.log("reviews", reviewData);
 
   if (!product) {
     return (

@@ -17,7 +17,6 @@ const AddressCard = ({ address, onDelete }) => {
   };
 
   const handleCancel = () => {
-    console.log("modal", isModalOpen);
     setIsModalOpen(false);
   };
 

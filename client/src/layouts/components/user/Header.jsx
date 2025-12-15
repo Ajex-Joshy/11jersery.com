@@ -15,7 +15,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  console.log(isAuthenticated || false);
 
   const { data: cartPayload } = useCart({ enabled: isAuthenticated || false });
   const cartItems = cartPayload?.data?.items?.length;

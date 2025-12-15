@@ -64,7 +64,6 @@ export const useChat = (user) => {
     },
     [user._id]
   );
-  console.log("typing", isTyping);
 
   return { messages, sendMessage, isConnected, isTyping, sendTyping };
 };

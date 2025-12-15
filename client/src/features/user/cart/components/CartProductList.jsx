@@ -11,12 +11,20 @@ import {
 } from "../../../../components/common/StateDisplays";
 import CartItem from "./CartItem";
 import { MAX_QUANTITY_PER_ORDER } from "../../../../utils/constants.js";
+import { selectIsAuthenticated } from "../../account/authSlice.js";
+import { useSelector } from "react-redux";
 
 /**
  * The list of cart items. Reusable in cart page, checkout, etc.
  */
 export const CartProductList = () => {
-  const { data: cartPayload, isLoading, isError, error } = useCart();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const {
+    data: cartPayload,
+    isLoading,
+    isError,
+    error,
+  } = useCart({ enabled: isAuthenticated || false });
   const { mutate: incrementMutate } = useIncrementItem();
   const { mutate: decrementMutate } = useDecrementItem();
   const { mutate: removeMutate } = useRemoveItemFromCart();

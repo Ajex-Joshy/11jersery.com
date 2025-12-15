@@ -83,7 +83,6 @@ const AddCategory = () => {
       }
     }
   }, [offerEnabled, discountType, register, unregister, setValue]);
-  console.log(errors);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -111,7 +110,6 @@ const AddCategory = () => {
     if (data.image instanceof File) {
       formData.append("image", data.image);
     }
-    console.log("test");
     mutate(formData, {
       onError: (error) => {
         const apiError = error.response?.data?.error;

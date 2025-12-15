@@ -16,7 +16,6 @@ const Pagination = ({ pagination, onPageChange }) => {
     totalCoupons,
     totalRequests,
   } = pagination;
-  console.log("page", pagination);
 
   if (totalPages <= 1) {
     return null;
@@ -40,7 +39,6 @@ const Pagination = ({ pagination, onPageChange }) => {
     totalRequests;
 
   const endItem = Math.min(currentPage * limit, totalItem);
-  console.log(startItem, totalItem, endItem, totalPages);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center p-4 bg-white border-t border-gray-200">

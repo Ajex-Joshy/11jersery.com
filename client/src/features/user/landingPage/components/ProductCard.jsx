@@ -6,7 +6,6 @@ import StarRating from "../../../../components/common/StarRating";
 import { formatRupee } from "../../../../utils/currency";
 
 const ProductCard = ({ product }) => {
-  console.log("product card", product);
   // --- 2. Calculate discount ---
   const listPrice = product.price.list;
   const salePrice = product.price.sale;

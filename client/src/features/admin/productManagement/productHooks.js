@@ -62,7 +62,6 @@ export const useToggleProductList = () => {
       const previousProducts = allQueries;
 
       allQueries.forEach(([key, oldData]) => {
-        console.log("oldData", oldData);
         if (!oldData || !oldData.data || !oldData.data.products) return;
 
         queryClient.setQueryData(key, {
@@ -152,7 +151,6 @@ export const useUpdateProduct = () => {
       navigate("/admin/products");
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error.response?.data?.message || "Failed to update product.");
     },
   });

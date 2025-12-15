@@ -68,7 +68,6 @@ export const useAdminOrderDetails = (orderId) => {
       },
       onSuccess: async () => {
         toast.success("Item cancelled successfully");
-        console.log(["adminOrders", String(orderId)]);
         return queryClient.refetchQueries(["adminOrders", String(orderId)], {
           exact: true,
         });
@@ -121,7 +120,6 @@ export const useAdminReturnRequests = (params) => {
       const { data } = await axiosInstance.get("/admin/orders/returns", {
         params,
       });
-      console.log(data);
       return data;
     },
     keepPreviousData: true,

@@ -90,7 +90,6 @@ export const useVerifyEmailOtp = () => {
       queryClient.invalidateQueries(USER_PROFILE_KEY);
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error?.response?.data?.error?.message || "Invalid OTP");
     },
   });

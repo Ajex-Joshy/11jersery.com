@@ -32,7 +32,6 @@ const OrderStatusBadge = ({ status }) => {
 
 // --- Component: Single Order Card ---
 const OrderHistoryCard = ({ order }) => {
-  console.log("order", order);
   const navigate = useNavigate();
 
   // Get first few items for preview
@@ -94,7 +93,6 @@ const OrderHistoryCard = ({ order }) => {
         </div>
 
         {/* Summary Text */}
-        {console.log(order)}
         <div className="grow">
           <h4 className="font-semibold text-gray-900 mb-1">
             {order?.items.length === 1
@@ -237,7 +235,6 @@ const OrderHistoryPage = () => {
         </div>
       ) : (
         <div>
-          {console.log(orders)}
           {orders.map((order) => (
             <OrderHistoryCard key={order._id} order={order} />
           ))}

@@ -34,12 +34,10 @@ const SalesReportPage = () => {
     isError,
     error,
   } = useSalesReport(queryParams);
-  console.log("reportPayload", reportPayload);
 
   const reportData = reportPayload?.payload?.report || [];
   const summary = reportPayload?.payload?.summary;
   const pagination = reportPayload?.payload?.pagination;
-  console.log(queryParams);
 
   // 3. Handlers
   const onCustomFilterChange = (newValues) => {

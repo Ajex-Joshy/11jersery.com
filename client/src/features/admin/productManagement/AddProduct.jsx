@@ -43,7 +43,6 @@ const AddProduct = () => {
       coverImageIndex: 0,
     },
   });
-  console.log(errors);
 
   // --- Field Array Hooks ---
   const { fields: variantFields } = useFieldArray({

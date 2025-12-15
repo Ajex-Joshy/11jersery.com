@@ -18,7 +18,6 @@ const CartPage = () => {
     isError,
     error,
   } = useCart({ enabled: isAuthenticated || false });
-  console.log(cartPayload);
 
   const { mutate: clearMutate, isLoading: isClearing } = useClearCart();
 

@@ -19,7 +19,6 @@ import { formatRupee } from "../../../utils/currency.js";
 const DiscoverCard = ({ data }) => (
   <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
     <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-      {console.log(data.imageUrl)}
       {data?.imageUrl ? (
         <img
           src={data.imageUrl}
@@ -53,7 +52,6 @@ const CategoryManagement = () => {
     isError: isErrorCategories,
     error: errorCategories,
   } = useCategories(queryParams);
-  console.log(categoryData);
 
   const { mutate: toggleList, isLoading: isTogglingList } =
     useToggleCategoryList();

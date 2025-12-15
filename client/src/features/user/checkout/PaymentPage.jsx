@@ -15,6 +15,8 @@ import {
 import PaymentMethodOption from "./components/PaymentMethodOption";
 import { paymentMethods } from "../../../utils/constants";
 import { ICON_MAP } from "../../../utils/constants";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../account/authSlice";
 
 const PaymentPage = () => {
   const navigate = useNavigate();
@@ -22,7 +24,13 @@ const PaymentPage = () => {
   const { processOrder, isProcessing } = useProcessOrder();
   const selectedAddressId = location.state?.selectedAddressId;
 
-  const { data: cartPayload, isLoading, isError, error } = useCart();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const {
+    data: cartPayload,
+    isLoading,
+    isError,
+    error,
+  } = useCart({ enabled: isAuthenticated || false });
 
   const [selectedMethod, setSelectedMethod] = useState("wallet");
 

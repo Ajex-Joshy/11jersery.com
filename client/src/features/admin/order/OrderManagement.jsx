@@ -18,7 +18,6 @@ const OrderManagement = () => {
     defaultSortBy: "createdAt",
     defaultSortOrder: "desc",
   });
-  console.log(uiState);
 
   // 2. Fetch Data
   const {
@@ -27,7 +26,6 @@ const OrderManagement = () => {
     isError,
     error,
   } = useAdminOrders(queryParams);
-  console.log(ordersPayload);
   if (isError) return <ErrorDisplay error={error} />;
 
   const orders = ordersPayload?.data?.orders || [];
