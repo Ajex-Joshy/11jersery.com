@@ -25,7 +25,7 @@ const ChatContainer = () => {
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
         <MessageList
           messages={messages}
-          currentUser={user.firstName}
+          currentUser={user?.firstName || "Guest"}
           isTyping={isTyping}
         />
       </div>
