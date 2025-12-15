@@ -47,10 +47,10 @@ export const signupSchema = z
       })
       .optional()
       .or(z.literal("")),
-    otp: z
-      .string()
-      .length(6, { message: "OTP must be exactly 6 digits" })
-      .optional(),
+    // otp: z
+    //   .string()
+    //   .length(6, { message: "OTP must be exactly 6 digits" })
+    //   .optional(),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" })

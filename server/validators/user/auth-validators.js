@@ -103,10 +103,10 @@ export const signupSchema = Joi.object({
         "Password must include at least one special symbol",
     }),
   imageId: Joi.string().optional(),
-  firebaseToken: Joi.string().required().messages({
-    "string.base": "Firebase token must be a string",
-    "string.empty": "Firebase token is required",
-    "any.required": "Firebase token is required",
-  }),
+  // firebaseToken: Joi.string().required().messages({
+  //   "string.base": "Firebase token must be a string",
+  //   "string.empty": "Firebase token is required",
+  //   "any.required": "Firebase token is required",
+  // }),
   referralCode: Joi.string().max(20).optional(),
 });

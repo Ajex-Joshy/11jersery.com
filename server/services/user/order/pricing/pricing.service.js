@@ -14,7 +14,30 @@ import { applyCouponDiscount } from "./coupon-discount.service.js";
 import { checkReferralBonus } from "./referral-bonus.service.js";
 
 export const calculateOrderPrice = async (cart) => {
+  if (!cart || !cart.items || !Array.isArray(cart.items)) {
+    return {
+      subtotal: 0,
+      discount: 0,
+      specialDiscount: 0,
+      couponDiscount: 0,
+      referralBonus: 0,
+      deliveryFee: 0,
+      total: 0,
+    };
+  }
+
   const items = cart.items;
+  if (items.length === 0) {
+    return {
+      subtotal: 0,
+      discount: 0,
+      specialDiscount: 0,
+      couponDiscount: 0,
+      referralBonus: 0,
+      deliveryFee: 0,
+      total: 0,
+    };
+  }
   const couponCode = cart.couponCode;
   const productIds = items.map((i) => i.productId);
   const products = await Product.find({ _id: { $in: productIds } });

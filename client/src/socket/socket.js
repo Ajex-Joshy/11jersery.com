@@ -5,5 +5,6 @@ const socketUrl = env.VITE_SOCKET_URL;
 
 export const socket = io(socketUrl, {
   autoConnect: false,
+  transports: ["websocket"],
   withCredentials: true,
 });

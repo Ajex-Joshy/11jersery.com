@@ -15,7 +15,7 @@ export const signupUser = async (userData) => {
     email,
     phone,
     password,
-    firebaseToken,
+    // firebaseToken,
     referralCode,
   } = userData;
 
@@ -28,7 +28,7 @@ export const signupUser = async (userData) => {
     );
 
   // Firebase verification
-  await verifyFirebaseToken(firebaseToken, phone);
+  // await verifyFirebaseToken(firebaseToken, phone);
 
   // Handle referral
   const referrer = await handleReferral(email, referralCode);
@@ -119,22 +119,22 @@ export const logoutUser = async (userId, accessToken) => {
   return { message: "User successfully logged out." };
 };
 
-/** Helpers for modularity **/
-const verifyFirebaseToken = async (firebaseToken, phone) => {
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-    if (decodedToken.phone_number !== phone)
-      throw new Error("Phone number mismatch");
-    return decodedToken;
-  } catch (error) {
-    logger.error(error);
-    throw new AppError(
-      STATUS_CODES.BAD_REQUEST,
-      "INVALID_TOKEN",
-      "Invalid or expired Firebase token."
-    );
-  }
-};
+// /** Helpers for modularity **/
+// const verifyFirebaseToken = async (firebaseToken, phone) => {
+//   try {
+//     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+//     if (decodedToken.phone_number !== phone)
+//       throw new Error("Phone number mismatch");
+//     return decodedToken;
+//   } catch (error) {
+//     logger.error(error);
+//     throw new AppError(
+//       STATUS_CODES.BAD_REQUEST,
+//       "INVALID_TOKEN",
+//       "Invalid or expired Firebase token."
+//     );
+//   }
+// };
 
 const handleReferral = async (email, referralCode) => {
   if (!referralCode) return null;

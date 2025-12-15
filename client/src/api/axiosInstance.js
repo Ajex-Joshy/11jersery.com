@@ -59,6 +59,26 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle blocked user (403)
+    console.log("Error Response:", error.response);
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.error?.code === "USER_BLOCKED"
+    ) {
+      localStorage.removeItem("token");
+
+      if (clearUserStoreCallback) clearUserStoreCallback();
+
+      toast.error(
+        error.response?.data?.error?.message ||
+          "Your account has been blocked by admin"
+      );
+
+      if (openLoginModalCallback) openLoginModalCallback();
+
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&

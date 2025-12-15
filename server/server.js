@@ -17,6 +17,7 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import { initializeSocket } from "./socket/socketHandler.js";
+import e from "express";
 
 const app = express();
 
@@ -31,7 +32,7 @@ app.use(cookieParser());
 const httpLogger = pinoHttp({
   logger,
 });
-
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "10kb" }));
 app.use(httpLogger);
 
@@ -62,9 +63,11 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: [env.FRONTEND_URL, env.FRONTEND_URL_2],
     methods: ["GET", "POST"],
     credentials: true,
+    pingTimeout: 60000,
+    pingInterval: 25000,
   },
 });
 

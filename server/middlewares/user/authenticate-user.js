@@ -44,7 +44,6 @@ export const authenticateUser = async (req, res, next) => {
       );
     const user = await User.findOne({
       _id: decoded?.user?._id,
-      isBlocked: false,
       isDeleted: false,
     });
     if (!user)
@@ -53,7 +52,21 @@ export const authenticateUser = async (req, res, next) => {
         "USER_NOT_FOUND",
         "User does not exist"
       );
+    if (!user) {
+      throw new AppError(
+        STATUS_CODES.NOT_FOUND,
+        "USER_NOT_FOUND",
+        "User does not exist"
+      );
+    }
 
+    if (user.isBlocked) {
+      throw new AppError(
+        STATUS_CODES.FORBIDDEN,
+        "USER_BLOCKED",
+        "Your account has been blocked by admin"
+      );
+    }
     req.user = user;
     next();
   } catch (err) {

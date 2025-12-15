@@ -10,15 +10,15 @@ import { FormInput } from "../../../../components/common/FormComponents";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { auth } from "../../../../config/firebaseConfig";
+// import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+// import { auth } from "../../../../config/firebaseConfig";
 const SignupForm = () => {
   const { mutate: signupMutate, isLoading: isSigningUp } = useSignup();
   const dispatch = useDispatch();
 
-  const [view, setView] = useState("form");
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  // const [view, setView] = useState("form");
+  // const [isSendingOtp, setIsSendingOtp] = useState(false);
+  // const [confirmationResult, setConfirmationResult] = useState(null);
 
   const {
     register,
@@ -29,111 +29,95 @@ const SignupForm = () => {
     setError,
   } = useForm({
     resolver: zodResolver(signupSchema),
-    defaultValues: {},
+    defaultValues: {
+      firstName: "Test",
+      lastName: "User",
+      email: "testuser@example.com",
+      phone: "+919876543210",
+      password: "Test@123",
+      confirmPassword: "Test@123",
+    },
   });
 
   // --- Firebase: Setup reCAPTCHA ---
-  useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: () => {
-            console.log("reCAPTCHA solved");
-          },
-          "expired-callback": () => {
-            toast.error("reCAPTCHA expired. Please try again.");
-          },
-        }
-      );
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!window.recaptchaVerifier) {
+  //     window.recaptchaVerifier = new RecaptchaVerifier(
+  //       auth,
+  //       "recaptcha-container",
+  //       {
+  //         size: "invisible",
+  //         callback: () => {
+  //           console.log("reCAPTCHA solved");
+  //         },
+  //         "expired-callback": () => {
+  //           toast.error("reCAPTCHA expired. Please try again.");
+  //         },
+  //       }
+  //     );
+  //   }
+  // }, []);
 
-  const handleSendOtp = async () => {
-    const fieldsToValidate = [
-      "firstName",
-      "lastName",
-      "email",
-      "phone",
-      "password",
-      "confirmPassword",
-    ];
-    const isValid = await trigger(fieldsToValidate);
+  // const handleSendOtp = async () => {
+  //   const fieldsToValidate = [
+  //     "firstName",
+  //     "lastName",
+  //     "email",
+  //     "phone",
+  //     "password",
+  //     "confirmPassword",
+  //   ];
+  //   const isValid = await trigger(fieldsToValidate);
 
-    if (!isValid) {
-      toast.error("Please fill in all required fields correctly.");
-      return;
-    }
+  //   if (!isValid) {
+  //     toast.error("Please fill in all required fields correctly.");
+  //     return;
+  //   }
 
-    const phone = getValues("phone");
-    const appVerifier = window.recaptchaVerifier;
+  //   const phone = getValues("phone");
+  //   const appVerifier = window.recaptchaVerifier;
 
-    setIsSendingOtp(true);
-    toast.loading("Sending OTP...");
+  //   setIsSendingOtp(true);
+  //   toast.loading("Sending OTP...");
 
-    try {
-      const result = await signInWithPhoneNumber(auth, phone, appVerifier);
-      setConfirmationResult(result);
-      setView("otp"); // Switch to OTP view
-      toast.dismiss();
-      toast.success("OTP sent successfully!");
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.message || "Failed to send OTP.");
-      // Reset reCAPTCHA if it fails
-      if (
-        window.grecaptcha &&
-        window.recaptchaVerifier.widgetId !== undefined
-      ) {
-        window.grecaptcha.reset(window.recaptchaVerifier.widgetId);
-      }
-    } finally {
-      setIsSendingOtp(false);
-    }
-  };
+  //   try {
+  //     const result = await signInWithPhoneNumber(auth, phone, appVerifier);
+  //     setConfirmationResult(result);
+  //     setView("otp"); // Switch to OTP view
+  //     toast.dismiss();
+  //     toast.success("OTP sent successfully!");
+  //   } catch (error) {
+  //     toast.dismiss();
+  //     toast.error(error.message || "Failed to send OTP.");
+  //     // Reset reCAPTCHA if it fails
+  //     if (
+  //       window.grecaptcha &&
+  //       window.recaptchaVerifier.widgetId !== undefined
+  //     ) {
+  //       window.grecaptcha.reset(window.recaptchaVerifier.widgetId);
+  //     }
+  //   } finally {
+  //     setIsSendingOtp(false);
+  //   }
+  // };
 
   const onSubmit = async (data) => {
-    if (!confirmationResult) {
-      toast.error("Please send and verify your OTP first.");
-      return;
-    }
+    const {
+      confirmPassword: _confirmPassword,
+      otp: _otp,
+      ...signupData
+    } = data;
 
-    // Manually check if OTP is present
-    if (!data.otp || data.otp.length !== 6) {
-      setError("otp", { type: "manual", message: "OTP must be 6 digits." });
-      return;
-    }
-
-    toast.loading("Verifying OTP...");
-
-    try {
-      const userCredential = await confirmationResult.confirm(data.otp);
-      const user = userCredential.user;
-
-      const firebaseToken = await user.getIdToken();
-      toast.dismiss();
-
-      const {
-        confirmPassword: _confirmPassword,
-        otp: _otp,
-        ...signupData
-      } = data;
-      signupMutate({
-        ...signupData,
-        firebaseToken,
-        referralCode: localStorage.getItem("referral-code") || null,
-      });
-    } catch {
-      toast.dismiss();
-      setError("otp", { type: "manual", message: "Invalid or expired OTP." });
-    }
+    signupMutate({
+      ...signupData,
+      firebaseToken: "",
+      referralCode: localStorage.getItem("referral-code") || null,
+    });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Invisible reCAPTCHA container */}
+      {/* 
       <div
         id="recaptcha-container"
         style={{
@@ -142,11 +126,12 @@ const SignupForm = () => {
           left: "-9999px",
         }}
       ></div>
+      */}
 
       <h2 className="text-2xl font-bold text-center mb-6">Create an Account</h2>
 
       {/* --- Fields visible in 'form' view --- */}
-      <div className={view === "form" ? "space-y-4" : "hidden"}>
+      <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormInput
             id="signup-firstName"
@@ -203,7 +188,7 @@ const SignupForm = () => {
         />
       </div>
 
-      {/* --- Field visible in 'otp' view --- */}
+      {/* 
       {view === "otp" && (
         <FormInput
           id="signup-otp"
@@ -217,28 +202,16 @@ const SignupForm = () => {
           className="tracking-[0.3em] text-center" // Adds spacing
         />
       )}
+      */}
 
-      {/* --- Conditional Submit Button --- */}
-      {view === "form" ? (
-        <button
-          type="button" // Important: Not a submit button
-          onClick={handleSendOtp}
-          disabled={isSendingOtp}
-          className="w-full bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 flex items-center justify-center"
-        >
-          {isSendingOtp && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {isSendingOtp ? "Sending OTP..." : "Send OTP"}
-        </button>
-      ) : (
-        <button
-          type="submit"
-          disabled={isSigningUp}
-          className="w-full bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 flex items-center justify-center"
-        >
-          {isSigningUp && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {isSigningUp ? "Creating Account..." : "Verify & Create Account"}
-        </button>
-      )}
+      <button
+        type="submit"
+        disabled={isSigningUp}
+        className="w-full bg-black text-white py-3 rounded-md font-semibold hover:bg-gray-800 transition disabled:opacity-50 flex items-center justify-center"
+      >
+        {isSigningUp && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+        {isSigningUp ? "Creating Account..." : "Create Account"}
+      </button>
 
       {/* --- Switch to Login --- */}
       <p className="text-sm text-center text-gray-600 pt-2">

@@ -16,8 +16,6 @@ export const useChat = (user) => {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-
     socket.auth = getSocketIdentity(user);
     socket.connect();
     setIsConnected(true);
@@ -46,8 +44,8 @@ export const useChat = (user) => {
       setIsTyping(true);
 
       const messageData = {
-        userId: user._id,
-        author: user.username,
+        userId: user?._id,
+        author: user?.username,
         message: text,
         time: new Date().toISOString(),
       };
@@ -60,9 +58,9 @@ export const useChat = (user) => {
 
   const sendTyping = useCallback(
     (isTypingStatus) => {
-      socket.emit(isTypingStatus ? "typing" : "stop_typing", user._id);
+      socket.emit(isTypingStatus ? "typing" : "stop_typing", user?._id);
     },
-    [user._id]
+    [user?._id]
   );
 
   return { messages, sendMessage, isConnected, isTyping, sendTyping };

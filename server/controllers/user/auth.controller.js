@@ -14,13 +14,13 @@ import {
 } from "../../services/user/auth/password.services.js";
 
 export const userSignupController = asyncHandler(async (req, res) => {
-  if (!req.body.firebaseToken) {
-    throw new AppError(
-      STATUS_CODES.BAD_REQUEST,
-      "VALIDATION_ERROR",
-      "Firebase verification token is missing."
-    );
-  }
+  // if (!req.body.firebaseToken) {
+  //   throw new AppError(
+  //     STATUS_CODES.BAD_REQUEST,
+  //     "VALIDATION_ERROR",
+  //     "Firebase verification token is missing."
+  //   );
+  // }
   const { user, accessToken, refreshToken } = await signupUser(req.body);
   setRefreshToken(res, refreshToken);
   sendResponse(res, { user, token: accessToken }, STATUS_CODES.CREATED);
