@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminLayout from "../layouts/adminLayout";
-import * as Pages from "./adminLazyPages";
+import * as Pages from "./AdminLazyPages";
 import CouponManagementPage from "../features/admin/coupon/CouponManagementPage";
 import SalesReportPage from "../features/admin/report/SalesReportPage";
 

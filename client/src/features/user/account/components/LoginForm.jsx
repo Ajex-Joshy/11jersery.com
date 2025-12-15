@@ -20,10 +20,7 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      identifier: "ajex.brototype@gmail.com",
-      password: "Ajex@123",
-    },
+    defaultValues: {},
   });
   console.log(errors);
   const onSubmit = (data) => {

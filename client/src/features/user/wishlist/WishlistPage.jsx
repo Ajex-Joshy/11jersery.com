@@ -7,8 +7,17 @@ import {
   LoadingSpinner,
   ErrorDisplay,
 } from "../../../components/common/StateDisplays";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../account/authSlice";
 const WishlistPage = () => {
-  const { data: wishlistPayload, isLoading, isError, error } = useWishlist();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const {
+    data: wishlistPayload,
+    isLoading,
+    isError,
+    error,
+  } = useWishlist({ enabled: isAuthenticated || false });
   const { mutate: toggleWishlist, isLoading: isToggling } = useToggleWishlist();
   console.log("wishlistPayload", wishlistPayload);
 

@@ -16,7 +16,11 @@ export const loginAdmin = createAsyncThunk(
       const response = await axiosInstance.post("/admin/auth/login", loginData);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || "Login failed");
+      return rejectWithValue(
+        error?.response?.data?.error?.message ||
+          error?.response?.data?.message ||
+          "Login failed"
+      );
     }
   }
 );

@@ -13,7 +13,7 @@ import {
   useAllCategories,
 } from "./productHooks.js";
 
-import ProductImageDropzone from "../../../components/admin/ProductImageDropZone.jsx";
+import ProductImageDropzone from "../../../components/admin/ProductImageDropzone.jsx";
 import { S3_URL } from "../../../utils/constants";
 import { FormInput } from "../../../components/common/FormComponents.jsx";
 import { FormTextarea } from "../../../components/common/FormComponents.jsx";

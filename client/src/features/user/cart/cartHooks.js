@@ -14,11 +14,13 @@ import { MAX_QUANTITY_PER_ORDER } from "../../../utils/constants";
 
 export const CART_KEY = "Cart";
 
-export const useCart = () => {
+export const useCart = ({ enabled = true }) => {
+  console.log("useCart enabled:", enabled);
   return useQuery({
     queryKey: [CART_KEY],
     queryFn: () => getCart(),
     staleTime: 1000 * 60 * 5,
+    enabled: enabled ? true : false,
     onError: (err) => {
       toast.error(
         err?.response?.data?.error?.message ||

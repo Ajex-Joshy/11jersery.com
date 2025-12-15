@@ -29,15 +29,7 @@ const SignupForm = () => {
     setError,
   } = useForm({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      firstName: "Ajex",
-      lastName: "Joshy",
-      email: "test@gmail.com",
-      phone: "+918547677320",
-      password: "Test@123",
-      confirmPassword: "Test@123",
-      otp: "",
-    },
+    defaultValues: {},
   });
 
   // --- Firebase: Setup reCAPTCHA ---
@@ -161,12 +153,14 @@ const SignupForm = () => {
           <FormInput
             id="signup-firstName"
             label="First Name"
+            placeholder="John"
             {...register("firstName")}
             error={errors.firstName?.message}
             autoComplete="given-name"
           />
           <FormInput
             id="signup-lastName"
+            placeholder="Doe"
             label="Last Name"
             {...register("lastName")}
             error={errors.lastName?.message}

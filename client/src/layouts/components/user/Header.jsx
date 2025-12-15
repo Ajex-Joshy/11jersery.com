@@ -15,9 +15,13 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: cartPayload } = useCart();
+  console.log(isAuthenticated || false);
+
+  const { data: cartPayload } = useCart({ enabled: isAuthenticated || false });
   const cartItems = cartPayload?.data?.items?.length;
-  const { data: wishlistPayload } = useWishlist();
+  const { data: wishlistPayload } = useWishlist({
+    enabled: isAuthenticated || false,
+  });
   const whislistItems = wishlistPayload?.payload?.products?.length;
 
   const handleOpenLogin = () => dispatch(openAuthModal("login"));
@@ -51,15 +55,15 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link to="/" className="text-2xl font-bold">
-            11jersey.com
+            11jersey.shop
           </Link>
           <div className="hidden md:flex gap-6 text-sm">
-            <NavLink to="/">Club</NavLink>
-            <NavLink to="/products?category=player-edition-jerseys">
-              Player
+            <NavLink to="/products?category=cub-jerseys">Club</NavLink>
+            <NavLink to="/products?category=player-edition">Player</NavLink>
+            <NavLink to="/products?category=limited-edition">
+              Limited Editions
             </NavLink>
-            <NavLink to="/collections/national">National</NavLink>
-            <NavLink to="/collections/limited">Limited Editions</NavLink>
+            <NavLink to="/products?category=top-selling">Top Selling</NavLink>
           </div>
         </div>
 

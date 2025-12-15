@@ -42,7 +42,6 @@ const AdminLogin = () => {
               type="email"
               id="email"
               name="email"
-              defaultValue={"ajex.joshy@11jersey.com"}
               className={`border p-2 rounded ${
                 errors.email ? "border-red-500" : "border-gray-300"
               }`}
@@ -69,7 +68,6 @@ const AdminLogin = () => {
               type="password"
               id="password"
               name="password"
-              defaultValue={"Ajex@12345"}
               className={`border p-2 rounded ${
                 errors.password ? "border-red-500" : "border-gray-300"
               }`}

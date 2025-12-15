@@ -9,9 +9,12 @@ import { useAddItemToCart, useCart } from "../../cart/cartHooks";
 import { MAX_QUANTITY_PER_ORDER } from "../../../../utils/constants";
 import { useToggleWishlist, useWishlist } from "../../wishlist/wishlistHooks";
 import { formatRupee } from "../../../../utils/currency";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../account/authSlice";
 
 const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
   const { title, rating, shortDescription, price, variants } = product;
+  const isAurhenticated = useSelector(selectIsAuthenticated);
 
   // State for user selections
   const [selectedSize, setSelectedSize] = useState(null);
@@ -19,11 +22,13 @@ const ProductPurchaseForm = ({ product, onOpenSizeGuide }) => {
 
   // API Hooks
   const { mutate: addItemToCart, isPending } = useAddItemToCart();
-  const { data: cart } = useCart();
+  const { data: cart } = useCart({ enabled: isAurhenticated || false });
 
   const { mutate: toggleWishlist, isLoading: isTogglingWishlist } =
     useToggleWishlist();
-  const { data: wishlistPayload, isLoading: isWishlistLoading } = useWishlist();
+  const { data: wishlistPayload, isLoading: isWishlistLoading } = useWishlist({
+    enabled: isAurhenticated || false,
+  });
 
   const isInWishlist = useMemo(() => {
     const wishlistItems = wishlistPayload?.payload?.products || [];

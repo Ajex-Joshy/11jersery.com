@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { categorySchema } from "./categorySchema"; // Adjust path if needed
 import { useAddCategory } from "./categoryHooks"; // Adjust path if needed
-import ImageDropzone from "../../../components/admin/ImageDropZone";
+import ImageDropzone from "../../../components/admin/ImageDropzone";
 import { FormInput } from "../../../components/common/FormComponents";
 
 // --- Main AddCategory Component ---

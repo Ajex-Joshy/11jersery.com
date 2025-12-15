@@ -12,7 +12,7 @@ export const authenticateUser = async (req, res, next) => {
       throw new AppError(
         STATUS_CODES.UNAUTHORIZED,
         "UNAUTHORIZED",
-        "Authentication token is missing or invalid."
+        "Please log in to continue."
       );
     }
 

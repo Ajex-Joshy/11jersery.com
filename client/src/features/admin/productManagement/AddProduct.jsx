@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { Plus, Trash2, Image as ImageIcon } from "lucide-react"; // Add icons
 import { productSchema } from "./productSchema";
 import { useAddProduct, useAllCategories } from "./productHooks";
-import ProductImageDropzone from "../../../components/admin/ProductImageDropZone";
+import ProductImageDropzone from "../../../components/admin/ProductImageDropzone";
 import { FormInput } from "../../../components/common/FormComponents";
 import { FormTextarea } from "../../../components/common/FormComponents";
 

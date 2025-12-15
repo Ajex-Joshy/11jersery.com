@@ -9,7 +9,7 @@ import { categorySchema } from "./categorySchema";
 import { useCategoryDetails, useUpdateCategory } from "./categoryHooks";
 // Removed unused import: import { sl } from "zod/v4/locales";
 import { S3_URL } from "../../../utils/constants"; // Ensure path is correct
-import ImageDropzone from "../../../components/admin/ImageDropZone";
+import ImageDropzone from "../../../components/admin/ImageDropzone";
 import { FormInput } from "../../../components/common/FormComponents";
 
 const EditCategory = () => {
