@@ -4,11 +4,12 @@ import toast from "react-hot-toast";
 
 export const WISHLIST_KEY = "wishlist";
 
-export const useWishlist = () => {
+export const useWishlist = ({ enabled }) => {
   return useQuery({
     queryKey: [WISHLIST_KEY],
     queryFn: getWishlist,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: enabled ? true : false,
   });
 };
 

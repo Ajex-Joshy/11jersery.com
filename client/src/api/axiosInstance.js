@@ -13,6 +13,13 @@ export const setClearUserStore = (callback) => {
 };
 
 // Prevent repeated session expiration trigger
+const AUTH_ROUTES = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+];
+
 let isSessionExpiredHandled = false;
 
 // Refresh queue handler variables
@@ -55,7 +62,9 @@ axiosInstance.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh-token")
+      !originalRequest.url.includes("/auth/refresh-token") &&
+      !AUTH_ROUTES.some((route) => originalRequest.url.includes(route)) &&
+      localStorage.getItem("token")
     ) {
       originalRequest._retry = true;
 
@@ -63,11 +72,7 @@ axiosInstance.interceptors.response.use(
         if (!isRefreshing) {
           isRefreshing = true;
 
-          const res = await axios({
-            method: "post",
-            url: `${import.meta.env.VITE_BASE_URL}/auth/refresh-token`,
-            withCredentials: true,
-          });
+          const res = await axiosInstance.post("/auth/refresh-token");
 
           const newAccessToken = res.data.token;
 
@@ -92,8 +97,8 @@ axiosInstance.interceptors.response.use(
           });
         });
       } catch (err) {
-        processQueue(err, null);
         localStorage.removeItem("token");
+        processQueue(err, null);
 
         if (!isSessionExpiredHandled) {
           isSessionExpiredHandled = true;

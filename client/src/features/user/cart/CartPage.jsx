@@ -7,9 +7,17 @@ import { OrderSummary } from "../../../components/user/OrderSummary";
 import { ErrorDisplay } from "../../../components/common/StateDisplays";
 import { EmptyCart } from "./components/EmptyCart";
 import CartPageSkeleton from "./components/CartSkelton";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../account/authSlice";
 
 const CartPage = () => {
-  const { data: cartPayload, isLoading, isError, error } = useCart();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const {
+    data: cartPayload,
+    isLoading,
+    isError,
+    error,
+  } = useCart({ enabled: isAuthenticated || false });
   console.log(cartPayload);
 
   const { mutate: clearMutate, isLoading: isClearing } = useClearCart();
