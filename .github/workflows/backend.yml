@@ -38,15 +38,13 @@ jobs:
           git reset --hard origin/main
           git clean -fd
 
-          #  Create env file
-          echo "🔐 Creating server/.env.production"
-          cd server
-
-          cat << 'ENVEOF' > .env.production
+          echo " Creating server/.env.production"
+          mkdir -p server
+          cat << 'ENVEOF' > server/.env.production
           ${{ secrets.SERVER_ENV_PRODUCTION }}
           ENVEOF
 
-          chmod 600 .env.production
+          chmod 600 server/.env.production
 
           echo " Deploying backend containers"
           docker compose -f docker-compose.prod.yml down
