@@ -15,7 +15,6 @@ import { MAX_QUANTITY_PER_ORDER } from "../../../utils/constants";
 export const CART_KEY = "Cart";
 
 export const useCart = ({ enabled = true }) => {
-  console.log("useCart enabled:", enabled);
   return useQuery({
     queryKey: [CART_KEY],
     queryFn: () => getCart(),

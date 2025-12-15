@@ -15,7 +15,7 @@ export const getPaginatedReviews = async ({
   minRating,
 } = {}) => {
   const { pageNumber, pageSize, skip } = getPagination(page, limit);
-  const query = buildReviewQuery({ productId, minRating });
+  const query = buildReviewQuery({ minRating });
   const sort = { rating: -1, createdAt: -1 };
 
   const [reviews, totalReviews] = await Promise.all([

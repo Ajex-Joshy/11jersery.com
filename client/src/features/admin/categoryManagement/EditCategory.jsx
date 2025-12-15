@@ -63,7 +63,6 @@ const EditCategory = () => {
       const category = categoryDetailsData.data;
       const hasOffer =
         category.discount > 0 && category.discountType ? true : false;
-      console.log("cat data", categoryDetailsData.data);
 
       reset({
         title: category.title,
@@ -135,7 +134,6 @@ const EditCategory = () => {
 
   // Construct existing image URL safely
 
-  console.log(errors);
   // --- Handle Form Submission ---
   const onSubmit = (data) => {
     const originalData = categoryDetailsData?.data;
@@ -245,9 +243,6 @@ const EditCategory = () => {
       return;
     }
 
-    for (const [key, value] of formData.entries()) {
-      console.log("formData", key, value);
-    }
     // --- Call Mutation ---
     const id = originalData._id;
     updateMutate(

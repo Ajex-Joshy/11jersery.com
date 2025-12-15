@@ -34,7 +34,6 @@ export const initializeSocket = (io) => {
           data: response.data,
           time: new Date().toISOString(),
         };
-        // console.log("msg", aiMessageData);
         io.to(personalRoom).emit("stop_typing");
         io.to(personalRoom).emit("receive_message", aiMessageData);
         //  saveToDb(socket.user.userId, message, 'Human');

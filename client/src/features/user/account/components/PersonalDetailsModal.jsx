@@ -52,7 +52,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
   }, [user, isOpen, reset, clearErrors]);
 
   useEffect(() => {
-    console.log(watchedEmail, user.email);
     if (user) {
       setEmailChanged(watchedEmail !== user.email);
       if (watchedEmail === user.email) {
@@ -83,7 +82,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
           clearErrors("otp");
         },
         onError: (error) => {
-          console.log(error);
           toast.error(
             error?.response?.data?.error?.message || "Failed to send OTP."
           );
@@ -140,14 +138,10 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
 
     if (data.firstName !== user.firstName) {
       changedFields.firstName = data.firstName;
-      console.log(data.firstName, user.firstName, changedFields);
     }
 
     if (data.lastName !== user.lastName) changedFields.lastName = data.lastName;
-    {
-      console.log("data", data);
-      console.log(data.email, user.email);
-    }
+
     if (data.email) {
       if (data.email !== user.email) {
         if (!otpVerified) {
@@ -166,7 +160,6 @@ export const PersonalDetailsModal = ({ isOpen, onClose, user }) => {
         changedFields.email = data.email;
       }
     }
-    console.log("changedFields", changedFields);
 
     if (Object.keys(changedFields).length > 0) {
       mutate(changedFields, {

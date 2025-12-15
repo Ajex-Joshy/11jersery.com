@@ -6,30 +6,25 @@ export const getOrders = async (params) => {
 };
 export const getOrderDetails = async (orderId) => {
   const response = await axiosInstance.get(`/orders/${orderId}`);
-  console.log(orderId, response.data);
   return response.data;
 };
 
 export const placeCODOrder = async (orderData) => {
-  console.log(orderData);
   const response = await axiosInstance.post("/orders/cod", orderData);
   return response.data;
 };
 
 export const placeWalletOrder = async (orderData) => {
   const response = await axiosInstance.post("/orders/wallet", orderData);
-  console.log(response.data);
   return response.data;
 };
 
 export const placeOnlineOrder = async (orderData) => {
-  console.log(orderData);
   const response = await axiosInstance.post("/orders/online", orderData);
   return response.data;
 };
 
 export const verifyRazorpayOrder = async (paymentDetails) => {
-  console.log("paymentDetails", paymentDetails);
   const response = await axiosInstance.post("/orders/verify-online-order", {
     paymentDetails,
   });
@@ -37,7 +32,6 @@ export const verifyRazorpayOrder = async (paymentDetails) => {
 };
 
 export const cancelOrder = async ({ orderId, reason }) => {
-  console.log(orderId, reason);
   const response = await axiosInstance.post(`/orders/${orderId}/cancel`, {
     reason,
   });
@@ -45,7 +39,6 @@ export const cancelOrder = async ({ orderId, reason }) => {
 };
 
 export const cancelItem = async ({ orderId, itemId, reason }) => {
-  console.log(orderId, itemId);
   const response = await axiosInstance.post(
     `/orders/${orderId}/items/${itemId}/cancel`,
     { reason }

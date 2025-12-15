@@ -142,12 +142,6 @@ const EditProduct = () => {
       // (url) => !imagesToDelete.includes(url.replace(`${S3_URL}/`, ""))
       (url) => url
     ) || [];
-  console.log(
-    "filteredInitialUrls",
-    filteredInitialUrls,
-    "urls",
-    productDetailsPayload?.data?.product?.imageUrls
-  );
 
   const onSubmit = (data) => {
     if (!originalData) return;

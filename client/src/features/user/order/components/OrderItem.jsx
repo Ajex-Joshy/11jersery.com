@@ -11,7 +11,6 @@ export const OrderItem = ({ item, onCancelItem, onReturnItem, canReturn }) => {
     "Return Rejected",
   ].includes(item.status);
   const canCancel = ["Pending", "Processing"].includes(item.status);
-  console.log(item.status, canCancel);
 
   // Simple status color logic
   const getStatusColor = (s) => {

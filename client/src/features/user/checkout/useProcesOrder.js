@@ -23,8 +23,6 @@ export const useProcessOrder = () => {
   const { mutate: razorpayVerifyMutation } = useRazorpayVerify();
 
   const processOrder = (method, selectedAddressId, total) => {
-    console.log("total", total);
-
     if (!method) {
       toast.error("Please select a payment method");
       return;
@@ -86,7 +84,6 @@ export const useProcessOrder = () => {
         {
           onSuccess: (razorOrder) => {
             const { amount, currency, razorpayOrderId } = razorOrder.data;
-            console.log(amount, currency, razorpayOrderId);
             const razor = new window.Razorpay({
               key: env.VITE_RAZORPAY_KEY_ID,
               amount,
@@ -101,7 +98,6 @@ export const useProcessOrder = () => {
                 },
               },
               handler: (paymentResult) => {
-                console.log("paymentResult", paymentResult);
                 razorpayVerifyMutation(
                   {
                     razorpayOrderId: paymentResult.razorpay_order_id,
@@ -130,7 +126,6 @@ export const useProcessOrder = () => {
             setIsProcessing(false);
           },
           onError: (err) => {
-            console.log(err);
             setIsProcessing(false);
             toast.error("Unable to initiate Razorpay payment");
           },

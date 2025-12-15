@@ -57,7 +57,7 @@ const Footer = () => {
 
       <div className="py-6 text-sm text-gray-500 flex justify-between px-6">
         <p>
-          &copy; {new Date().getFullYear()} 11jersey.com All Rights Reserved
+          &copy; {new Date().getFullYear()} 11jersey.shop All Rights Reserved
         </p>
       </div>
     </footer>

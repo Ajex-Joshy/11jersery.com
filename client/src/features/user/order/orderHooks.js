@@ -65,7 +65,6 @@ export const useWalletPay = () => {
       queryClient.invalidateQueries(ORDER_KEYS.all);
     },
     onError: (err) => {
-      console.log("err", err);
       toast.error(
         err?.response?.data?.error?.message || "Something went wrong"
       );

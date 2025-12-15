@@ -22,7 +22,6 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {},
   });
-  console.log(errors);
   const onSubmit = (data) => {
     loginMutate(data, {
       onError: (error) => {

@@ -19,7 +19,6 @@ const WishlistPage = () => {
     error,
   } = useWishlist({ enabled: isAuthenticated || false });
   const { mutate: toggleWishlist, isLoading: isToggling } = useToggleWishlist();
-  console.log("wishlistPayload", wishlistPayload);
 
   // Track which item is being removed to show spinner on specific card
   const [removingId, setRemovingId] = useState(null);

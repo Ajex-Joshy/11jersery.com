@@ -59,7 +59,6 @@ const AddAddressPage = () => {
 
   const onSubmit = (data) => {
     if (isEditMode) {
-      console.log("id", addressId);
       updateAddress(
         { addressId, data },
         {

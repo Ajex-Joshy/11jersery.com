@@ -51,7 +51,6 @@ const ProductList = () => {
     isError: isErrorProducts,
     error: errorProducts,
   } = useProducts(queryParams);
-  console.log(productData);
 
   // Fetch categories for the filter dropdown
   const { data: categoriesData } = useAllCategories();

@@ -16,7 +16,6 @@ export const addAddress = async (addressData) => {
 };
 
 export const updateAddress = async (id, addressData) => {
-  console.log("Api", id, addressData);
   const response = await axiosInstance.patch(`/address/${id}`, addressData);
   return response.data;
 };

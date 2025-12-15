@@ -4,7 +4,6 @@ import axiosInstance from "../../../api/axiosInstance";
  */
 export const getCoupons = async (params) => {
   const { data } = await axiosInstance.get("/admin/coupons", { params });
-  console.log(data);
   return data; // Expects { payload: { coupons: [], pagination: {} } }
 };
 

@@ -75,13 +75,11 @@ const SignupForm = () => {
 
     try {
       const result = await signInWithPhoneNumber(auth, phone, appVerifier);
-      console.log(result);
       setConfirmationResult(result);
       setView("otp"); // Switch to OTP view
       toast.dismiss();
       toast.success("OTP sent successfully!");
     } catch (error) {
-      console.log(error);
       toast.dismiss();
       toast.error(error.message || "Failed to send OTP.");
       // Reset reCAPTCHA if it fails

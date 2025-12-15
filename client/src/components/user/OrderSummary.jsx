@@ -9,6 +9,8 @@ import {
   useRemoveCoupon,
 } from "../../features/user/cart/couponHooks";
 import { formatRupee } from "../../utils/currency.js";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "../../features/user/account/authSlice.js";
 
 /**
  * Reusable component for showing order totals.
@@ -32,13 +34,13 @@ export const OrderSummary = ({ isCheckoutPage }) => {
     applyCoupon(couponInput);
     setCouponInput("");
   };
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const {
     data: cartPayload,
     isLoading: isCartLoading,
     isError,
     error,
-  } = useCart();
-
+  } = useCart({ enabled: isAuthenticated || false });
   const cart = cartPayload?.data;
 
   const {

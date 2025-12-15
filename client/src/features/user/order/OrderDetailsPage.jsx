@@ -76,7 +76,6 @@ const OrderDetailsPage = () => {
       order_id: order.payment.razorpayOrderId,
       name: "11jersey.com",
       handler: (paymentResult) => {
-        console.log("paymentResult", paymentResult);
         razorpayVerifyMutation(
           {
             razorpayOrderId: paymentResult.razorpay_order_id,

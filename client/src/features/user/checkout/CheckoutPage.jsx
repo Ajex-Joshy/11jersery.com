@@ -10,6 +10,8 @@ import { useAddresses } from "../address/addressHooks";
 import AddressSelection from "./components/AddressSelection";
 import { CartProductList } from "../cart/components/CartProductList";
 import { OrderSummary } from "../../../components/user/OrderSummary";
+import { selectIsAuthenticated } from "../account/authSlice";
+import { useSelector } from "react-redux";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -34,7 +36,8 @@ const CheckoutPage = () => {
     }
     navigate("/payment", { state: { selectedAddressId } });
   };
-  const { data: cartPayload } = useCart();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const { data: cartPayload } = useCart({ enabled: isAuthenticated || false });
   useEffect(() => {
     const items = cartPayload?.data?.items || [];
     if (items.length === 0) {

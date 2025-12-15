@@ -61,31 +61,3 @@ export const calculateCategoryDiscountRefund = async (order, item) => {
     categoryRefundAmount: Math.round(discountDifference),
   };
 };
-
-// export const calculateCategoryDiscountRefund = async (order, item) => {
-//   let reduceAmount = 0;
-//   const specialDiscount = order?.price?.specialDiscount;
-//   const { categoryId, minPurchaseAmount, discountType, discount, maxRedeemable } =
-//     order?.price?.appliedCategoryOffer;
-//   let items = order.items.filter((i) => i._id !== item._id);
-//   const productIds = items.map((i) => i.productId);
-//   const products = await Product.find({ _id: { $in: productIds } });
-
-//   const { totalAmount } = await buildCategoryTotals(
-//     items,
-//     products,
-//     categoryId
-//   );
-//   console.log(discountType);
-//   if (discountType === "percent") {
-//     console.log(specialDiscount, totalAmount, discount);
-//     reduceAmount = Math.round(specialDiscount - totalAmount * (discount / 100));
-//   }
-//   if (discountType === "flat") {
-//     if (totalAmount < minPurchaseAmount) {
-//       reduceAmount = specialDiscount;
-//     }
-//   }
-
-//   return reduceAmount;
-// };
