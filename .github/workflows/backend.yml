@@ -42,7 +42,6 @@ jobs:
           docker volume prune -f || true
 
           echo "Deploying backend"
-          cd server
 
           docker compose -f docker-compose.prod.yml down
           docker compose -f docker-compose.prod.yml build
