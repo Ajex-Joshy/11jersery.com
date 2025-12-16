@@ -4,7 +4,7 @@ import logger from "./logger.js";
 import { env } from "./env.js";
 
 const redisClient = new IORedis({
-  host: env.REDIS_HOST,
+  host: env.NODE_ENV === "development" ? "127.0.0.1" : env.REDIS_HOST,
   port: env.REDIS_PORT,
 });
 
