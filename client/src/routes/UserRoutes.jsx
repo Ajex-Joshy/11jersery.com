@@ -5,7 +5,7 @@ import React, { Suspense } from "react";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 import ResetPasswordPage from "../features/user/account/components/ResetPasswordPage";
 
-import * as Pages from "./UserLazyPages";
+import * as Pages from "./UserLazyPages.js";
 import { Loader2 } from "lucide-react";
 
 const AppLoader = () => {

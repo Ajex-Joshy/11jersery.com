@@ -17,7 +17,6 @@ const ProductImageDropzone = ({
   error,
   aspect = 1 / 1,
 }) => {
-  console.log(initialImageUrls);
   // Combined state for display: { type: 'initial'|'new', source: string|File, previewUrl: string }
   const [cropModalState, setCropModalState] = useState({
     isOpen: false,
@@ -89,6 +88,7 @@ const ProductImageDropzone = ({
       }
     } else {
       // Re-cropping 'initial' image - add as new file for simplicity
+      toast.dismissAll();
       toast.info("Re-cropped existing image added as a new image.");
       updatedFiles = [...valueFiles, croppedFile];
       if (updatedFiles.length === 1 && initialImageUrls.length === 0) {
@@ -154,6 +154,7 @@ const ProductImageDropzone = ({
       };
       reader.readAsDataURL(fileToRecrop);
     } else {
+      toast.dismissAll();
       toast.info(
         "To re-crop an existing image, please remove it and upload the new version."
       );

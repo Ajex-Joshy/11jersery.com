@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FileText, Loader2 } from "lucide-react";
 import { useDownloadInvoice } from "../../features/user/order/orderHooks";
@@ -9,13 +9,20 @@ const InvoiceDownloadButton = ({
   variant = "default",
 }) => {
   const { mutate: download, isLoading } = useDownloadInvoice();
+  const [downloaded, setDownloaded] = useState(false);
 
   const handleDownload = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isLoading) {
-      download(order);
-    }
+
+    if (isLoading) return;
+
+    download(order, {
+      onSuccess: () => {
+        setDownloaded(true);
+        setTimeout(() => setDownloaded(false), 2000);
+      },
+    });
   };
 
   if (variant === "icon") {
@@ -52,7 +59,11 @@ const InvoiceDownloadButton = ({
       ) : (
         <FileText size={16} />
       )}
-      {isLoading ? "Downloading..." : "Download Invoice"}
+      {isLoading
+        ? "Downloading..."
+        : downloaded
+        ? "Downloaded"
+        : "Download Invoice"}
     </button>
   );
 };

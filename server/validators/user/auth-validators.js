@@ -108,5 +108,5 @@ export const signupSchema = Joi.object({
   //   "string.empty": "Firebase token is required",
   //   "any.required": "Firebase token is required",
   // }),
-  referralCode: Joi.string().max(20).optional(),
+  referralCode: Joi.string().max(20).optional().allow(null, ""),
 });

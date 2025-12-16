@@ -61,7 +61,6 @@ export const useTableParams = ({
   };
 
   const handleSearch = (value) => {
-    // console.log(value);
     updateParams({ search: value, page: "1" });
   };
 

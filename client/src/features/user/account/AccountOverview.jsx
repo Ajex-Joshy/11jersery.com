@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { User, Mail, Phone } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -23,7 +23,6 @@ const getJoinDateFromObjectId = (objectId) => {
       year: "numeric",
     });
   } catch (e) {
-    console.error("Error parsing ObjectId:", e);
     return "N/A";
   }
 };
@@ -38,13 +37,16 @@ const InfoRow = ({ icon: Icon, label, value }) => (
       <Icon size={14} className="mr-2" />
       {label}
     </label>
-    <p className="text-md text-gray-800 ml-[22px]">{value || "Not provided"}</p>
+    <p className="text-md text-gray-800 sm:ml-[22px] ml-0">
+      {value || "Not provided"}
+    </p>
   </div>
 );
 
 const AccountOverview = () => {
   const { data: profilePayload, isLoading, isError, error } = useUserProfile();
   const userFromStore = useSelector(selectCurrentUser);
+  const [copied, setCopied] = useState(false);
 
   if (isLoading) {
     return <LoadingSpinner text="Loading your profile..." />;
@@ -88,7 +90,7 @@ const AccountOverview = () => {
           </div>
 
           {/* Profile Details */}
-          <div className="flex my-auto space-x-10">
+          <div className="flex flex-col gap-4 my-auto sm:flex-row sm:gap-10">
             <InfoRow
               icon={User}
               label="Full Name"
@@ -113,26 +115,34 @@ const AccountOverview = () => {
           <span className="font-semibold">10% discount</span> up to{" "}
           <span className="font-semibold">₹100</span> on your next order.
         </p>
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex flex-col gap-3 mt-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-500">Your Referral Code</p>
-            <p className="text-xl font-bold tracking-widest text-gray-900">
+            <p className="text-lg sm:text-xl font-bold tracking-widest text-gray-900 break-all">
               {user.referralCode}
             </p>
           </div>
 
           <button
+            disabled={copied}
             onClick={() => {
               navigator.clipboard.writeText(
                 `${window.location.origin}/?ref=${user.referralCode}`
               );
+              toast.dismissAll();
               toast.success("Referral link copied!", {
                 duration: 1800,
               });
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
             }}
-            className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-200 active:scale-95 transition-all"
+            className={`w-full sm:w-auto px-4 py-3 text-sm font-semibold border rounded-lg transition-all ${
+              copied
+                ? "bg-green-100 border-green-400 text-green-700 cursor-not-allowed"
+                : "border-gray-300 hover:bg-gray-200 active:scale-95"
+            }`}
           >
-            Copy Link
+            {copied ? "Copied" : "Copy Link"}
           </button>
         </div>
       </div>

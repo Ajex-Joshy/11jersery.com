@@ -265,7 +265,6 @@ const EditProduct = () => {
       { id, formData },
       {
         onError: (err) => {
-          console.error("Error updating product:", err);
           const errorMessage = err?.response?.data?.error.message;
           ("Something went wrong while updating the product.");
           toast.error(errorMessage);
