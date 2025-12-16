@@ -90,6 +90,7 @@ export const useResetPassword = () => {
   return useMutation({
     mutationFn: resetPassword,
     onSuccess: (data) => {
+      toast.dismissAll();
       toast.success(data.message || "Password reset successfully!");
       navigate("/"); // Go to homepage
       openLoginModal(); // Open the login modal

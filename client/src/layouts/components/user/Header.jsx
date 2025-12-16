@@ -15,6 +15,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   const { data: cartPayload } = useCart({ enabled: isAuthenticated || false });
   const cartItems = cartPayload?.data?.items?.length;
@@ -83,6 +84,16 @@ const Header = () => {
             </div>
           </form>
 
+          {/* Mobile Search Icon */}
+          <button
+            type="button"
+            onClick={() => setShowMobileSearch((prev) => !prev)}
+            className="lg:hidden"
+            aria-label="Search"
+          >
+            <Search size={22} />
+          </button>
+
           {renderProtectedIcon(
             <div className="relative">
               <Heart size={22} />
@@ -109,6 +120,27 @@ const Header = () => {
           {renderProtectedIcon(<User />, "/account")}
         </div>
       </nav>
+
+      {showMobileSearch && (
+        <div className="lg:hidden border-t px-4 py-3 bg-white">
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative">
+              <input
+                className="w-full bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm"
+                type="search"
+                placeholder="Search for products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+              />
+              <Search
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+            </div>
+          </form>
+        </div>
+      )}
     </header>
   );
 };

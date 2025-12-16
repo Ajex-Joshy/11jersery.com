@@ -47,6 +47,7 @@ export const useAdminOrderDetails = (orderId) => {
       });
     },
     onSuccess: async () => {
+      toast.dismissAll();
       toast.success("Order cancelled successfully");
       return queryClient.refetchQueries(["adminOrders", String(orderId)], {
         exact: true,
@@ -67,6 +68,7 @@ export const useAdminOrderDetails = (orderId) => {
         );
       },
       onSuccess: async () => {
+        toast.dismissAll();
         toast.success("Item cancelled successfully");
         return queryClient.refetchQueries(["adminOrders", String(orderId)], {
           exact: true,
@@ -136,6 +138,7 @@ export const useApproveReturn = () => {
       await axiosInstance.patch(url);
     },
     onSuccess: () => {
+      toast.dismissAll();
       toast.success("Return approved");
       queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
     },
@@ -155,11 +158,14 @@ export const useRejectReturn = () => {
       await axiosInstance.patch(url, { reason });
     },
     onSuccess: () => {
+      toast.dismissAll();
       toast.success("Return rejected");
       queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
     },
-    onError: (err) =>
-      toast.error(err.response?.data?.error?.message || "Failed to reject"),
+    onError: (err) => {
+      toast.dismissAll();
+      toast.error(err.response?.data?.error?.message || "Failed to reject");
+    },
   });
 };
 
@@ -174,6 +180,7 @@ export const useConfirmReturnReceived = () => {
       await axiosInstance.patch(url);
     },
     onSuccess: () => {
+      toast.dismissAll();
       toast.success("Return receipt confirmed & refunded");
       queryClient.invalidateQueries([ADMIN_RETURNS_KEY]);
     },

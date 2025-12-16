@@ -30,6 +30,7 @@ export const useAddCategory = () => {
   return useMutation({
     mutationFn: addCategory,
     onSuccess: async () => {
+      toast.dismissAll();
       toast.success("Category added successfully!");
 
       await queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
@@ -75,13 +76,15 @@ export const useToggleCategoryList = () => {
           queryClient.setQueryData(key, old);
         });
       }
+      toast.dismissAll();
       toast.error(
-        error.response?.data?.message ||
+        error.response?.data?.error?.message ||
           "Failed to update category status. Rolled back."
       );
     },
 
     onSuccess: (data) => {
+      toast.dismissAll();
       toast.success(data.message || "Category status updated!");
     },
   });
@@ -92,12 +95,13 @@ export const useDeleteCategory = () => {
   return useMutation({
     mutationFn: deleteCategory,
     onSuccess: async (data) => {
+      toast.dismissAll();
       toast.success(data.message || "Category deleted successfully!");
       await queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
     },
     onError: (error) => {
       toast.error(
-        error.response?.data?.message || "Failed to delete category."
+        error.response?.data?.error?.message || "Failed to delete category."
       );
     },
   });
@@ -125,6 +129,7 @@ export const useUpdateCategory = () => {
     mutationFn: updateCategory,
     onSuccess: (data, variables) => {
       // 'variables' holds { slug, formData }
+      toast.dismissAll();
       toast.success(data.message || "Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY] });
       // Invalidate the specific details query using the slug
@@ -134,8 +139,9 @@ export const useUpdateCategory = () => {
       navigate("/admin/categories");
     },
     onError: (error) => {
+      toast.dismissAll();
       toast.error(
-        error.response?.data?.message || "Failed to update category."
+        error.response?.data?.error?.message || "Failed to update category."
       );
     },
   });

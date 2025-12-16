@@ -60,7 +60,6 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Handle blocked user (403)
-    console.log("Error Response:", error.response);
     if (
       error.response?.status === 403 &&
       error.response?.data?.error?.code === "USER_BLOCKED"
@@ -68,7 +67,6 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem("token");
 
       if (clearUserStoreCallback) clearUserStoreCallback();
-
       toast.error(
         error.response?.data?.error?.message ||
           "Your account has been blocked by admin"
@@ -122,6 +120,7 @@ axiosInstance.interceptors.response.use(
 
         if (!isSessionExpiredHandled) {
           isSessionExpiredHandled = true;
+          toast.dismissAll();
           toast.error("Session expired. Please log in again.");
 
           if (clearUserStoreCallback) clearUserStoreCallback();

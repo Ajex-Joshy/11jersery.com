@@ -22,6 +22,7 @@ export const useCreateCoupon = () => {
   return useMutation({
     mutationFn: createCoupon,
     onSuccess: () => {
+      toast.dismissAll();
       toast.success("Coupon created successfully");
       queryClient.invalidateQueries([COUPONS_QUERY_KEY]);
     },

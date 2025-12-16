@@ -120,7 +120,8 @@ const AddProduct = () => {
           setError("title", { type: "manual", message: apiError.message });
         } else {
           toast.error(
-            error.response?.data?.message || "An unexpected error occurred"
+            error.response?.data?.error?.message ||
+              "An unexpected error occurred"
           );
         }
       },

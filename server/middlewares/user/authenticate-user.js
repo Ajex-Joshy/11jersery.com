@@ -12,7 +12,7 @@ export const authenticateUser = async (req, res, next) => {
       throw new AppError(
         STATUS_CODES.UNAUTHORIZED,
         "UNAUTHORIZED",
-        "Please log in to continue."
+        "Please sign in to continue seamlessly."
       );
     }
 

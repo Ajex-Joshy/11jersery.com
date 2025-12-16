@@ -90,12 +90,14 @@ export const useToggleProductList = () => {
       }
 
       toast.error(
-        error.response?.data?.message || "Failed to update product status."
+        error.response?.data?.error?.message ||
+          "Failed to update product status."
       );
     },
 
     // On success, show toast
     onSuccess: (data) => {
+      toast.dismissAll();
       toast.success(data.message || "Product status updated!");
     },
   });
@@ -110,7 +112,9 @@ export const useDeleteProduct = () => {
       await queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to delete product.");
+      toast.error(
+        error.response?.data?.error?.message || "Failed to delete product."
+      );
     },
   });
 };
@@ -127,7 +131,9 @@ export const useAddProduct = () => {
       navigate("/admin/products"); // Navigate to product list
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to add product.");
+      toast.error(
+        error.response?.data?.error?.message || "Failed to add product."
+      );
     },
   });
 };
@@ -151,7 +157,9 @@ export const useUpdateProduct = () => {
       navigate("/admin/products");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update product.");
+      toast.error(
+        error.response?.data?.error?.message || "Failed to update product."
+      );
     },
   });
 };

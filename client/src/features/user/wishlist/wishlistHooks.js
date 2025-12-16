@@ -24,7 +24,9 @@ export const useToggleWishlist = () => {
       queryClient.invalidateQueries({ queryKey: [WISHLIST_KEY] });
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update wishlist");
+      toast.error(
+        error.response?.data?.error?.message || "Failed to update wishlist"
+      );
     },
   });
 };

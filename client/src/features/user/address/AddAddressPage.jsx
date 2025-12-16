@@ -64,7 +64,7 @@ const AddAddressPage = () => {
         {
           onSuccess: () => {
             toast.success("Address updated successfully!");
-            navigate("/account/addresses");
+            navigate(-1);
           },
           onError: (err) => {
             toast.error(

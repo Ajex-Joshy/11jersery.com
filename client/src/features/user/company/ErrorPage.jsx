@@ -6,8 +6,6 @@ const ErrorPage = () => {
   const error = useRouteError(); // This hook gets the error
   const navigate = useNavigate();
 
-  console.error(error);
-
   const errorMessage =
     error?.statusText || error?.message || "An unexpected error occurred.";
   const errorStatus = error?.status || "Error";

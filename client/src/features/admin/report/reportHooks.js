@@ -48,7 +48,6 @@ export const downloadReport = async (params, format) => {
     link.click();
     link.parentNode.removeChild(link);
   } catch (error) {
-    console.error("Download failed", error);
     // You might want to show a toast error here
   }
 };

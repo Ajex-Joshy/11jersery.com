@@ -137,6 +137,7 @@ const AdminOrderDetails = () => {
       await axiosInstance.patch(`/admin/orders/${orderId}/status`, { status });
     },
     onSuccess: () => {
+      toast.dismissAll();
       toast.success("Order status updated");
       queryClient.invalidateQueries(["adminOrders", orderId]);
       setIsEditingStatus(false);

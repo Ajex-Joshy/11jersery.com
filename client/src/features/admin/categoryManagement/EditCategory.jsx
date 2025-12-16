@@ -138,6 +138,7 @@ const EditCategory = () => {
   const onSubmit = (data) => {
     const originalData = categoryDetailsData?.data;
     if (!originalData) {
+      toast.dismissAll();
       toast.error("Original category data not loaded. Cannot update.");
       return;
     }
@@ -254,7 +255,10 @@ const EditCategory = () => {
             // Or similar update error code
             setError("title", { type: "manual", message: apiError.message });
           } else {
-            toast.error(error.response?.data?.message || "Update failed.");
+            toast.dismissAll();
+            toast.error(
+              error.response?.data?.error?.message || "Update failed."
+            );
           }
         },
       }
