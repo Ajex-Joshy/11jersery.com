@@ -67,7 +67,6 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem("token");
 
       if (clearUserStoreCallback) clearUserStoreCallback();
-      toast.dismissAll();
       toast.error(
         error.response?.data?.error?.message ||
           "Your account has been blocked by admin"
