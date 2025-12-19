@@ -53,7 +53,6 @@ export const resetPasswordSchema = Joi.object({
 const nameValidation = (label) =>
   Joi.string()
     .pattern(/^[A-Za-z]+(?:[\s'-][A-Za-z]+)*$/)
-    .min(3)
     .max(30)
     .required()
     .messages({
@@ -66,8 +65,8 @@ const nameValidation = (label) =>
     });
 
 export const signupSchema = Joi.object({
-  firstName: nameValidation("First name"),
-  lastName: nameValidation("Last name"),
+  firstName: nameValidation("First name").min(3),
+  lastName: nameValidation("Last name").min(1),
 
   email: Joi.string().email().required().messages({
     "string.email": "Please provide a valid email address",

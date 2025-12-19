@@ -11,79 +11,171 @@
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Key Features
 
-### User Features:
-
-- **Authentication:** User Signup (with OTP), Login, Forgot Password, Google/Facebook SSO.
-- **Product Discovery:** Homepage, Product Listing with Search, Sort & Filters (Category, Price), Product Details Page with Image Zoom.
-- **Shopping Experience:** Add to Cart, Update Quantity, Remove from Cart, Add/Remove from Wishlist, Move Wishlist Item to Cart.
-- **Promotions:** View Available Coupons, Apply/Remove Coupons from Cart.
-- **Checkout:** Multi-step checkout, Address Management (CRUD), Payment Gateway Integration (Razorpay), Wallet Payment.
-- **Post-Purchase:** Order History, Order Details & Tracking Timeline, Invoice Download, Submit Product Reviews, Cancel/Return Requests.
-- **Account Management:** View/Edit Profile, Change Password, Manage Addresses, View Wallet Balance & Transactions.
-
-### Admin Features:
-
-- **Secure Authentication:** Separate Admin Login.
-- **Dashboard:** Sales analytics, KPIs, best-selling products.
-- **User Management:** View all users, Block/Unblock users, View user details & order history.
-- **Category Management:** CRUD operations, List/Unlist categories.
-- **Product Management:** CRUD operations (including multiple image uploads), List/Unlist products, Manage variants & stock.
-- **Coupon Management:** CRUD operations, Activate/Deactivate coupons.
-- **Order Management:** View all orders, Filter/Search orders, Update order status (Ship, Deliver, etc.), Review/Approve/Reject Cancellation & Return requests.
-- **Transaction Management:** View all payment transactions.
-- **Global Search:** Search across orders, users, products within the admin panel.
+- **AI-powered support agent** built using **LangGraph** for stateful, multi-step conversational workflows
+- **Full observability stack** with **Prometheus (metrics)**, **Grafana (dashboards)**, and **Loki (centralized logging)**
+- Fully **Dockerized services** for consistent development and production environments
+- Frontend data management using **TanStack Query** for caching, synchronization,optimistic updates and performance optimization
+- **CI/CD pipelines implemented using GitHub Actions** for automated build, test, and deployment workflows
+- **Redis** used for caching and performance optimization
+- **Concurrency Control:** Leveraged MongoDB ACID transactions and atomic operations to ensure data integrity during high-concurrency order processing, effectively preventing race conditions and inventory over-selling.
+- **Socket.IO** used for real-time communication with the AI support agent
+- **JWT token blacklisting** for secure logout and compromised token invalidation
 
 ## Technology Stack
 
-- **Frontend:** React, Redux Toolkit, React Router, Axios, Tailwind CSS (or your choice of styling)
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB (with Mongoose)
-- **Authentication:** JWT (JSON Web Tokens), OAuth 2.0 (Passport.js or similar)
-- **Image Management:** Cloudinary, Multer
-- **Payment Gateway:** Razorpay
-- **Real-time Updates (Optional):** Socket.IO (for admin dashboard or notifications)
+### Frontend
+
+- React
+- Redux Toolkit
+- TanStack Query
+- React Router
+- Axios
+- Tailwind CSS
+
+### Backend
+
+- Node.js
+- Express.js
+- MongoDB
+- JWT authentication with token blacklisting
+- Redis (caching)
+- Socket.IO (real-time communication)
+
+### AI & Data
+
+- LangGraph (AI support agent orchestration)
+- Pinecone (vector database)
+
+### Infrastructure & DevOps
+
+- Nginx reverse proxy
+- Docker & Docker Compose
+- AWS EC2 (backend hosting)
+- AWS Amplify (frontend hosting)
+- AWS S3 (image storage)
+- GitHub Actions (CI/CD)
+- Prometheus, Grafana, Loki (observability)
 
 ## Project Structure
 
-The project follows a monorepo structure with separate directories for the backend and frontend.
-
-```plaintext
-11jersey-ecommerce/
-├── server/                 # Backend (Node.js / Express)
-│   ├── config/
-│   ├── controllers/
-│   ├── middlewares/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   ├── utils/
-│   ├── .env.example
+```
+11jersey/
+├── client/                        # Frontend (React + Vite)
+│   ├── public/                    # Static assets
+│   ├── src/
+│   │   ├── api/                   # API clients & service wrappers
+│   │   ├── app/                   # App-level providers & store config
+│   │   ├── components/            # Reusable UI components
+│   │   ├── features/              # Feature-based modules (Redux slices)
+│   │   ├── hooks/                 # Custom React hooks
+│   │   ├── routes/                # Application routing
+│   │   ├── utils/                 # Helper utilities
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── .env.example               # Frontend environment variables
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/
+│   ├── ai/                        # AI support agent
+│   ├── config/                    # Configuration (DB, Redis, S3, etc.)
+│   ├── controllers/               # Request handlers
+│   ├── middlewares/               # Auth, validation, error handling
+│   ├── models/                    # Mongoose schemas & models
+│   ├── routes/                    # API route definitions
+│   ├── services/                  # Business logic & integrations
+│   ├── utils/                     # Shared utilities & helpers
+│   ├── socket/                    # Socket.IO handlers (support agent)
+│   ├── jobs/                      # Background jobs / schedulers
+│   ├── validations/               # Request validation schemas
+│   ├── .env.example               # Backend environment variables
 │   ├── package.json
 │   └── server.js
 │
-└── client/                 # Frontend (React / Redux)
-    ├── public/
-    ├── src/
-    │   ├── api/
-    │   ├── app/
-    │   ├── assets/
-    │   ├── components/
-    │   ├── features/
-    │   ├── hooks/
-    │   ├── pages/
-    │   ├── routes/
-    │   ├── styles/
-    │   ├── utils/
-    │   ├── App.jsx
-    │   └── main.jsx
-    ├── .env.example
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
+├── docker-compose.yml             # Multi-service orchestration
+├── .github/
+│   └── workflows/                # GitHub Actions CI/CD pipelines
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
+
+## Prerequisites
+
+Ensure the following are installed and configured before running the application:
+
+- Node.js (LTS recommended)
+- MongoDB (local or managed instance)
+- Redis
+- Docker & Docker Compose (optional but recommended)
+- AWS account (for S3, EC2, Amplify integrations)
+- Git
+
+## Installation
+
+Clone the repository and install dependencies for both backend and frontend:
+
+```bash
+git clone https://github.com/Ajex-Joshy/11jersery.com.git
+cd 11jersey.com
+```
+
+```bash
+# Backend
+cd server
+npm install
+
+# Frontend
+cd ../client
+npm install
+```
+
+## Environment Variables
+
+Create `.env.development` files using the provided `.env.example` files for both backend and frontend:
+
+- `server/.env.example`
+- `client/.env.example`
+
+## Running the Application
+
+### Development (Local)
+
+```bash
+# Start backend
+cd server
+npm run dev
+```
+
+```bash
+# Start frontend
+cd client
+npm run dev
+```
+
+### Docker (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+## Contributing
+
+Contributions are welcome and appreciated.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit changes following conventional commits
+4. Push to your branch
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

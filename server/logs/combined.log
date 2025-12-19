@@ -170,3 +170,8 @@
 {"level":50,"time":1765697950309,"pid":68556,"hostname":"Ajexs-MacBook-Air.local","msg":"Redis connection error: AggregateError"}
 {"level":50,"time":1765697952315,"pid":68556,"hostname":"Ajexs-MacBook-Air.local","msg":"Redis connection error: AggregateError"}
 {"level":50,"time":1765697954317,"pid":68556,"hostname":"Ajexs-MacBook-Air.local","msg":"Redis connection error: AggregateError"}
+{"level":30,"time":1766067251806,"pid":84795,"hostname":"Ajexs-MacBook-Air.local","msg":"Cron jobs initialized"}
+{"level":30,"time":1766067251833,"pid":84795,"hostname":"Ajexs-MacBook-Air.local","msg":"Connected to Redis successfully"}
+{"level":30,"time":1766067252685,"pid":84795,"hostname":"Ajexs-MacBook-Air.local","msg":"connected to monogoDB successfully"}
+{"level":30,"time":1766067252686,"pid":84795,"hostname":"Ajexs-MacBook-Air.local","msg":"Server started successfully"}
+{"level":30,"time":1766067252829,"pid":84795,"hostname":"Ajexs-MacBook-Air.local","msg":"joined room room_guest_e7ef5e82-ad56-4d0c-be42-cf7f216da789"}

@@ -1,5 +1,5 @@
 // src/features/auth/components/SignupForm.jsx
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
@@ -7,7 +7,7 @@ import { useSignup } from "../authHooks";
 import { setAuthModalView } from "../authSlice";
 import { signupSchema } from "./authSchemas";
 import { FormInput } from "../../../../components/common/FormComponents";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
 // import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
@@ -24,9 +24,9 @@ const SignupForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-    trigger,
-    getValues,
-    setError,
+    // trigger,
+    // getValues,
+    // setError,
   } = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {},

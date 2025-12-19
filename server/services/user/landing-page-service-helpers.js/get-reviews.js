@@ -9,7 +9,6 @@ const buildReviewQuery = ({ productId, minRating = 3.5 } = {}) => {
 };
 
 export const getPaginatedReviews = async ({
-  productId,
   page = 1,
   limit = 5,
   minRating,

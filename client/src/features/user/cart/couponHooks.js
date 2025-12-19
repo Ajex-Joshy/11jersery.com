@@ -7,7 +7,7 @@ export const useApplyCoupon = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: applyCouponCode,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Coupon applied!");
       queryClient.invalidateQueries([CART_KEY]);
     },

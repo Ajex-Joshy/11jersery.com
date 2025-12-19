@@ -22,7 +22,7 @@ const getJoinDateFromObjectId = (objectId) => {
       month: "short",
       year: "numeric",
     });
-  } catch (e) {
+  } catch {
     return "N/A";
   }
 };
