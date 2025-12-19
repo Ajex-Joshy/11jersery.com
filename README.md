@@ -17,7 +17,6 @@
 ## Key Features
 
 - **AI-powered support agent** built using **LangGraph** for stateful, multi-step conversational workflows
-- **Full observability stack** with **Prometheus (metrics)**, **Grafana (dashboards)**, and **Loki (centralized logging)**
 - Fully **Dockerized services** for consistent development and production environments
 - Frontend data management using **TanStack Query** for caching, synchronization,optimistic updates and performance optimization
 - **CI/CD pipelines implemented using GitHub Actions** for automated build, test, and deployment workflows
@@ -59,7 +58,6 @@
 - AWS Amplify (frontend hosting)
 - AWS S3 (image storage)
 - GitHub Actions (CI/CD)
-- Prometheus, Grafana, Loki (observability)
 
 ## Project Structure
 
