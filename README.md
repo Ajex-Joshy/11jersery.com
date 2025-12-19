@@ -19,7 +19,7 @@
 - **AI-powered support agent** built using **LangGraph** for stateful, multi-step conversational workflows
 - **Full observability stack** with **Prometheus (metrics)**, **Grafana (dashboards)**, and **Loki (centralized logging)**
 - Fully **Dockerized services** for consistent development and production environments
-- Frontend data management using **TanStack Query** for caching, synchronization, and performance optimization
+- Frontend data management using **TanStack Query** for caching, synchronization,optimistic updates and performance optimization
 - **CI/CD pipelines implemented using GitHub Actions** for automated build, test, and deployment workflows
 - **Redis** used for caching and performance optimization
 - **Concurrency Control:** Leveraged MongoDB ACID transactions and atomic operations to ensure data integrity during high-concurrency order processing, effectively preventing race conditions and inventory over-selling.

@@ -24,12 +24,12 @@ export const signupSchema = z
     firstName: z
       .string()
       .trim()
-      .min(2, { message: "First name must be at least 2 characters" })
+      .min(3, { message: "First name must be at least 2 characters" })
       .max(30, { message: "First name must be at most 30 characters" }),
     lastName: z
       .string()
       .trim()
-      .min(2, { message: "Last name must be at least 2 characters" })
+      .min(1, { message: "Last name must be at least 2 characters" })
       .max(30, { message: "Last name must be at most 30 characters" }),
     email: z
       .string()

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../../api/axiosInstance";
-
+import { toast } from "react-hot-toast";
 export const SALES_REPORT_KEY = "salesReport";
 
 /**
@@ -48,6 +48,9 @@ export const downloadReport = async (params, format) => {
     link.click();
     link.parentNode.removeChild(link);
   } catch (error) {
-    // You might want to show a toast error here
+    toast.error(
+      error?.response?.data?.error?.message ||
+        "Failed to download sales report. Please try again."
+    );
   }
 };

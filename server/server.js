@@ -17,7 +17,6 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import { initializeSocket } from "./socket/socketHandler.js";
-import e from "express";
 
 const app = express();
 

@@ -43,6 +43,8 @@ export const creditWallet = async (
   orderId,
   paymentMethod
 ) => {
+  if (amount <= 0)
+    throw new Error("Amount to credit must be greater than zero");
   const user = await User.findById(userId).select("wallet");
   user.wallet += amount;
   await user.save();

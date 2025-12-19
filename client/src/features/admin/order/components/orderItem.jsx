@@ -6,6 +6,7 @@ import {
   PackageCheck,
   AlertTriangle,
 } from "lucide-react";
+import { formatCurrency } from "../../../../../../server/utils/currency";
 
 export const OrderItem = ({
   item,
@@ -64,7 +65,7 @@ export const OrderItem = ({
             </p>
           </div>
           <p className="font-medium text-sm text-gray-900">
-            ₹{item.salePrice?.toLocaleString()}
+            {formatCurrency(item.salePrice)}
           </p>
         </div>
 

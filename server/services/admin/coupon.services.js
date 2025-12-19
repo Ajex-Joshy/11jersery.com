@@ -13,7 +13,7 @@ export const createCoupon = async (couponData) => {
     throw createError(400, "Expiry date must be after start date");
   }
 
-  if (couponData.discountValue) {
+  if (couponData.discountValue && couponData.discountType === "FIXED") {
     couponData.discountValue = toPaise(couponData.discountValue);
   }
   if (couponData.minPurchaseAmount) {
@@ -86,7 +86,7 @@ export const updateCoupon = async (couponId, updateData) => {
     if (duplicate) throw createError(409, "Coupon code already exists");
   }
 
-  if (updateData.discountValue) {
+  if (updateData.discountValue && updateData.discountType === "FIXED") {
     updateData.discountValue = toPaise(updateData.discountValue);
   }
 

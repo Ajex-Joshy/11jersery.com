@@ -125,7 +125,7 @@ export const useProcessOrder = () => {
             razor.open();
             setIsProcessing(false);
           },
-          onError: (err) => {
+          onError: () => {
             setIsProcessing(false);
             toast.error("Unable to initiate Razorpay payment");
           },

@@ -2,10 +2,10 @@ import User from "../../models/user.model.js";
 
 import {
   AppError,
-  buildUserQuery,
+  // buildUserQuery,
   getDaysAgoDate,
-  getPagination,
-  getSortOption,
+  // getPagination,
+  // getSortOption,
 } from "../../utils/helpers.js";
 import {
   calcPercentageChange,
@@ -20,12 +20,12 @@ import { STATUS_CODES } from "../../utils/constants.js";
 
 export const getUsers = async (queryParams) => {
   const {
-    page = 1,
-    limit = 10,
-    status,
-    search = "",
-    sortBy = "createdAt",
-    sortOrder = "desc",
+    // page = 1,
+    // limit = 10,
+    // status,
+    // search = "",
+    // sortBy = "createdAt",
+    // sortOrder = "desc",
   } = queryParams;
 
   // const query = buildUserQuery({ status, search });
