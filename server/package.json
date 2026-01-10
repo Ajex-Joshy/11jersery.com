@@ -50,7 +50,7 @@
     "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
     "keycloak-connect": "^26.1.1",
-    "langchain": "^1.1.4",
+    "langchain": "^1.2.2",
     "mongodb": "^7.0.0",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
